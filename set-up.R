@@ -2,18 +2,14 @@
 ## PACKAGES ##
 ##############
 
-library("shiny")
-library("shinydashboard")
-library("shinycssloaders")  # enables loading signs
-library("markdown")  # enables markdown format
-library("DT")
+if(!require("shiny")) install.packages("shiny")  
+if(!require("shinydashboard")) install.packages("shinydashboard")  
+if(!require("shinycssloaders")) install.packages("shinycssloaders")  
+if(!require("markdown")) install.packages("markdown")  
+if(!require("markdown")) install.packages("markdown")  
+if(!require("DT")) install.packages("DT")  
+if(!require("tidyverse")) install.packages("tidyverse") 
 
-
-# library("ggforce")  # geom_circle
-# library("ggpubr")  # ggarrange
-library("tidyverse")
-# library("document")
-# library("scales")  # scientif number format
 
 
 ##################
