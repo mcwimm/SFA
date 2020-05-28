@@ -4,6 +4,7 @@
 
 install.packages("shiny")
 install.packages("shinydashboard")
+library("shinydashboard")
 install.packages("shinycssloaders")  # enables loading signs
 install.packages("markdown")  # enables markdown format
 install.packages("DT")
