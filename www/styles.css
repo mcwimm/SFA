@@ -1,0 +1,29 @@
+.shiny-notification {
+    position: fixed;
+    top: 60px;
+    left: 240px;
+    font-size: 2rem;
+    opacity: 1 !important;
+    white-space: nowrap;
+    padding: 2rem 3rem;
+}
+.shiny-notification-close {
+    float: right;
+    font-weight: bold;
+    font-size: 18px;
+    bottom: 9px;
+    position: relative;
+    padding-left: 4px;
+    color: #444;
+    cursor: default;
+    position: absolute;
+    right: 8px;
+    top: 2px;
+}
+body > .wrapper{
+    overflow: initial;
+}
+body > .wrapper > header{
+    position: sticky;
+    top: 0
+}
