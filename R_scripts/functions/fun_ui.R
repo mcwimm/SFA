@@ -67,26 +67,20 @@ settingsOutput = function(){
       box(title = "Project",
           status = "warning", solidHeader = F, #height = 300,
           collapsible = T,
-          checkboxInput("prjNew", "Create new project", T),
-          textInput("prjName", "Project name",
-                    placeholder = "avoid white spaces"),
-          br(), 
-          actionButton("setProject", "Set project",
-                       icon("folder-plus")),
+          
+          p("Please select a current project or create a new folder:"),
+          
+          shinyDirButton('folder', 
+                         'Folder select', 
+                         'Please select a folder', 
+                         # multiple = FALSE,
+                         style = buttonStyles("orange"),
+                         icon("folder-open")),
           
           br(), br(),
           verbatimTextOutput("prj"),
           h4("Current project"),
-          verbatimTextOutput("prjName"),
-          
-          
-          tags$hr(),
-          h4("Existing projects"),
-          actionButton("UpdatePrjFolder", "Update list",
-                       icon("folder-open")),
-          br(), br(),
-          output.table("prjFolder"),
-          
+          verbatimTextOutput("prjName")
       ),
       box(title = "Wood properties",
           status = "warning",
@@ -117,7 +111,7 @@ box.dat_upl.upload = function(){
       selectInput("inputType", "Input file type/ manufacturer",
                   c("ICT_raw" = "ICT_raw", 
                     "ICT_delta" = "ICT_delta")),
-      br(),
+      br(), 
       # Input: Select a file ----
       fileInput("file1", "Choose CSV File",
                 multiple = F,
@@ -246,6 +240,14 @@ sfIndexOutput <- function(){
 
 buttonStyles = function(type = "blue"){
    if (type == "blue")
+   {
+      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+   }
+   if (type == "orange")
+   {
+      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+   }
+   if (type == "green")
    {
       return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
    }
