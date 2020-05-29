@@ -3,16 +3,15 @@ shinyServer(function(input, output) {
     # define output directory
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
-    projectName <- reactive({
+    projectPath <- reactive({
         parseDirPath(c(wd='.'), input$folder)
     })
 
-    fileName <- reactive({
-        fn = unlist(strsplit(as.character(input$file1), "\\."))[1]
-        return(fn)
+    projectName <- reactive({
+        return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
     })
     
-
+    
     ### data handling ###
     
     rawData <- reactive({
@@ -68,8 +67,8 @@ shinyServer(function(input, output) {
         print(depths())
     })
     
-    output$prjName <- renderPrint({
-        print(projectName())
+    output$prjDir <- renderPrint({
+        print(projectPath())
     })
     
     
@@ -77,48 +76,76 @@ shinyServer(function(input, output) {
     #### Buttons ####
     #################
     
+    
+    ### Settings ###
+    
+    observeEvent(input$crtPrj, {
+        if (!isTruthy(input$folder)){
+            showNotification("Please choose a directory first!",
+                             type = "error")
+        } else{
+            req(input$folder)
+            csvPath = paste(projectPath(),
+                            "/csv-files/", sep = "")
+            figPath = paste(projectPath(),
+                            "/graphics/", sep = "")
+            if (!dir.exists(csvPath)){
+                dir.create(csvPath)
+            }
+            if (!dir.exists(figPath)){
+                dir.create(figPath)
+            }
+            showNotification("Project set successfully!",
+                             type = "message")
+        }
+        
+    })
+    
     ### DATA ###
     
     observeEvent(input$save_dat_upl, {
         csvObject = deltaTempLong()
-        path = paste(projectName(), "/temperatureDifferences_longFormat", sep = "")
+        path = paste(projectPath(), 
+                     "/csv-files/",
+                     "temperatureDifferences_longFormat", sep = "")
         save.csv(path, csvObject)
 
     })
     
     observeEvent(input$save.deltaTfacetWrap, {
-        name = paste("./output/", projectName(),
+        name = paste(projectPath(),
                      "/graphics/",
                      "temperatureDifferences", sep = "")
         obj = plot.deltaTfacetWrap(deltaTempLong(), 
                                    input$rawPlot.x, input$rawPlot.y,
                                    input$rawPlot.scales,
-                                   fileName())
+                                   projectName())
         save.figure(name, obj,
                     input$figFor)
     })
     
+    ### Sap flow
     observeEvent(input$save.sfIndex, {
-        name = paste("./output/", projectName(),
+        name = paste(projectPath(),
                      "/graphics/",
                      "sapFlowIndexComplete", sep = "")
         obj = plot.sapFlowIndex(deltaTempLong(), 
                                 input$sfIndexPlot.y, 
                                 input$sfIndexPlot.scales,
-                                fileName())
+                                projectName())
         save.figure(name, obj,
                     input$figFor)
     })
     
     observeEvent(input$save.sfIndex.day, {
-        name = paste("./output/", projectName(),
+        name = paste(projectPath(),
                      "/graphics/",
                      "sapFlowIndexDaily", sep = "")
         obj = plot.sapFlowIndex.Day(deltaTempLong(), 
                                     input$sfIndexPlot.x, 
                                     input$sfIndexPlot.y, 
                                     input$sfIndexPlot.scales,
-                                    fileName())
+                                    projectName())
         save.figure(name, obj,
                     input$figFor)
     })
@@ -133,14 +160,14 @@ shinyServer(function(input, output) {
     output$rawPlot <- renderPlot({
         d = deltaTempLong()
         plot.deltaTemperature(d,
-                          input$rawPlot.y, fileName())
+                          input$rawPlot.y, projectName())
     })
     
     output$deltaTfacetWrap <- renderPlot({
         plot.deltaTfacetWrap(deltaTempLong(), 
                              input$rawPlot.x, input$rawPlot.y, 
                              input$rawPlot.scales,
-                             fileName())
+                             projectName())
     })
     
     ### SAP FLOW INDEX
@@ -149,7 +176,7 @@ shinyServer(function(input, output) {
         plot.sapFlowIndex(deltaTempLong(), 
                           input$sfIndexPlot.y, 
                           input$sfIndexPlot.scales,
-                          fileName())
+                          projectName())
     })
     
     output$sapFlowIndex.Day <- renderPlot({
@@ -157,6 +184,6 @@ shinyServer(function(input, output) {
                               input$sfIndexPlot.x, 
                               input$sfIndexPlot.y, 
                               input$sfIndexPlot.scales,
-                              fileName())
+                              projectName())
     })
 })

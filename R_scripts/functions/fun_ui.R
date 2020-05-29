@@ -76,11 +76,13 @@ settingsOutput = function(){
                          # multiple = FALSE,
                          style = buttonStyles("orange"),
                          icon("folder-open")),
-          
+          actionButton("crtPrj", "Create/set project",
+                       style = buttonStyles("blue"),
+                       icon("broom")),
           br(), br(),
           verbatimTextOutput("prj"),
-          h4("Current project"),
-          verbatimTextOutput("prjName")
+          h4("Current project directory"),
+          verbatimTextOutput("prjDir")
       ),
       box(title = "Wood properties",
           status = "warning",
