@@ -74,13 +74,14 @@ settingsOutput = function(){
                          'Folder select', 
                          'Please select a folder', 
                          # multiple = FALSE,
-                         style = buttonStyles("orange"),
+                         style = buttonStyles("red"),
                          icon("folder-open")),
           actionButton("crtPrj", "Create/set project",
                        style = buttonStyles("blue"),
                        icon("broom")),
           br(), br(),
-          verbatimTextOutput("prj"),
+          h4("Current project"),
+          verbatimTextOutput("prjName"),
           h4("Current project directory"),
           verbatimTextOutput("prjDir")
       ),
@@ -245,13 +246,13 @@ buttonStyles = function(type = "blue"){
    {
       return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
    }
-   if (type == "orange")
+   if (type == "red")
    {
-      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      return("color: #fff; background-color: #cc0000; border-color: #990000")
    }
    if (type == "green")
    {
-      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      return("color: #fff; background-color: #42C728; border-color: #38A822")
    }
 }
 

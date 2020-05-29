@@ -1,4 +1,4 @@
-var setProjectButton = document.getElementById('setProject'),
+var setProjectButton = document.getElementById('crtPrj'),
 	projectContainer = document.createElement('span'),
 	nav = document.querySelector('.navbar-static-top');
 
@@ -8,11 +8,11 @@ projectContainer.textContent = 'Project: -';
 nav.appendChild(projectContainer);
 
 function showProjectInHeader() {
-	var prjName = document.getElementById('prjName').value;
+	var prjName = document.getElementById('prjName').textContent;
 
 	projectContainer.textContent = 'Project: ' + prjName;
 }
 
-window.addEventListener('load',function(){ 
+window.addEventListener('load', function(){ 
 	setProjectButton.addEventListener('click', showProjectInHeader);
 });

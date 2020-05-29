@@ -179,7 +179,8 @@ get.delta.temp = function(rawData, depths){
    delta.temp = do.call(rbind, 
            lapply(depths, function(x)
               cbind(depth = x, 
-                    get.delta.temp.depth(rawData = rawData, depth = x))))
+                    get.delta.temp.depth(rawData = rawData, 
+                                         depth = x))))
    
    delta.temp$dTime = convertTimeToDeci(as.character(rawData$Time))
    delta.temp$doy <- strftime(rawData$datetime, format = "%j")
