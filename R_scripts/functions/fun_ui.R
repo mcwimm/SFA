@@ -203,6 +203,27 @@ dataViewOutput = function(){
    ))   
 }
 
+######### K-value estimation ###
+
+kValueOutput <- function(){
+   return(list(
+      box(title = "Settings",
+          collapsible = T, #width = 8,
+          status = "warning",
+          sliderInput("depthSelect", "Depth", 1, 10, 1),
+          selectInput("kMethod", "Method",
+                      choices = c("manual" = "manual",
+                                  "closest" = "closest",
+                                  "regression" = "regression")),
+          actionButton("setK", "Set k-value",
+                       style = buttonStyles("red"),
+                       icon("check-circle"))),
+      box(title = "Figures",
+          collapsible = T,
+          status = "info")
+   ))
+}
+
 ######### Sap Flow Index ###
 
 sfIndexOutput <- function(){

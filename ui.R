@@ -30,6 +30,9 @@ shinyUI(
                 tabItem(tabName = "k_des",
                         includeMarkdown("./man/des_k-value.md")),
                 
+                tabItem(tabName = "k_est",
+                        kValueOutput()),
+                
                 tabItem(tabName = "sf_ind",
                         sfIndexOutput()
                 )
