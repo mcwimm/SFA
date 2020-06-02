@@ -1,5 +1,5 @@
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     # define output directory
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
@@ -23,15 +23,23 @@ shinyServer(function(input, output) {
     
     deltaTempLong <- reactive({
         if (input$inputType == "ICT_raw"){
-            return(get.delta.from.temp(rawData(), depths()))
+            d = get.delta.from.temp(rawData(), depths())
         }
         if (input$inputType == "ICT_delta"){
-            return(get.delta.temp(rawData(), depths()))
+            d = get.delta.temp(rawData(), depths())
         }
+        
+        # if (!is.null(input$daterange)){
+        #     req(input$updateTime)
+        #     print("Inside if daterange")
+        #     print(input$daterange[1])
+        #     d = d %>%
+        #         filter(Date >= input$daterange[1]) %>%
+        #         filter(Date <= input$daterange[2])
+        # }
+        return(d)
     })
     
-
-
     depths <- reactive({
         return(get.depths(depthManual = input$depthManual,
                           inputType = input$inputType,
@@ -39,7 +47,28 @@ shinyServer(function(input, output) {
                           depthInput = input$depthInput))
     })
     
+    ### data file insights for ui ###
+
+    minMaxDatetime <- reactive({
+        # d = deltaTempLong()
+        d = rawData()
+        minDate = as.Date(d[which.min(as.POSIXct(d$datetime)),
+                            "datetime"])
+        maxDate = as.Date(d[which.max(as.POSIXct(d$datetime)),
+                            "datetime"])
+        print(c(minDate, maxDate))
+        return(c(minDate, maxDate))
+    })
     
+    observe({
+        req(input$getTimeRange)
+
+        updateDateRangeInput(session, "daterange",
+                             start = minMaxDatetime()[1],
+                             end = minMaxDatetime()[2],
+                             min = minMaxDatetime()[1],
+                             max = minMaxDatetime()[2])
+    })
     
     ############################
     ##### Table outputs ########
@@ -98,6 +127,10 @@ shinyServer(function(input, output) {
             showNotification("Project set successfully!",
                              type = "message")
         }
+        
+        output$prjName <- renderPrint({
+            print(projectName())
+        })
         
     })
     

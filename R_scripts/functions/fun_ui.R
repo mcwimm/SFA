@@ -171,10 +171,20 @@ dataUplOutput = function(){
                      output.table("raw.wide")),
             tabPanel("long", br(),
                      output.table("raw.long")))),
-      box(title = "Sensor depths",
+      box(title = "Other",
           collapsible = T,
           status = "info",
-          box.dat_upl.depths())
+          h4("Sensor depths"),
+          box.dat_upl.depths(),
+          tags$hr(),
+          h4("Subset data"),
+          actionButton("getTimeRange", "Get time",
+                       icon("broom")),
+          dateRangeInput("daterange", "Date range:"),
+          actionButton("updateTime", "Update time",
+                       icon("broom"))
+          
+      )
       
    ))
 }
