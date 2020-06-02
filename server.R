@@ -3,8 +3,16 @@ shinyServer(function(input, output, session) {
     # define output directory
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
+    
     projectPath <- reactive({
-        parseDirPath(c(wd='.'), input$folder)
+        if (is.null(input$folder)){
+            print("No project path selected!")
+            tempdir()
+            
+        } else {
+            parseDirPath(c(wd='.'), input$folder)
+            
+        }
     })
 
     projectName <- reactive({
@@ -28,15 +36,18 @@ shinyServer(function(input, output, session) {
         if (input$inputType == "ICT_delta"){
             d = get.delta.temp(rawData(), depths())
         }
+        # print(as.Date(input$daterange[1]) - 1)
+        # print(as.Date(input$daterange[2]) + 1)
+        # 
+        # print(paste("Nrow before:  ", nrow(d)))
+        # 
+        # d = d[which(as.POSIXct(d$datetime) > as.Date(input$daterange[1]) - 1  &
+        #                 as.POSIXct(d$datetime) < as.Date(input$daterange[2]) + 1), ]
+        # print(paste("Nrow after:  ", nrow(d)))
+        # 
+        # print(paste("Nrow before:  ", nrow(d)))
         
-        # if (!is.null(input$daterange)){
-        #     req(input$updateTime)
-        #     print("Inside if daterange")
-        #     print(input$daterange[1])
-        #     d = d %>%
-        #         filter(Date >= input$daterange[1]) %>%
-        #         filter(Date <= input$daterange[2])
-        # }
+        
         return(d)
     })
     
@@ -70,6 +81,48 @@ shinyServer(function(input, output, session) {
                              max = minMaxDatetime()[2])
     })
     
+    # observeEvent(input$updateTime, {
+    #     d = deltaTempLong()
+    #     print(paste("Nrow after:  ", nrow(d)))
+    #     print(head(d))
+    # })
+    
+    
+    minMaxDepth <- reactive({
+        d = depths()
+        return(list(min(d), max(d)))
+    })
+    
+    observe({
+       
+        if (!is.null(input$file1)){
+            minMaxDepth = minMaxDepth()
+            print(minMaxDepth)
+            updateSliderInput(session, "kDepthSelect",
+                              value = minMaxDepth[1],
+                              min = minMaxDepth[1],
+                              max = minMaxDepth[2], 
+                              step = 1)
+        } else {
+            updateSliderInput(session, "kDepthSelect",
+                              value = 1,
+                              min = 1,
+                              max = 10, 
+                              step = 1)
+        }
+    })
+    
+    ### cleaned data
+    
+    cleanedDataAndKvalues <- reactive({
+        d = deltaTempLong() %>% 
+            filter(depth == input$kDepthSelect)
+        data.adj = clean.data.iteration(d, 0)
+        
+        return(data.adj)
+    }) 
+    
+    
     ############################
     ##### Table outputs ########
     ############################
@@ -86,6 +139,11 @@ shinyServer(function(input, output, session) {
     output$prjFolder <- DT::renderDataTable({ # raw data
         return(prjFolderList())
     }, options = list(scrollX = TRUE))
+    
+    
+    ### k-values ###
+    
+    
     
     #####################
     #### Text output ####
@@ -139,7 +197,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save_dat_upl, {
         csvObject = deltaTempLong()
         path = paste(projectPath(), 
-                     "/csv-files/",
+                    "/csv-files/",
                      "temperatureDifferences_longFormat", sep = "")
         save.csv(path, csvObject)
 
@@ -157,7 +215,46 @@ shinyServer(function(input, output, session) {
                     input$figFor)
     })
     
-    ### Sap flow
+    
+    ### K estimation ###
+    
+    observeEvent(input$setK, {
+        kAs <- cleanedDataAndKvalues()[[2]]
+        kSa <- cleanedDataAndKvalues()[[3]]
+        csvObject = data.frame(depth = input$kDepthSelect,
+                       kAs = kAs[[1]],
+                       rAs = kAs[[2]],
+                       kSa = kSa[[1]],
+                       rSa = kSa[[2]],
+                       kAvg = (mean(c(abs(kAs[[1]]), abs(kSa[[1]]))))
+                       )
+        print(csvObject)
+        path = paste(projectPath(), 
+                     "/csv-files/",
+                     "k_", input$kDepthSelect, sep = "")
+        print(path)
+        
+        save.csv(path, csvObject)
+        
+    })
+    
+    observeEvent(input$save.kValues, {
+        path = paste(projectPath(), 
+                     "/csv-files", sep = "")
+        csvObject = get.existingKvalues(path)
+        save.csv(paste(path, "/k-values", sep = ""), csvObject)
+    })
+    
+    observeEvent(input$update.Kvalues, {
+        output$existingKvalues <- DT::renderDataTable({
+            path = paste(projectPath(), 
+                         "/csv-files", sep = "")
+            return(get.existingKvalues(path)[, -1]  %>% 
+                       round(., 2))
+        }, options = list(scrollX = TRUE))
+    })
+    
+    ### Sap flow ###
     observeEvent(input$save.sfIndex, {
         name = paste(projectPath(),
                      "/graphics/",
@@ -203,6 +300,18 @@ shinyServer(function(input, output, session) {
                              projectName())
     })
     
+    ### K-VALUE ESTIMATION
+    
+    output$kvaluePlot1 <- renderPlot({
+        d = deltaTempLong() %>% 
+            filter(depth == input$kDepthSelect)
+        plot.kEst1(d, cleanedDataAndKvalues()[[1]],
+                   input$k1Plot.x[1], input$k1Plot.x[2])
+
+    })
+    
+    
+    
     ### SAP FLOW INDEX
     
     output$sapFlowIndex <- renderPlot({
@@ -219,4 +328,6 @@ shinyServer(function(input, output, session) {
                               input$sfIndexPlot.scales,
                               projectName())
     })
+    
+    
 })

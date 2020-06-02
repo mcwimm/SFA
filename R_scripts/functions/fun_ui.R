@@ -178,6 +178,7 @@ dataUplOutput = function(){
           box.dat_upl.depths(),
           tags$hr(),
           h4("Subset data"),
+          p("NOT WORKING!!!", style = "color:red"),
           actionButton("getTimeRange", "Get time",
                        icon("broom")),
           dateRangeInput("daterange", "Date range:"),
@@ -220,17 +221,52 @@ kValueOutput <- function(){
       box(title = "Settings",
           collapsible = T, #width = 8,
           status = "warning",
-          sliderInput("depthSelect", "Depth", 1, 10, 1),
+          sliderInput("kDepthSelect", "Depth", 1, 10, 1),
           selectInput("kMethod", "Method",
                       choices = c("manual" = "manual",
                                   "closest" = "closest",
                                   "regression" = "regression")),
+          
+          sliderInput("k1Plot.x", "x-range",
+                      min = -10, max = 10, step = 0.5,
+                      value = c(-2, 2)),
+          # sliderInput("k1Plot.y", "y-range",
+          #             min = -10, max = 10, step = 0.5,
+          #             value = c(-2, 2)),
+          sliderInput("kDepthSelect", "Depth", 1, 1, 10, 1),
+          
           actionButton("setK", "Set k-value",
                        style = buttonStyles("red"),
-                       icon("check-circle"))),
+                       icon("check-circle")),
+          actionButton("save.kValues", "Save csv",
+                       style = buttonStyles("blue"),
+                       icon("check-circle"))
+          ),
       box(title = "Figures",
           collapsible = T,
-          status = "info")
+          status = "info",
+          tabsetPanel(
+             tabPanel("Plot1", br(),
+                      output.figure("kvaluePlot1")),
+             tabPanel("Plot2", br(),
+                      # output.figure("kvaluePlot2"))
+             ))
+          ),
+      box(title = "K-values",
+          collapsible = T,
+          status = "info",
+          tabsetPanel(
+             tabPanel("Automatic", br(),
+                      actionButton("update.Kvalues", "Update list",
+                                   style = buttonStyles("green"),
+                                   icon("broom")),  
+                      output.table("existingKvalues")),
+             tabPanel("Manual", br()),
+                      # output.figure("kvaluePlot2"))
+             tabPanel("Read csv", br())
+             )
+          
+          )
    ))
 }
 

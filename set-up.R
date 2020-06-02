@@ -9,6 +9,7 @@ if(!require("shinyFiles")) install.packages("shinyFiles")
 if(!require("markdown")) install.packages("markdown")  
 if(!require("DT")) install.packages("DT")  
 if(!require("tidyverse")) install.packages("tidyverse") 
+if(!require("ggpubr")) install.packages("ggpubr") # draw regression line in ggplot
 
 
 
