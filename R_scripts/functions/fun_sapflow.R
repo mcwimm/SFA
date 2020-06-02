@@ -97,6 +97,19 @@ clean.data.iteration = function(data, initial.cutoff){
    return(list(data, K.dTas, K.dTsa))
 }
 
+get_min_at_min <- function(vec1, vec2) {
+   return(vec2[order(vec1, vec2)[1]])
+}
+
+get.closestKvalues <- function(data){
+
+   return(data %>% 
+      group_by(depth) %>% 
+      summarise("Min dTsym.dTas" = min(dTsym.dTas),
+                "K" = get_min_at_min(dTsym.dTas, dTas)))
+   
+}
+
 get.existingKvalues <- function(path){
    files = list.files(path = path, pattern = "k_")
    

@@ -1,8 +1,9 @@
 ######## GENERAL ###########
 
 output.table = function(outputID){
-   return(DT::dataTableOutput(outputID) %>% 
-             withSpinner(color="#0dc5c1"))
+   return(list(br(), 
+          DT::dataTableOutput(outputID) %>% 
+             withSpinner(color="#0dc5c1")))
 }
 
 output.figure = function(outputID){
@@ -263,7 +264,15 @@ kValueOutput <- function(){
                       output.table("existingKvalues")),
              tabPanel("Manual", br()),
                       # output.figure("kvaluePlot2"))
-             tabPanel("Read csv", br())
+             tabPanel("Closest",
+                      output.table("kClosest")),
+             tabPanel("Read csv", br(),
+                      fileInput("file2", "Choose CSV File",
+                                multiple = F,
+                                accept = c("text/csv",
+                                           "text/comma-separated-values,text/plain",
+                                           ".csv")),
+                      output.table("uploadedKvalues"))
              )
           
           )

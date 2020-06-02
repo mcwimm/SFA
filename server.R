@@ -5,14 +5,7 @@ shinyServer(function(input, output, session) {
                    roots=c(wd='.'), filetypes=c('', 'txt'))
     
     projectPath <- reactive({
-        if (is.null(input$folder)){
-            print("No project path selected!")
-            tempdir()
-            
-        } else {
-            parseDirPath(c(wd='.'), input$folder)
-            
-        }
+        parseDirPath(c(wd='.'), input$folder)
     })
 
     projectName <- reactive({
@@ -88,29 +81,29 @@ shinyServer(function(input, output, session) {
     # })
     
     
-    minMaxDepth <- reactive({
-        d = depths()
-        return(list(min(d), max(d)))
-    })
-    
-    observe({
-       
-        if (!is.null(input$file1)){
-            minMaxDepth = minMaxDepth()
-            print(minMaxDepth)
-            updateSliderInput(session, "kDepthSelect",
-                              value = minMaxDepth[1],
-                              min = minMaxDepth[1],
-                              max = minMaxDepth[2], 
-                              step = 1)
-        } else {
-            updateSliderInput(session, "kDepthSelect",
-                              value = 1,
-                              min = 1,
-                              max = 10, 
-                              step = 1)
-        }
-    })
+    # minMaxDepth <- reactive({
+    #     d = depths()
+    #     return(list(min(d), max(d)))
+    # })
+    # 
+    # observe({
+    #    
+    #     if (!is.null(input$file1)){
+    #         minMaxDepth = minMaxDepth()
+    #         print(minMaxDepth)
+    #         updateSliderInput(session, "kDepthSelect",
+    #                           value = minMaxDepth[1],
+    #                           min = minMaxDepth[1],
+    #                           max = minMaxDepth[2], 
+    #                           step = 1)
+    #     } else {
+    #         updateSliderInput(session, "kDepthSelect",
+    #                           value = 1,
+    #                           min = 1,
+    #                           max = 10, 
+    #                           step = 1)
+    #     }
+    # })
     
     ### cleaned data
     
@@ -142,7 +135,29 @@ shinyServer(function(input, output, session) {
     
     
     ### k-values ###
+
     
+    # uploadedKs <- reactive({
+    #     ks <- read.csv(input$file2,
+    #                         header = T, sep = ",", 
+    #                         fileEncoding="latin1")
+    #     return(ks)
+    # })
+    # 
+    # output$uploadedKvalues <- DT::renderDataTable({
+    #     
+    #     print(uploadedKs())
+    #     return(uploadedKs())
+    # }, options = list(scrollX = TRUE))
+    
+    
+    kClosest <- reactive({
+        get.closestKvalues(deltaTempLong())
+    })
+    
+    output$kClosest <- DT::renderDataTable({ # raw data
+        return(kClosest() %>% round(., 2))
+    }, options = list(scrollX = TRUE))
     
     
     #####################
