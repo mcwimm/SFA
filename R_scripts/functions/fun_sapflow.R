@@ -117,3 +117,16 @@ get.existingKvalues <- function(path){
    for (f in files[-1]) kvalues <- rbind(kvalues, read.csv(paste(path, f, sep = "/")))  
    return(kvalues)
 }
+
+get.kByMethod <- function(method, depth){
+   if (method == "manual"){
+      k = paste0("input$depth", depth)
+   }
+   if (method == "automatic"){
+      k = paste0("input$depth", depth)
+   }
+   if (method == "closest"){
+      k = paste0("input$depth", depth)
+   }
+   return(k)
+}
