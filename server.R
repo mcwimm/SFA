@@ -1,5 +1,6 @@
 
 shinyServer(function(input, output, session) {
+
     # define output directory
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
@@ -115,6 +116,16 @@ shinyServer(function(input, output, session) {
         return(data.adj)
     }) 
     
+    ### manual k-value input
+    
+    output$manKvalues <- renderUI({
+        depths <- depths()
+        lapply(depths, function(i) {
+            numericInput(inputId = paste0("depth", i), 
+                         label = paste("Depth", i),
+                         value = depths[1])
+        })
+    })
     
     ############################
     ##### Table outputs ########
@@ -234,9 +245,13 @@ shinyServer(function(input, output, session) {
     ### K estimation ###
     
     observeEvent(input$setK, {
+        # get.kByMethod(method = input$kMethod, input$kDepthSelect)
+        # print(input$paste0("depth", input$kDepthSelect))
+        
         kAs <- cleanedDataAndKvalues()[[2]]
         kSa <- cleanedDataAndKvalues()[[3]]
         csvObject = data.frame(depth = input$kDepthSelect,
+                               method = input$kMethod,
                        kAs = kAs[[1]],
                        rAs = kAs[[2]],
                        kSa = kSa[[1]],
@@ -321,7 +336,8 @@ shinyServer(function(input, output, session) {
         d = deltaTempLong() %>% 
             filter(depth == input$kDepthSelect)
         plot.kEst1(d, cleanedDataAndKvalues()[[1]],
-                   input$k1Plot.x[1], input$k1Plot.x[2])
+                   input$k1Plot.x[1], input$k1Plot.x[2],
+                   input$k1Plot.fullrange)
 
     })
     

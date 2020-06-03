@@ -47,36 +47,40 @@ plot.deltaTfacetWrap <- function(data, xRange, yRange, free, fn){
 
 ######## K-Estimation
 
-plot.kEst1 <- function(data.complete, data.adj, x.min, x.max){
-   return(data.complete %>% 
-             gather(., temp, value, dTsa, dTas, dTSym) %>%
-             ggplot(.) +
-             geom_point(aes(x = dTsym.dTas, y = value, group = temp,
-                            col = temp), shape = 1) +
-             geom_point(data.adj, 
-                        mapping = aes(x = dTsym.dTas, y = dTas), 
-                        col = "black", shape = 4) +
-             geom_point(data.adj, 
-                        mapping = aes(x = dTsym.dTas, y = dTsa), 
-                        col = "black", shape = 4) +
-             stat_smooth(data.adj, method = "lm", 
-                         mapping=aes(x = dTsym.dTas, y = dTas),
-                         col = "red") +
-             stat_regline_equation(data.adj,
-                                   mapping=aes(x = dTsym.dTas, y = dTas,
-                                               label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
-                                   label.y.npc = "top") +
-             stat_smooth(data.adj, method = "lm", 
-                         mapping=aes(x = dTsym.dTas, y = dTsa),
-                         col = "red") +
-             stat_regline_equation(data.adj, 
-                                   mapping=aes(x = dTsym.dTas, y = dTsa,
-                                               label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
-                                   label.y.npc = "bottom") +
-             scale_color_manual(values=fillcolors(3)) +
-             xlim(x.min, x.max) +
-             labs(x = "dTsym / dTas (C)", y = "T (C)", col = "") +
-             theme_bw())
+plot.kEst1 <- function(data.complete, data.adj, x.min, x.max, 
+                       fullrange = F){
+   d = data.complete %>% 
+      gather(., temp, value, dTsa, dTas, dTSym)
+   ad = data.adj %>% 
+      gather(., temp, value, dTsa, dTas)#, dTSym)
+   
+   p = ggplot() +
+      geom_point(d, 
+                 mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                             col = temp), shape = 1) +
+      geom_point(ad, 
+                 mapping = aes(x = dTsym.dTas, y = value, group = temp), 
+                 col = "black", shape = 4) +
+      stat_smooth(ad, method = "lm", 
+                  mapping=aes(x = dTsym.dTas, y = value, group = temp),
+                  col = "red") +
+      stat_regline_equation(ad,
+                            mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                                        label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                            label.y.npc = c("top", "bottom")) + #"center", 
+      scale_color_manual(values=fillcolors(3)) +
+      xlim(x.min, x.max) +
+      labs(x = "dTsym / dTas (C)", y = "T (C)", col = "") +
+      theme_bw()
+   
+   if (fullrange){
+      p = p +
+         stat_smooth(ad, method = "lm", 
+                     mapping=aes(x = dTsym.dTas, y = value, group = temp),
+                     col = "#333333", fullrange = T, se = F,
+                     size = 0.5)
+   }
+   return(p)
 }
 
 ######## SAP FLOW INDEX
