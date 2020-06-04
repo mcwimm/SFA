@@ -257,6 +257,19 @@ dataViewOutput = function(){
 ### K-ESTIMATION ###
 ####################
 
+kDescriptionOutput <- function(){
+   return(list(
+      box(title = "K-value estimation",
+          collapsible = T,
+          status = "info",
+          includeMarkdown("./man/des_k_value.md")),
+      box(title = "K-diagrams",
+          collapsible = T,
+          status = "info",
+          includeMarkdown("./man/des_k_diagrams.md"))
+   ))
+}
+
 kValueOutput <- function(){
    return(list(
       box(title = "Settings",
@@ -362,7 +375,31 @@ sdDescriptionOutput <- function(){
           includeMarkdown("./man/des_sf.md")),
       box(title = "Tree water use",
           collapsible = T, status = "info",
-          includeMarkdown("./man/des_sf_twu.md"))
+          includeMarkdown("./man/des_sf_twu.md")),
+      box(title = "References",
+          collapsible = T, status = "info",
+          p(strong("Sap flow index:"), 
+            HTML('&nbsp;'),
+            a("Nadezhdina et al. (2015)", href="https://content.sciendo.com/view/journals/johh/63/2/article-p124.xml",
+              target="_blank"), ",", 
+            HTML('&nbsp;'),
+            a("Nadezhdina (1999)", href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
+          p(strong("Sap flow density:"), 
+            HTML('&nbsp;'),
+            a("Nadezhdina (2018", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
+            HTML('&nbsp;'),
+            a("Author", href="", target="_blank")),
+          p(strong("Sap flow:"), 
+            HTML('&nbsp;'),
+            a("Author", href="", target="_blank"), ",",
+            HTML('&nbsp;'),
+            a("Author", href="", target="_blank")),
+          p(strong("Tree water use:"), 
+            HTML('&nbsp;'),
+            a("Author", href="", target="_blank"), ",",
+            HTML('&nbsp;'),
+            a("Author", href="", target="_blank")))
+      
    ))
 }
 

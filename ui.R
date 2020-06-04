@@ -28,7 +28,7 @@ shinyUI(
                         fluidRow(dataViewOutput())),
                 
                 tabItem(tabName = "k_des",
-                        includeMarkdown("./man/des_k-value.md")),
+                        kDescriptionOutput()),
                 
                 tabItem(tabName = "k_est",
                         kValueOutput()),
