@@ -27,10 +27,10 @@ menuOutput = function(){
                menuSubItem("Sap Flow Index", tabName = "sf_ind"),
                menuSubItem("Sap Flow Density", tabName = "sf_dens"),
                menuSubItem("Sap Flow", tabName = "sf_flow"),
-               menuSubItem("Tree Water Use", tabName = "sf_twu")),
-      br(), tags$hr(), br(),
-      downloadButton("DownloadProject", "Download project",
-                     style=buttonStyles())
+               menuSubItem("Tree Water Use", tabName = "sf_twu"))
+      # br(), tags$hr(), br(),
+      # downloadButton("DownloadProject", "Download project",
+      #                style=buttonStyles())
       ))
 }
 
@@ -232,9 +232,18 @@ kValueOutput <- function(){
           
           tags$hr(), tags$hr(),
           selectInput("kMethod", "Method",
-                      choices = c("manual" = "manual",
+                      choices = c("regression" = "regression",
                                   "closest" = "closest",
-                                  "regression" = "regression")),
+                                  "manual" = "manual",
+                                  "csv" = "csv")),
+          conditionalPanel(
+             condition = "input.kMethod != `manual`",
+             verbatimTextOutput("kCurrent")
+          ),
+          conditionalPanel(
+             condition = "input.kMethod == `manual`",
+             numericInput("kManual", "Enter k manually", value = 1.11)
+          ),
           actionButton("setK", "Set k-value",
                        style = buttonStyles("red"),
                        icon("check-circle")),
@@ -256,25 +265,30 @@ kValueOutput <- function(){
           collapsible = T,
           status = "info",
           tabsetPanel(
-             tabPanel("Automatic", br(),
-                      actionButton("update.Kvalues", "Update list",
-                                   style = buttonStyles("green"),
-                                   icon("broom")),  
-                      output.table("existingKvalues")),
-             tabPanel("Manual", br(),
-                      uiOutput("manKvalues"),
-                      actionButton("save.manK", "Save values",
-                                   style = buttonStyles("blue"),
-                                   icon("check-circle"))),
-                      # output.figure("kvaluePlot2"))
+             tabPanel("Selected", br(),
+                      output.table("kSelected")),
+             tabPanel("Regression", br(),
+                      output.table("kRegression")),
              tabPanel("Closest",
                       output.table("kClosest")),
              tabPanel("Read csv", br(),
+                      # Input: Select a file ----
                       fileInput("file2", "Choose CSV File",
                                 multiple = F,
                                 accept = c("text/csv",
                                            "text/comma-separated-values,text/plain",
                                            ".csv")),
+                      checkboxInput("moreOptions", "More upload options", F),
+                      conditionalPanel(
+                         condition = "input.moreOptions == true",
+                         
+                         numericInput("skip2", "Skip:", min = 0, max = 100, 0),
+                         checkboxInput("header2", "Header", TRUE),
+                         radioButtons("sep2", "Separator",
+                                      choices = c(Comma = ",",
+                                                  Semicolon = ";",
+                                                  Tab = "\t"),
+                                      selected = ",")),
                       output.table("uploadedKvalues"))
              )
           

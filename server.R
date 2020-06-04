@@ -1,7 +1,11 @@
 
 shinyServer(function(input, output, session) {
 
-    # define output directory
+    ###############
+    ### PROJECT ###
+    ###############
+    
+    #### Variables ####
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
     
@@ -14,7 +18,46 @@ shinyServer(function(input, output, session) {
     })
     
     
-    ### data handling ###
+    #### Text output ####
+    
+    output$prjDir <- renderPrint({
+        print(projectPath())
+    })
+    
+    #### Buttons ####
+    
+    observeEvent(input$crtPrj, {
+        if (!isTruthy(input$folder)){
+            showNotification("Please choose a directory first!",
+                             type = "error")
+        } else{
+            req(input$folder)
+            csvPath = paste(projectPath(),
+                            "/csv-files/", sep = "")
+            figPath = paste(projectPath(),
+                            "/graphics/", sep = "")
+            if (!dir.exists(csvPath)){
+                dir.create(csvPath)
+            }
+            if (!dir.exists(figPath)){
+                dir.create(figPath)
+            }
+            showNotification("Project set successfully!",
+                             type = "message")
+        }
+        
+        output$prjName <- renderPrint({
+            print(projectName())
+        })
+        
+    })
+    
+    
+    ############
+    ### DATA ###
+    ############
+    
+    #### Variables ####
     
     rawData <- reactive({
         print(input$inputType)
@@ -75,158 +118,15 @@ shinyServer(function(input, output, session) {
                              max = minMaxDatetime()[2])
     })
     
-    # observeEvent(input$updateTime, {
-    #     d = deltaTempLong()
-    #     print(paste("Nrow after:  ", nrow(d)))
-    #     print(head(d))
-    # })
-    
-    
-    # minMaxDepth <- reactive({
-    #     d = depths()
-    #     return(list(min(d), max(d)))
-    # })
-    # 
-    # observe({
-    #    
-    #     if (!is.null(input$file1)){
-    #         minMaxDepth = minMaxDepth()
-    #         print(minMaxDepth)
-    #         updateSliderInput(session, "kDepthSelect",
-    #                           value = minMaxDepth[1],
-    #                           min = minMaxDepth[1],
-    #                           max = minMaxDepth[2], 
-    #                           step = 1)
-    #     } else {
-    #         updateSliderInput(session, "kDepthSelect",
-    #                           value = 1,
-    #                           min = 1,
-    #                           max = 10, 
-    #                           step = 1)
-    #     }
-    # })
-    
-    ### cleaned data
-    
-    cleanedDataAndKvalues <- reactive({
-        d = deltaTempLong() %>% 
-            filter(depth == input$kDepthSelect)
-        data.adj = clean.data.iteration(d, 0)
-        
-        return(data.adj)
-    }) 
-    
-    ### manual k-value input
-    
-    output$manKvalues <- renderUI({
-        depths <- depths()
-        lapply(depths, function(i) {
-            numericInput(inputId = paste0("depth", i), 
-                         label = paste("Depth", i),
-                         value = depths[1])
-        })
-    })
-    
-    ############################
-    ##### Table outputs ########
-    ############################
-    
-    output$raw.wide <- DT::renderDataTable({ # raw data
-        return(rawData())
-    }, options = list(scrollX = TRUE))
-    
-    output$raw.long <- DT::renderDataTable({ # raw data
-        return(deltaTempLong())
-    }, options = list(scrollX = TRUE))
-    
-    
-    output$prjFolder <- DT::renderDataTable({ # raw data
-        return(prjFolderList())
-    }, options = list(scrollX = TRUE))
-    
-    
-    ### k-values ###
-
-    
-    # uploadedKs <- reactive({
-    #     ks <- read.csv(input$file2,
-    #                         header = T, sep = ",", 
-    #                         fileEncoding="latin1")
-    #     return(ks)
-    # })
-    # 
-    # output$uploadedKvalues <- DT::renderDataTable({
-    #     
-    #     print(uploadedKs())
-    #     return(uploadedKs())
-    # }, options = list(scrollX = TRUE))
-    
-    
-    kClosest <- reactive({
-        get.closestKvalues(deltaTempLong())
-    })
-    
-    output$kClosest <- DT::renderDataTable({ # raw data
-        return(kClosest() %>% round(., 2))
-    }, options = list(scrollX = TRUE))
-    
-    
-    #####################
-    #### Text output ####
-    #####################
-    
-    output$depths <- renderPrint({
-        cat("As atomic vector:\n")
-        print(depths())
-    })
-    
-    output$prjDir <- renderPrint({
-        print(projectPath())
-    })
-    
-    
-    #################
     #### Buttons ####
-    #################
-    
-    
-    ### Settings ###
-    
-    observeEvent(input$crtPrj, {
-        if (!isTruthy(input$folder)){
-            showNotification("Please choose a directory first!",
-                             type = "error")
-        } else{
-            req(input$folder)
-            csvPath = paste(projectPath(),
-                            "/csv-files/", sep = "")
-            figPath = paste(projectPath(),
-                            "/graphics/", sep = "")
-            if (!dir.exists(csvPath)){
-                dir.create(csvPath)
-            }
-            if (!dir.exists(figPath)){
-                dir.create(figPath)
-            }
-            showNotification("Project set successfully!",
-                             type = "message")
-        }
-        
-        output$prjName <- renderPrint({
-            print(projectName())
-        })
-        
-    })
-    
-    ### DATA ###
     
     observeEvent(input$save_dat_upl, {
         csvObject = deltaTempLong()
         path = paste(projectPath(), 
-                    "/csv-files/",
+                     "/csv-files/",
                      "temperatureDifferences_longFormat", sep = "")
         save.csv(path, csvObject)
-
+        
     })
     
     observeEvent(input$save.deltaTfacetWrap, {
@@ -242,49 +142,161 @@ shinyServer(function(input, output, session) {
     })
     
     
-    ### K estimation ###
+    #### Table outputs #####
+
+    output$raw.wide <- DT::renderDataTable({ # raw data
+        return(rawData())
+    }, options = list(scrollX = TRUE))
     
-    observeEvent(input$setK, {
-        # get.kByMethod(method = input$kMethod, input$kDepthSelect)
-        # print(input$paste0("depth", input$kDepthSelect))
-        
-        kAs <- cleanedDataAndKvalues()[[2]]
-        kSa <- cleanedDataAndKvalues()[[3]]
-        csvObject = data.frame(depth = input$kDepthSelect,
-                               method = input$kMethod,
-                       kAs = kAs[[1]],
-                       rAs = kAs[[2]],
-                       kSa = kSa[[1]],
-                       rSa = kSa[[2]],
-                       kAvg = (mean(c(abs(kAs[[1]]), abs(kSa[[1]]))))
-                       )
-        print(csvObject)
-        path = paste(projectPath(), 
-                     "/csv-files/",
-                     "k_", input$kDepthSelect, sep = "")
-        print(path)
-        
-        save.csv(path, csvObject)
+    output$raw.long <- DT::renderDataTable({ # raw data
+        return(deltaTempLong())
+    }, options = list(scrollX = TRUE))
+    
+    
+    #### Text output ####
+    
+    output$depths <- renderPrint({
+        cat("As atomic vector:\n")
+        print(depths())
+    })
+    
+    
+    #### Graphics ####
+    
+    output$rawPlot <- renderPlot({
+        d = deltaTempLong()
+        plot.deltaTemperature(d,
+                              input$rawPlot.y, projectName())
+    })
+    
+    output$deltaTfacetWrap <- renderPlot({
+        plot.deltaTfacetWrap(deltaTempLong(), 
+                             input$rawPlot.x, input$rawPlot.y, 
+                             input$rawPlot.scales,
+                             projectName())
+    })
+    
+
+    
+    ####################
+    ### K-ESTIMATION ###
+    ####################
+    
+    #### Variables ####
+    
+    cleanedDataAndKvalues <- reactive({ # get cleaned data for regression plot
+        d = deltaTempLong() %>%
+            filter(depth == input$kDepthSelect)
+        return(clean.data.iteration(d, 0))
+    })
+    
+    
+    kValue <- reactive({     # get k value by selected method for selected depth
+        if (input$kMethod == "manual"){
+            kManual = input$kManual
+        }
+        if (input$kMethod == "csv"){
+            d = kFromCsv()
+            kManual = d[d$depth == input$kDepthSelect, "k"]
+        }
+        get.kByMethod(method = input$kMethod, 
+                      data = deltaTempLong(),
+                      depth = input$kDepthSelect,
+                      kManual = kManual)
+    })
+
+    kComplete <- reactive({  # get k-values for all depths for closest, regression
+        get.kByMethodAll(deltaTempLong())
+    })
+    
+    
+    kFromCsv <- reactive({
+        kcsv = get.csvKvalues(input$file2, 
+                              header = input$header2, 
+                              sep = input$sep2,
+                              skip = input$skip2)
+        return(kcsv)
         
     })
     
-    observeEvent(input$save.kValues, {
+    #### Store and display selected k-values
+
+    values <- reactiveValues(df_data = NULL)  # create reactive value to store selected k-values
+    
+    observeEvent(input$file1, {  # create empty dataframe with depths to store selected k-values
+        values$df_data <-  data.frame(depth = depths(),  
+                                      method = rep(NA),
+                                      k = rep(NA))
+    })
+    
+    observeEvent(input$setK, {  # store selected k-value in data.frame
+        values$df_data[values$df_data$depth == input$kDepthSelect, 2:3] <- cbind(method = as.character(input$kMethod),
+                                                                                 k = round(kValue(), 3))
+    })
+    
+
+   
+
+    #### Text outputs ####
+
+    output$kCurrent <- renderPrint({  # output current k-value (depends on selected depth and method)
+        paste("K-value", round(kValue(), 3))
+    })
+    
+    
+    #### Table outputs ####
+    
+    output$kSelected <- DT::renderDataTable({  # display selected k-values
+        return(values$df_data)
+    }, options = list(scrollX = TRUE))
+    
+    
+    output$kRegression <- DT::renderDataTable({  # display estimated k-values - by regression
+        return(kComplete()$regression  %>% round(., 2))
+    }, options = list(scrollX = TRUE))
+    
+    
+    output$kClosest <- DT::renderDataTable({  # output closest k-estimates
+        return(kComplete()$closest %>% round(., 2))
+    }, options = list(scrollX = TRUE))
+
+
+    output$uploadedKvalues <- DT::renderDataTable({  # output closest k-estimates
+        return(kFromCsv())
+    }, options = list(scrollX = TRUE))
+    
+    #### Buttons ####
+    # save data
+    
+    observeEvent(input$save.kValues, { # save selected k-values as csv
         path = paste(projectPath(), 
                      "/csv-files", sep = "")
-        csvObject = get.existingKvalues(path)
+        csvObject = values$df_data
         save.csv(paste(path, "/k-values", sep = ""), csvObject)
     })
     
-    observeEvent(input$update.Kvalues, {
-        output$existingKvalues <- DT::renderDataTable({
-            path = paste(projectPath(), 
-                         "/csv-files", sep = "")
-            return(get.existingKvalues(path)[, -1]  %>% 
-                       round(., 2))
-        }, options = list(scrollX = TRUE))
-    })
     
-    ### Sap flow ###
+    ### Graphics ####
+    
+    output$kvaluePlot1 <- renderPlot({
+        d = deltaTempLong() %>% 
+            filter(depth == input$kDepthSelect)
+        plot.kEst1(d, cleanedDataAndKvalues()[[1]],
+                   input$k1Plot.x[1], input$k1Plot.x[2],
+                   input$k1Plot.fullrange)
+        
+    })
+
+
+    
+
+    #########################
+    ##### SAP FLOW INDEX ####
+    #########################
+    
+    
+    #### Buttons ####
+    
     observeEvent(input$save.sfIndex, {
         name = paste(projectPath(),
                      "/graphics/",
@@ -310,40 +322,8 @@ shinyServer(function(input, output, session) {
                     input$figFor)
     })
     
-
-    ###################
-    ##### GRAPHICS ####
-    ###################
     
-    ### DATA ###
-    
-    output$rawPlot <- renderPlot({
-        d = deltaTempLong()
-        plot.deltaTemperature(d,
-                          input$rawPlot.y, projectName())
-    })
-    
-    output$deltaTfacetWrap <- renderPlot({
-        plot.deltaTfacetWrap(deltaTempLong(), 
-                             input$rawPlot.x, input$rawPlot.y, 
-                             input$rawPlot.scales,
-                             projectName())
-    })
-    
-    ### K-VALUE ESTIMATION
-    
-    output$kvaluePlot1 <- renderPlot({
-        d = deltaTempLong() %>% 
-            filter(depth == input$kDepthSelect)
-        plot.kEst1(d, cleanedDataAndKvalues()[[1]],
-                   input$k1Plot.x[1], input$k1Plot.x[2],
-                   input$k1Plot.fullrange)
-
-    })
-    
-    
-    
-    ### SAP FLOW INDEX
+    #### Graphics ####
     
     output$sapFlowIndex <- renderPlot({
         plot.sapFlowIndex(deltaTempLong(), 
