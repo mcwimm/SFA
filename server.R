@@ -304,6 +304,7 @@ shinyServer(function(input, output, session) {
         obj = plot.sapFlowIndex(deltaTempLong(), 
                                 input$sfIndexPlot.y, 
                                 input$sfIndexPlot.scales,
+                                input$sfIndexPlot.wrap,
                                 projectName())
         save.figure(name, obj,
                     input$figFor)
@@ -329,6 +330,7 @@ shinyServer(function(input, output, session) {
         plot.sapFlowIndex(deltaTempLong(), 
                           input$sfIndexPlot.y, 
                           input$sfIndexPlot.scales,
+                          input$sfIndexPlot.wrap,
                           projectName())
     })
     

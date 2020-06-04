@@ -314,6 +314,8 @@ sfIndexOutput <- function(){
                       value = c(-0.5, 2)),
           checkboxInput("sfIndexPlot.scales", "Scales free",
                         value = F),
+          checkboxInput("sfIndexPlot.wrap", "Facet wrap",
+                        value = T),
           br(), tags$hr(), br(),
           actionButton("save.sfIndex",
                        "Save figure `Complete`", icon("chart-bar"),

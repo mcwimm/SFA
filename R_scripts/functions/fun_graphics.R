@@ -85,16 +85,21 @@ plot.kEst1 <- function(data.complete, data.adj, x.min, x.max,
 
 ######## SAP FLOW INDEX
 
-plot.sapFlowIndex = function(data, yRange, free, fn){
+plot.sapFlowIndex = function(data, yRange, free, wrap, fn){
    scales = ifelse(free, "free", "fixed")
    p = data %>% 
       ggplot(.) +
-      geom_line(aes(x = datetime, y = dTSym)) +
-      facet_wrap(~ depth, labeller = label_both, scales = scales) +
+      geom_line(aes(x = datetime, y = dTSym, col = factor(depth))) +
       labs(x = "", 
-           y = "Sap Flow Index (dTSym)") +
+           y = "Sap Flow Index (dTSym)",
+           col = "Sensor depth") +
       theme_bw() +
       ggtitle(fn)
+   
+   if (wrap){
+      p = p +
+         facet_wrap(~ depth, labeller = label_both, scales = scales)
+   }
    if (scales == "fixed"){
       p = p +
          ylim(yRange[1], yRange[2]) 
