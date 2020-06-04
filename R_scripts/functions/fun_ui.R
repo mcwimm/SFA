@@ -1,4 +1,6 @@
-######## GENERAL ###########
+###############
+### GENERAL ###
+###############
 
 output.table = function(outputID){
    return(list(br(), 
@@ -10,7 +12,28 @@ output.figure = function(outputID){
    return(plotOutput(outputID) %>% withSpinner(color="#0dc5c1"))
 }
 
-######## MENU ###############
+#############
+### STYLE ###
+#############
+
+buttonStyles = function(type = "blue"){
+   if (type == "blue")
+   {
+      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+   }
+   if (type == "red")
+   {
+      return("color: #fff; background-color: #cc0000; border-color: #990000")
+   }
+   if (type == "green")
+   {
+      return("color: #fff; background-color: #42C728; border-color: #38A822")
+   }
+}
+
+############
+### MENU ###
+############
 
 menuOutput = function(){
    return(list(
@@ -36,11 +59,10 @@ menuOutput = function(){
       ))
 }
 
-############################ 
-######### BOXES ############
-############################ 
 
-######### About ############
+#############
+### ABOUT ###
+#############
 
 introOutput = function(){
    return(list(
@@ -63,7 +85,10 @@ introOutput = function(){
    ))   
 }
 
-######### Settings #########
+
+################
+### SETTINGS ###
+################
 
 settingsOutput = function(){
    return(list(
@@ -115,7 +140,10 @@ settingsOutput = function(){
    ))
 }
 
-######### Data #############
+
+############
+### DATA ###
+############
 
 box.dat_upl.upload = function(){
    return(list(
@@ -225,7 +253,9 @@ dataViewOutput = function(){
    ))   
 }
 
-######### K-value estimation ###
+####################
+### K-ESTIMATION ###
+####################
 
 kValueOutput <- function(){
    return(list(
@@ -315,7 +345,26 @@ kValueOutput <- function(){
    ))
 }
 
-######### Sap Flow Index ###
+################
+### SAP FLOW ###
+################
+
+sdDescriptionOutput <- function(){
+   return(list(
+      box(title = "Sap Flow Index",
+          collapsible = T, status = "info",
+          includeMarkdown("./man/des_sf_index.md")),
+      box(title = "Sap Flow Density",
+          collapsible = T, status = "info",
+          includeMarkdown("./man/des_sf_density.md")),
+      box(title = "Sap Flow",
+          collapsible = T, status = "info",
+          includeMarkdown("./man/des_sf.md")),
+      box(title = "Tree water use",
+          collapsible = T, status = "info",
+          includeMarkdown("./man/des_sf_twu.md"))
+   ))
+}
 
 sfIndexOutput <- function(){
    return(list(
@@ -353,22 +402,8 @@ sfIndexOutput <- function(){
 
 
 
-######## STYLE ############
 
-buttonStyles = function(type = "blue"){
-   if (type == "blue")
-   {
-      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
-   }
-   if (type == "red")
-   {
-      return("color: #fff; background-color: #cc0000; border-color: #990000")
-   }
-   if (type == "green")
-   {
-      return("color: #fff; background-color: #42C728; border-color: #38A822")
-   }
-}
-
-
+###################
+### DIAGNOSTICS ###
+###################
 

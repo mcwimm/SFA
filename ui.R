@@ -33,6 +33,8 @@ shinyUI(
                 tabItem(tabName = "k_est",
                         kValueOutput()),
                 
+                tabItem(tabName = "sf_des",
+                        sdDescriptionOutput()),
                 tabItem(tabName = "sf_ind",
                         sfIndexOutput()
                 )
