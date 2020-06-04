@@ -1,6 +1,8 @@
 get.rawData = function(file, inputType, header, sep, skip){
    if (is.null(file)){
       defaultData = "./tests/ICT_rawdata.csv"
+      print("Default data")
+      
       return(get.temperatures.ICT(defaultData,
                                   header = T, sep = ",",
                                   skip = 10))
@@ -244,7 +246,8 @@ save.figure = function(name,
 }
 
 save.csv = function(name, csvObject){
-   res = try(write.csv(csvObject, file = paste(name, ".csv", sep = "")))
+   res = try(write.csv(csvObject, file = paste(name, ".csv", sep = ""),
+                       row.names = FALSE))
    if (is.null(res)){
       showNotification("File saved successfully!",
                        type = "message")
