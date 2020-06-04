@@ -230,8 +230,10 @@ get.depths = function(depthManual = F, inputType,
 
 ########### SAVE #############
 
-save.figure = function(name,
-                        plotObject, format = "svg"){
+save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
+   plotObject = plotObject +
+      ggtitle(prjName) +
+      theme_bw(base_size = 14)
    res = try(ggsave(plotObject, filename = paste(name, format,
                                  sep = "."),
              width = 12, height = 6, dpi = 600))

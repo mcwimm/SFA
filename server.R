@@ -17,6 +17,13 @@ shinyServer(function(input, output, session) {
         return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
     })
     
+    figTitle <- reactive({
+        if (input$prjNameAsTitle){
+            return(projectName())
+        } else {
+            return(input$figTitle)
+        }
+    })
     
     #### Text output ####
     
@@ -88,6 +95,11 @@ shinyServer(function(input, output, session) {
         return(d)
     })
     
+    deltaTempLong.depth <- reactive({
+        deltaTempLong() %>% 
+            filter(depth == input$kDepthSelect)
+    })
+    
     depths <- reactive({
         return(get.depths(depthManual = input$depthManual,
                           inputType = input$inputType,
@@ -135,10 +147,8 @@ shinyServer(function(input, output, session) {
                      "temperatureDifferences", sep = "")
         obj = plot.deltaTfacetWrap(deltaTempLong(), 
                                    input$rawPlot.x, input$rawPlot.y,
-                                   input$rawPlot.scales,
-                                   projectName())
-        save.figure(name, obj,
-                    input$figFor)
+                                   input$rawPlot.scales)
+        save.figure(name, obj, figTitle(), input$figFor)
     })
     
     
@@ -166,14 +176,13 @@ shinyServer(function(input, output, session) {
     output$rawPlot <- renderPlot({
         d = deltaTempLong()
         plot.deltaTemperature(d,
-                              input$rawPlot.y, projectName())
+                              input$rawPlot.y)
     })
     
     output$deltaTfacetWrap <- renderPlot({
         plot.deltaTfacetWrap(deltaTempLong(), 
                              input$rawPlot.x, input$rawPlot.y, 
-                             input$rawPlot.scales,
-                             projectName())
+                             input$rawPlot.scales)
     })
     
 
@@ -265,6 +274,36 @@ shinyServer(function(input, output, session) {
         return(kFromCsv())
     }, options = list(scrollX = TRUE))
     
+    
+    
+    ### Graphics ####
+    kplot1 <- reactive({
+        plot.kEst1(deltaTempLong.depth(),
+                   cleanedDataAndKvalues()[[1]],
+                   input$k1Plot.x,
+                   input$k1Plot.fullrange,
+                   input$k1Plot.scales)
+    })
+    
+    kplot2 <- reactive({
+        plot.kEst2(deltaTempLong.depth(),
+                   cleanedDataAndKvalues()[[1]],
+                   kValue(),
+                   input$k1Plot.x,
+                   input$k1Plot.fullrange,
+                   input$k1Plot.scales)
+    })
+    
+    kplot3 <- reactive({
+        plot.kEst3(deltaTempLong.depth(), 
+                   cleanedDataAndKvalues()[[1]],
+                   kValue())
+    })
+    
+    output$kvaluePlot1 <- renderPlot({ kplot1() })
+    output$kvaluePlot2 <- renderPlot({ kplot2() })
+    output$kvaluePlot3 <- renderPlot({ kplot3() })
+    
     #### Buttons ####
     # save data
     
@@ -275,20 +314,18 @@ shinyServer(function(input, output, session) {
         save.csv(paste(path, "/k-values", sep = ""), csvObject)
     })
     
-    
-    ### Graphics ####
-    
-    output$kvaluePlot1 <- renderPlot({
-        d = deltaTempLong() %>% 
-            filter(depth == input$kDepthSelect)
-        plot.kEst1(d, cleanedDataAndKvalues()[[1]],
-                   input$k1Plot.x[1], input$k1Plot.x[2],
-                   input$k1Plot.fullrange)
-        
+    # save figures
+    observeEvent(input$save.kPlots, {
+        name = paste(projectPath(),
+                     "/graphics/",
+                     sep = "")
+        save.figure(paste(name, "k_fig1_depth_", input$kDepthSelect, sep = ""), 
+                    kplot1(), figTitle(), input$figFor)
+        save.figure(paste(name, "k_fig2_depth_", input$kDepthSelect, sep = ""), 
+                    kplot2(), figTitle(), input$figFor)
+        save.figure(paste(name, "k_fig3_depth_", input$kDepthSelect, sep = ""), 
+                    kplot3(), figTitle(), input$figFor)
     })
-
-
-    
 
     #########################
     ##### SAP FLOW INDEX ####
@@ -304,10 +341,8 @@ shinyServer(function(input, output, session) {
         obj = plot.sapFlowIndex(deltaTempLong(), 
                                 input$sfIndexPlot.y, 
                                 input$sfIndexPlot.scales,
-                                input$sfIndexPlot.wrap,
-                                projectName())
-        save.figure(name, obj,
-                    input$figFor)
+                                input$sfIndexPlot.wrap)
+        save.figure(name, obj, figTitle(), input$figFor)
     })
     
     observeEvent(input$save.sfIndex.day, {
@@ -317,10 +352,8 @@ shinyServer(function(input, output, session) {
         obj = plot.sapFlowIndex.Day(deltaTempLong(), 
                                     input$sfIndexPlot.x, 
                                     input$sfIndexPlot.y, 
-                                    input$sfIndexPlot.scales,
-                                    projectName())
-        save.figure(name, obj,
-                    input$figFor)
+                                    input$sfIndexPlot.scales)
+        save.figure(name, obj, figTitle(), input$figFor)
     })
     
     
@@ -330,16 +363,14 @@ shinyServer(function(input, output, session) {
         plot.sapFlowIndex(deltaTempLong(), 
                           input$sfIndexPlot.y, 
                           input$sfIndexPlot.scales,
-                          input$sfIndexPlot.wrap,
-                          projectName())
+                          input$sfIndexPlot.wrap)
     })
     
     output$sapFlowIndex.Day <- renderPlot({
         plot.sapFlowIndex.Day(deltaTempLong(), 
                               input$sfIndexPlot.x, 
                               input$sfIndexPlot.y, 
-                              input$sfIndexPlot.scales,
-                              projectName())
+                              input$sfIndexPlot.scales)
     })
     
     

@@ -27,7 +27,9 @@ menuOutput = function(){
                menuSubItem("Sap Flow Index", tabName = "sf_ind"),
                menuSubItem("Sap Flow Density", tabName = "sf_dens"),
                menuSubItem("Sap Flow", tabName = "sf_flow"),
-               menuSubItem("Tree Water Use", tabName = "sf_twu"))
+               menuSubItem("Tree Water Use", tabName = "sf_twu")),
+      menuItem("Diagnostics", tabName = "diagnostics",
+               menuSubItem("VPD", tabName = "vpd"))
       # br(), tags$hr(), br(),
       # downloadButton("DownloadProject", "Download project",
       #                style=buttonStyles())
@@ -103,7 +105,13 @@ settingsOutput = function(){
           selectInput("figFor", "Figure format",
                       c("svg" = "svg",
                         "pdf" = "pdf",
-                        "jpg" = "jpg")))
+                        "jpg" = "jpg")),
+          checkboxInput("prjNameAsTitle", "Use project name as title", value = T),
+          conditionalPanel(
+             condition = "input.prjNameAsTitle != true",
+             textInput("figTitle", "Figure title", placeholder = "Tree species")
+          )
+          )
    ))
 }
 
@@ -202,8 +210,10 @@ dataViewOutput = function(){
           sliderInput("rawPlot.y", "y-axis range",
                       min = -10, max = 10, step = 0.25,
                       value = c(-2, 2)),
-          checkboxInput("rawPlot.scales", "Scales free",
-                        value = F),
+          radioButtons("rawPlot.scales","Scales", c("free" = "false", "fixed" = "true"), inline=T),
+          
+          # checkboxInput("rawPlot.scales", "Scales free",
+          #               value = F),
           br(), tags$hr(), br(),
           actionButton("save.deltaTfacetWrap",
                        "Save figure", icon("chart-bar"),
@@ -224,6 +234,7 @@ kValueOutput <- function(){
           status = "warning",
           sliderInput("kDepthSelect", "Depth", value = 1, 
                       min = 1, max = 10, step = 1),
+          radioButtons("k1Plot.scales","Scales", c("free" = "false", "fixed" = "true"), inline=T),
           sliderInput("k1Plot.x", "x-range",
                       min = -10, max = 10, step = 0.25,
                       value = c(-2, 2)),
@@ -249,17 +260,22 @@ kValueOutput <- function(){
                        icon("check-circle")),
           actionButton("save.kValues", "Save csv",
                        style = buttonStyles("blue"),
+                       icon("check-circle")),
+          actionButton("save.kPlots", "Save figures",
+                       style = buttonStyles("blue"),
                        icon("check-circle"))
           ),
       box(title = "Figures",
           collapsible = T,
           status = "info",
           tabsetPanel(
-             tabPanel("Plot1", br(),
+             tabPanel("Plot 1", br(),
                       output.figure("kvaluePlot1")),
-             tabPanel("Plot2", br(),
-                      # output.figure("kvaluePlot2"))
-             ))
+             tabPanel("Plot 2", br(),
+                      output.figure("kvaluePlot2")),
+             tabPanel("Plot 3", br(),
+                      output.figure("kvaluePlot3"))
+             )
           ),
       box(title = "K-values",
           collapsible = T,
@@ -283,7 +299,7 @@ kValueOutput <- function(){
                                            ".csv")),
                       checkboxInput("moreOptions", "More upload options", F),
                       conditionalPanel(
-                         condition = "input.moreOptions == true",
+                         condition = "input.moreOptions == 1",
                          
                          numericInput("skip2", "Skip:", min = 0, max = 100, 0),
                          checkboxInput("header2", "Header", TRUE),
