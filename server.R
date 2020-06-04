@@ -223,7 +223,7 @@ shinyServer(function(input, output, session) {
 
     values <- reactiveValues(df_data = NULL)  # create reactive value to store selected k-values
     
-    observeEvent(input$file1, {  # create empty dataframe with depths to store selected k-values
+    observeEvent(input$kCreate, {  # create empty dataframe with depths to store selected k-values
         values$df_data <-  data.frame(depth = depths(),  
                                       method = rep(NA),
                                       k = rep(NA))

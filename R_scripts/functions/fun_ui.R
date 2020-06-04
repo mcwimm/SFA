@@ -266,6 +266,9 @@ kValueOutput <- function(){
           status = "info",
           tabsetPanel(
              tabPanel("Selected", br(),
+                      actionButton("kCreate", "Create new selection",
+                                   icon("broom"), style = buttonStyles("green")), 
+                      br(),
                       output.table("kSelected")),
              tabPanel("Regression", br(),
                       output.table("kRegression")),

@@ -11,7 +11,7 @@ get.kByMethod <- function(method, data, depth, kManual = 1.11){
    
    if (method == "closest"){
       allK = get.closestKvalues(data)
-      k = allK[allK$depth == sensorDepth, "K"][[1]]
+      k = allK[allK$depth == sensorDepth, "k"][[1]]
    }
    
    if (method == "csv"){
