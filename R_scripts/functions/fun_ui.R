@@ -162,7 +162,13 @@ settingsOutput = function(){
           conditionalPanel(
              condition = "input.prjNameAsTitle != true",
              textInput("figTitle", "Figure title", placeholder = "Tree species")
-          )
+          ),
+          p(strong("Visualization")),
+          p("NOT WORKING!!!", style = "color:red"),
+          
+          textInput("gradientColorLow", "Gradient color low", placeholder = "#d8b365"),
+          textInput("gradientColorHigh", "Gradient color high", placeholder = "#5ab4ac")
+          
           )
    ))
 }
@@ -261,16 +267,41 @@ dataViewOutput = function(){
           sliderInput("rawPlot.y", "y-axis range",
                       min = -10, max = 10, step = 0.25,
                       value = c(-2, 2)),
-          radioButtons("rawPlot.scales","Scales", c("free" = "false", "fixed" = "true"), inline=T),
-          
-          # checkboxInput("rawPlot.scales", "Scales free",
-          #               value = F),
-          br(), tags$hr(), br(),
-          actButton("save.deltaTfacetWrap", "Save figure", "saveFigure")),
-      box(title = "Temperature differences",
+          radioButtons("rawPlot.scales","Scales", c("free" = "free", "fixed" = "fixed"), inline=T),
+          checkboxInput("rawPlot.facetWrap", "Facet wrap", F),
+          selectInput("rawPlot.xcol", "X-axis",
+                      choices = c("dTsym.dTas" = "dTsym.dTas",
+                                  "dTas" = "dTas",
+                                  "dTsa" = "dTsa",
+                                  "dTSym" = "dTSym")),
+          selectInput("rawPlot.ycol", "Y-axis",
+                      choices = c("dTas" = "dTas",
+                                  "dTsa" = "dTsa",
+                                  "dTSym" = "dTSym",
+                                  "dTsym.dTas" = "dTsym.dTas")),
+          selectInput("rawPlot.col", "Color",
+                      choices = c("day time" = "dTime",
+                                  "doy" = "doy",
+                                  "depth" = "depth")),
+          selectInput("rawPlot.shape", "Shape",
+                      choices = c("depth" = "depth",
+                                  "doy" = "doy")),
+          selectInput("rawPlot.facet", "Facet",
+                      choices = c("depth" = "depth",
+                                  "day time" = "dTime",
+                                  "doy" = "doy"))
+      ),
+      box(title = "Figures",
           collapsible = T, width = 8,
           status = "info",
-          output.figure("deltaTfacetWrap"))
+          tabsetPanel(
+             tabPanel("Temperature difference", br(),
+                      actButton("save.deltaTfacetWrap", "Save figure", "saveFigure"),
+                      output.figure("deltaTfacetWrap")),
+            tabPanel("Variable", br(),
+                     actButton("save.deltaTSingle", "Save figure", "saveFigure"),
+                      output.figure("deltaTSingle"))
+          ))
    ))   
 }
 
@@ -297,15 +328,18 @@ kValueOutput <- function(){
           collapsible = T, #width = 8,
           status = "warning",
           sliderInput("kDepthSelect", "Depth", value = 1, 
-                      min = 1, max = 10, step = 1),
+                      min = 1, max = 10, step = 1), 
+          tags$hr(),
           radioButtons("k1Plot.scales","Scales", c("free" = "false", "fixed" = "true"), inline=T),
-          sliderInput("k1Plot.x", "x-range",
+          sliderInput("k1Plot.x", "x-axis range",
                       min = -10, max = 10, step = 0.25,
                       value = c(-2, 2)),
           checkboxInput("k1Plot.fullrange", "Fullrange regression", 
                         value = F),
           
-          tags$hr(), tags$hr(),
+          tags$hr(), 
+          sliderInput("kRegressionDataPoints", "% data points used for regression",
+                      value = c(0, 100), min = 0, max = 100),
           selectInput("kMethod", "Method",
                       choices = c("regression" = "regression",
                                   "closest" = "closest",
@@ -319,6 +353,8 @@ kValueOutput <- function(){
              condition = "input.kMethod == `manual`",
              numericInput("kManual", "Enter k manually", value = 1.11)
           ),
+          tags$hr(),
+          
           actButton("kCreate", "Create new selection", "create"),
           actButton("setK", "Set k-value", "setValue")
           ),

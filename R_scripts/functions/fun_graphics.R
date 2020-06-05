@@ -5,37 +5,51 @@ fillcolors = function(N){
    return(col[1:N])
 }
 
-######## TEMPERATURES ########
 
-plot.deltaTemperature <- function(data, yRangeSlider){
-   return(data %>% 
-             ggplot(.) +
-             geom_line(mapping=aes(x = timestep, y = dTSym, 
-                                   col = factor(depth), group = factor(depth))) +
-             # scale_x_datetime() +
-             ylim(yRangeSlider[1], yRangeSlider[2]) +
-             labs(x = "", 
-                  col = "Depth") +
-             theme_bw())
+gradientcolors <- function(){
+   # return(c("#AED4E6", "#03354D"))
+   print("COLORRRRRRR")
+   # if (is.null(input$gradientColorLow)){
+   col = c("#d8b365", "#5ab4ac")
+   # } else {
+   #    col = c(input$gradientColorLow, input$gradientColorHigh)
+   #
+   # }
+   print(col)
+   return(col)
 }
 
-plot.deltaTfacetWrap <- function(data, xRange, yRange, free){
-   fillcolors = c("#d8b365", "#260C7D", "#5ab4ac") # "#f5f5f5", 
-   # fillcolors = c("#260C7D", "#007D06", "#7D410C")
-   scales = ifelse(free, "free", "fixed")
+get.labelledFacets = function(data, facet.col){
+   facet = as.integer(data[, facet.col]) 
+   facet.factor <- c(unique(facet))
+   labs = unlist(lapply(facet.factor, function(x) paste(facet.col, ": ", x, sep = "")))
+   return(factor(facet, labels = labs))
+}
+
+######## TEMPERATURES ########
+
+
+
+plot.deltaTfacetWrap <- function(data, xRange, yRange, scales, facetWrap = T, facet.col){
+
    p = data %>% 
       gather(., key, value, "dTas", "dTsa", "dTSym") %>% 
       ggplot(.) +
       geom_line(mapping=aes(x = dTsym.dTas, y = value, 
                             col = factor(key), 
                             group = factor(key))) +
-      scale_color_manual(values = fillcolors) +
-      facet_wrap(~ depth, labeller = label_both, scales = scales) +
+      scale_color_manual(values = fillcolors(3)) +
       labs(x = "dTsym.dTas", 
            y = "dT",
            col = "Temperature (\u00B0 C)") +
       theme_bw()
 
+   
+   if (facetWrap){
+      facet = get.labelledFacets(data, facet.col)
+      p = p +
+         facet_wrap(~ (facet), scales = scales)
+   }
    
    if (scales == "fixed"){
       p = p +
@@ -43,6 +57,55 @@ plot.deltaTfacetWrap <- function(data, xRange, yRange, free){
          ylim(yRange[1], yRange[2]) 
          
    }
+   return(p)
+}
+
+plot.singleTemperature <- function(data, x.col, y.col, col.col, shape.col, facetWrap,
+                                   xRange, yRange, scales, facet.col){
+
+   x = data[, x.col]
+   y = data[, y.col]
+   col = data[, col.col]
+   shape = data[, shape.col]
+
+   p = data %>% 
+      ggplot(., aes(x = x, y = y, shape = factor(shape))) +
+      labs(x = x.col,
+           y = y.col,
+           col = col.col,
+           shape = shape.col) +
+      theme_bw()
+   
+   if (col.col == "dTime"){
+      p = p +
+         geom_point(aes(col = col)) +
+         scale_color_gradient(low = gradientcolors()[1], high = gradientcolors()[2])
+      
+      
+   } else {
+      p = p +
+         geom_point(aes(col = factor(col))) +
+         scale_color_manual(values = fillcolors(length(unique(col))))
+   }
+   
+   if (facetWrap){
+      facet = get.labelledFacets(data, facet.col)
+      p = p +
+         facet_wrap(~ (facet), scales = scales)
+   }
+   
+   if (length(unique(shape)) > 6){
+      p = p +
+         scale_shape_manual(values = c(1:length(unique(shape))))
+   }
+   
+   if (scales == "fixed"){
+      p = p +
+         xlim(xRange[1], xRange[2]) +
+         ylim(yRange[1], yRange[2]) 
+      
+   }
+   
    return(p)
 }
 

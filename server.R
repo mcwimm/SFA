@@ -1,6 +1,6 @@
 
 shinyServer(function(input, output, session) {
-
+  
     ###############
     ### PROJECT ###
     ###############
@@ -130,27 +130,7 @@ shinyServer(function(input, output, session) {
                              max = minMaxDatetime()[2])
     })
     
-    #### Buttons ####
-    
-    observeEvent(input$save_dat_upl, {
-        csvObject = deltaTempLong()
-        path = paste(projectPath(), 
-                     "/csv-files/",
-                     "temperatureDifferences_longFormat", sep = "")
-        save.csv(path, csvObject)
-        
-    })
-    
-    observeEvent(input$save.deltaTfacetWrap, {
-        name = paste(projectPath(),
-                     "/graphics/",
-                     "temperatureDifferences", sep = "")
-        obj = plot.deltaTfacetWrap(deltaTempLong(), 
-                                   input$rawPlot.x, input$rawPlot.y,
-                                   input$rawPlot.scales)
-        save.figure(name, obj, figTitle(), input$figFor)
-    })
-    
+
     
     #### Table outputs #####
 
@@ -172,19 +152,70 @@ shinyServer(function(input, output, session) {
     
     
     #### Graphics ####
+
     
-    output$rawPlot <- renderPlot({
-        d = deltaTempLong()
-        plot.deltaTemperature(d,
-                              input$rawPlot.y)
+    deltaTfacetWrap <- reactive({
+        plot.deltaTfacetWrap(data = deltaTempLong(), 
+                             xRange = input$rawPlot.x, 
+                             yRange = input$rawPlot.y, 
+                             scales = input$rawPlot.scales, 
+                             facetWrap = input$rawPlot.facetWrap,
+                             facet = input$rawPlot.facet)
+    })
+    
+    deltaTSingle <- reactive({
+        plot.singleTemperature(data = deltaTempLong(),
+                               x.col = input$rawPlot.xcol, 
+                               y.col = input$rawPlot.ycol, 
+                               col.col = input$rawPlot.col,  
+                               shape.col = input$rawPlot.shape, 
+                               facetWrap = input$rawPlot.facetWrap,
+                               xRange = input$rawPlot.x,
+                               yRange = input$rawPlot.y, 
+                               scales = input$rawPlot.scales,
+                               facet = input$rawPlot.facet)
     })
     
     output$deltaTfacetWrap <- renderPlot({
-        plot.deltaTfacetWrap(deltaTempLong(), 
-                             input$rawPlot.x, input$rawPlot.y, 
-                             input$rawPlot.scales)
+        deltaTfacetWrap()
     })
     
+    output$deltaTSingle <- renderPlot({
+        deltaTSingle()
+    })
+    
+    #### Buttons ####
+    
+    observeEvent(input$save_dat_upl, {
+        csvObject = deltaTempLong()
+        path = paste(projectPath(), 
+                     "/csv-files/",
+                     "temperatureDifferences_longFormat", sep = "")
+        save.csv(path, csvObject)
+        
+    })
+    
+    observeEvent(input$save.deltaTfacetWrap, {
+        name = paste(projectPath(),
+                     "/graphics/",
+                     "temperatureDifferences_", input$rawPlot.facet, sep = "")
+        obj = deltaTfacetWrap()
+        save.figure(name, obj, figTitle(), input$figFor)
+    })
+    
+    observeEvent(input$save.deltaTSingle, {
+        v = paste(input$rawPlot.xcol, 
+                  input$rawPlot.ycol, 
+                  input$rawPlot.col,  
+                  input$rawPlot.shape,
+                  input$rawPlot.facet, sep = "-")
+        
+        name = paste(projectPath(),
+                     "/graphics/",
+                     "tempDiff_", v, sep = "")
+        obj = deltaTSingle()
+        save.figure(name, obj, figTitle(), input$figFor)
+    })
 
     
     ####################
