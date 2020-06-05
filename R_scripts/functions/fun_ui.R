@@ -16,18 +16,47 @@ output.figure = function(outputID){
 ### STYLE ###
 #############
 
+actButton <- function(ID, label, type){
+   if (type == "saveCsv"){
+      return(actionButton(ID, label,
+                   style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
+                   icon("file-download")))
+   }
+   if (type == "saveFigure"){
+      return(actionButton(ID, label,
+                   style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
+                   icon("file-download")))
+   }
+   if (type == "setValue"){
+      return(actionButton(ID, label,
+                   style = paste(buttonStyles("red"), "margin-bottom: 2rem", sep = ";"),
+                   icon("check-circle")))
+   }
+   if (type == "create"){
+      return(actionButton(ID, label,
+                   style = paste(buttonStyles("red"), "margin-bottom: 2rem", sep = ";"),
+                   icon("folder-plus")))
+   }
+   if (type == "update"){
+      return(actionButton(ID, label,
+                   style = buttonStyles("green"), 
+                   icon("broom")))
+   }
+   
+}
+
 buttonStyles = function(type = "blue"){
    if (type == "blue")
    {
-      return("color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      return("color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 2rem")
    }
    if (type == "red")
    {
-      return("color: #fff; background-color: #cc0000; border-color: #990000")
+      return("color: #fff; background-color: #cc0000; border-color: #990000; margin-bottom: 2rem")
    }
    if (type == "green")
    {
-      return("color: #fff; background-color: #42C728; border-color: #38A822")
+      return("color: #fff; background-color: #42C728; border-color: #38A822; margin-bottom: 2rem")
    }
 }
 
@@ -103,10 +132,8 @@ settingsOutput = function(){
                          'Please select a folder', 
                          # multiple = FALSE,
                          style = buttonStyles("red"),
-                         icon("folder-open")),
-          actionButton("crtPrj", "Create/set project",
-                       style = buttonStyles("blue"),
-                       icon("broom")),
+                         icon = icon("folder-open")),
+          actButton("crtPrj", "Create/set project", "create"),
           br(), br(),
           h4("Current project"),
           verbatimTextOutput("prjName"),
@@ -191,9 +218,7 @@ dataUplOutput = function(){
           includeMarkdown("./man/des_data.md"), br(),
           tags$hr(),
           # downloadButton("save_dat_upl", "Save csv"),
-          actionButton("save_dat_upl", "Save csv",
-                       icon("file-download"),
-                       style=buttonStyles()),
+          actButton("save_dat_upl", "Save csv", "saveCsv"),
           br()),
       box(title = "Upload file",
           collapsible = T,
@@ -216,12 +241,10 @@ dataUplOutput = function(){
           tags$hr(),
           h4("Subset data"),
           p("NOT WORKING!!!", style = "color:red"),
-          actionButton("getTimeRange", "Get time",
-                       icon("broom")),
+          actButton("getTimeRange", "Get time", "update"),
           dateRangeInput("daterange", "Date range:"),
-          actionButton("updateTime", "Update time",
-                       icon("broom"))
-          
+          actButton("updateTime", "Update time", "update")
+
       )
       
    ))
@@ -243,9 +266,7 @@ dataViewOutput = function(){
           # checkboxInput("rawPlot.scales", "Scales free",
           #               value = F),
           br(), tags$hr(), br(),
-          actionButton("save.deltaTfacetWrap",
-                       "Save figure", icon("chart-bar"),
-                       style=buttonStyles())),
+          actButton("save.deltaTfacetWrap", "Save figure", "saveFigure")),
       box(title = "Temperature differences",
           collapsible = T, width = 8,
           status = "info",
@@ -298,19 +319,13 @@ kValueOutput <- function(){
              condition = "input.kMethod == `manual`",
              numericInput("kManual", "Enter k manually", value = 1.11)
           ),
-          actionButton("setK", "Set k-value",
-                       style = buttonStyles("red"),
-                       icon("check-circle")),
-          actionButton("save.kValues", "Save csv",
-                       style = buttonStyles("blue"),
-                       icon("check-circle")),
-          actionButton("save.kPlots", "Save figures",
-                       style = buttonStyles("blue"),
-                       icon("check-circle"))
+          actButton("kCreate", "Create new selection", "create"),
+          actButton("setK", "Set k-value", "setValue")
           ),
       box(title = "Figures",
           collapsible = T,
           status = "info",
+          actButton("save.kPlots", "Save figures", "saveFigure"),
           tabsetPanel(
              tabPanel("Plot 1", br(),
                       output.figure("kvaluePlot1")),
@@ -324,10 +339,10 @@ kValueOutput <- function(){
           collapsible = T,
           status = "info",
           tabsetPanel(
+             
              tabPanel("Selected", br(),
-                      actionButton("kCreate", "Create new selection",
-                                   icon("broom"), style = buttonStyles("green")), 
                       br(),
+                      actButton("save.kValues", "Save csv", "saveCsv"),
                       output.table("kSelected")),
              tabPanel("Regression", br(),
                       output.table("kRegression")),
@@ -419,12 +434,8 @@ sfIndexOutput <- function(){
           checkboxInput("sfIndexPlot.wrap", "Facet wrap",
                         value = T),
           br(), tags$hr(), br(),
-          actionButton("save.sfIndex",
-                       "Save figure `Complete`", icon("chart-bar"),
-                       style=buttonStyles()),
-          actionButton("save.sfIndex.day",
-                       "Save figure `Daily`", icon("chart-bar"),
-                       style=buttonStyles())),
+          actButton("save.sfIndex", "Save figure `Complete`", "saveFigure"),
+          actButton("save.sfIndex.day", "Save figure `Daily`", "saveFigure")),
       box(title = "Sap Flow Index",
           collapsible = T, width = 8,
           status = "info",
