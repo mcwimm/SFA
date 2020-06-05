@@ -7,3 +7,6 @@ mcw_notes.md
 
 /output/
 /rsconnect/
+
+/tests/tests.R
+/tests/shinyErrorMessagesHelp.md
