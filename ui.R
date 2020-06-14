@@ -36,8 +36,9 @@ shinyUI(
                 tabItem(tabName = "sf_des",
                         sdDescriptionOutput()),
                 tabItem(tabName = "sf_ind",
-                        sfIndexOutput()
-                )
+                        sfIndexOutput()),
+                tabItem(tabName = "sf_dens",
+                        sfDensityOutput())
                     
             ),
             

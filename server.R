@@ -307,7 +307,7 @@ shinyServer(function(input, output, session) {
     
     
     
-    ### Graphics ####
+    #### Graphics ####
     kplot1 <- reactive({
         plot.kEst1(deltaTempLong.depth(),
                    cleanedDataAndKvalues()[[1]],
@@ -363,6 +363,28 @@ shinyServer(function(input, output, session) {
     #########################
     
     
+    
+    #### Variables ####
+    sapFlow <- reactive({
+      req(input$setK)
+      kValues = values$df_data
+      kValues[, "k"] = as.numeric(kValues[, "k"])
+      depths = unique(kValues[!is.na(kValues$k), ]$depth)
+      data = deltaTempLong()
+      data = data[data$depth %in% depths, ]
+      data = merge(data, kValues[, c("depth", "k")], by = "depth")
+      data = data[!is.na(data$datetime), ]
+      
+      data = get.sapFlowDensity(method = "HFD",
+                                data = data,
+                                sapWoodDepth = input$sapWoodDepth,
+                                Dst = input$ThermalDiffusivity,
+                                Zax = input$Zax, 
+                                Ztg = input$Ztg)
+      return(data)
+      
+    })
+    
     #### Buttons ####
     
     observeEvent(input$save.sfIndex, {
@@ -404,5 +426,35 @@ shinyServer(function(input, output, session) {
                               input$sfIndexPlot.scales)
     })
     
+    sapFlowDensityPlot = reactive({
+      plot.sapFlowDensity(data = sapFlow(), 
+                          y = input$sapFlowDensityPlot.y,
+                          col = input$sapFlowDensityPlot.color, 
+                          scales = input$sapFlowDensityPlot.scales, 
+                          facetWrap = input$sapFlowDensityPlot.facetWrap, 
+                          facet.col = input$sapFlowDensityPlot.facet)
+    })
+    
+    output$sapFlowDensity <- renderPlot({
+      sapFlowDensityPlot()
+    })
+    
+    #### Buttons ####
+    
+    observeEvent(input$save.sapFlowDensityPlot, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "sapFlowDensityPlot", sep = "")
+      obj = sapFlowDensityPlot()
+      save.figure(name, obj, figTitle(), input$figFor)
+    })
+    
+    observeEvent(input$save.sapFlowDensity, {
+      name = paste(projectPath(),
+                   "/csv-files/",
+                   "sapFlowDensity", sep = "")
+      obj = sapFlow()
+      save.csv(name, obj)
+    })
     
 })

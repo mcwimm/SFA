@@ -26,11 +26,26 @@ get.labelledFacets = function(data, facet.col){
    return(factor(facet, labels = labs))
 }
 
+labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
+               "dTas" = "dTas",
+               "dTsa" = "dTsa",
+               "dTSym" = "dTSym",
+               "dT" = "\U0394 T (\u00B0 C)",
+               "T" = paste("Temperature (\u00B0", "C)", sep = ""),
+               "doy" = "Day of year",
+               "dTime" = "Time (h)",
+               "depth" = "Sensor depth",
+               "SFI" = "Sap Flow Index (\u00B0 C)",
+               "SFS" = expression(paste("Sap Flow Density (g \u22C5 ", cm^-2, "\u22C5", s^-1, ")")),
+               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5", cm^-1, "\u22C5", s^-1, ")")))
+
+
 ######## TEMPERATURES ########
 
 
 
-plot.deltaTfacetWrap <- function(data, xRange, yRange, scales, facetWrap = T, facet.col){
+plot.deltaTfacetWrap <- function(data, xRange, yRange, 
+                                 scales, facetWrap = T, facet.col){
 
    p = data %>% 
       gather(., key, value, "dTas", "dTsa", "dTSym") %>% 
@@ -39,9 +54,9 @@ plot.deltaTfacetWrap <- function(data, xRange, yRange, scales, facetWrap = T, fa
                             col = factor(key), 
                             group = factor(key))) +
       scale_color_manual(values = fillcolors(3)) +
-      labs(x = "dTsym.dTas", 
-           y = "dT",
-           col = "Temperature (\u00B0 C)") +
+      labs(x = labels["dTsym.dTas"][[1]], 
+           y = labels["dT"][[1]],
+           col = labels["T"][[1]]) +
       theme_bw()
 
    
@@ -70,10 +85,10 @@ plot.singleTemperature <- function(data, x.col, y.col, col.col, shape.col, facet
 
    p = data %>% 
       ggplot(., aes(x = x, y = y, shape = factor(shape))) +
-      labs(x = x.col,
-           y = y.col,
-           col = col.col,
-           shape = shape.col) +
+      labs(x = labels[x.col][[1]],
+           y = labels[y.col][[1]],
+           col = labels[col.col][[1]],
+           shape = labels[shape.col][[1]]) +
       theme_bw()
    
    if (col.col == "dTime"){
@@ -132,7 +147,9 @@ plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScal
                                         label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
                             label.y.npc = c("top", "bottom")) + #"center", 
       scale_color_manual(values=fillcolors(3)) +
-      labs(x = "dTsym / dTas", y = "T (\u00B0 C)", col = "Temperature (\u00B0 C)") +
+      labs(x = labels["dTsym.dTas"][[1]], 
+           y = labels["dT"][[1]], 
+           col = labels["T"][[1]]) +
       theme_bw()
    
    if (fixedScales){
@@ -164,7 +181,9 @@ plot.kEst2 <- function(data.complete, data.adj, k, xRange, fullrange = F, fixedS
       geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                      label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
       scale_color_manual(values=fillcolors(4)) +
-      labs(x = "dTsym / dTas", y = "T (\u00B0 C)", col = "Temperature (\u00B0 C)") +
+      labs(x = labels["dTsym.dTas"][[1]], 
+           y = labels["dT"][[1]], 
+           col = labels["T"][[1]]) +
       theme_bw()
    
    if (fixedScales){
@@ -199,7 +218,9 @@ plot.kEst3 <- function(data.complete, data.adj, k){
                      label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
       scale_color_manual(values=fillcolors(2)) +
       scale_shape_manual(values = c(21, 24)) +
-      labs( y = "T (\u00B0 C)", col = "x-axis", shape = "Temperature (\u00B0 C)") +
+      labs( y = labels["dT"][[1]], 
+            col = "x-axis", 
+            shape = labels["T"][[1]]) +
       theme_bw()
    
    return(p)
@@ -213,8 +234,8 @@ plot.sapFlowIndex = function(data, yRange, free, wrap){
       ggplot(.) +
       geom_line(aes(x = datetime, y = dTSym, col = factor(depth))) +
       labs(x = "", 
-           y = "Sap Flow Index (dTSym)",
-           col = "Sensor depth") +
+           y = labels["SFI"][[1]],
+           col = labels["depth"][[1]]) +
       theme_bw()
    
    if (wrap){
@@ -235,9 +256,9 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, free){
       ggplot(.) +
       geom_line(aes(x = dTime, y = dTSym, group = doy, col = doy)) +
       facet_wrap(~ depth, labeller = label_both, scales = scales) +
-      labs(x = "Time (h)", 
-           col = "Day of year",
-           y = "Sap Flow Index (dTSym)") +
+      labs(x = labels["dTime"][[1]], 
+           col = labels["doy"][[1]],
+           y = labels["SFI"][[1]]) +
       theme_bw() 
    
    if (scales == "fixed"){
@@ -245,5 +266,33 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, free){
          xlim(xRange[1], xRange[2]) +
          ylim(yRange[1], yRange[2]) 
    }
+   return(p)
+}
+
+
+######## SAP FLOW DENSITY ########
+
+plot.sapFlowDensity <- function(data, 
+                                y,
+                                col, 
+                                scales, facetWrap = T, facet.col){
+   y.col = data[, y]
+   col.col = factor(data[, col])
+   
+   p = data %>% 
+      ggplot(.) +
+      geom_line(aes(x = dTime, y = y.col, col = col.col)) +
+      labs(x = labels["dTime"][[1]], 
+           col = labels[col][[1]],
+           y = labels[y][[1]]) +
+              #expression(paste("Sap Flow Density (g ", m^-2, s^-1, ")"))) +
+      theme_bw() 
+   
+   if (facetWrap){
+      facet = get.labelledFacets(data, facet.col)
+      p = p +
+         facet_wrap(~ (facet), scales = scales)
+   }
+   
    return(p)
 }

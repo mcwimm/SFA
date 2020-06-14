@@ -140,16 +140,26 @@ settingsOutput = function(){
           h4("Current project directory"),
           verbatimTextOutput("prjDir")
       ),
-      box(title = "Wood properties",
+      box(title = "Measuring environment",
           status = "warning",
           collapsible = T,
+          h4("Wood properties"),
           numericInput("stemCircumference", "Stem circumference (cm)",
                        value = 0.0),
           numericInput("stemDiameter", "Stem diameter (cm)",
                        value = 0.0),
           # numericInput("barkThickness", "Bark thickness (cm)"),
           numericInput("sapWoodDepth", "Sap wood depth (cm)",
-                       value = 0.0)),
+                       value = 5.0),
+          numericInput("ThermalDiffusivity", "Thermal diffusivity (cm/s)",
+                       value = 0.0025),
+          
+          h4("Sensor properties"),
+          numericInput("Zax", "Axial sensor distance Zax (mm)",
+                       value = 5),
+          numericInput("Ztg", "Tangential sensor distance Ztg (mm)",
+                       value = 10)
+          ),
       box(title = "Output",
           status = "info", solidHeader = F, #height = 300,
           collapsible = T,
@@ -485,7 +495,33 @@ sfIndexOutput <- function(){
 }
 
 
-
+sfDensityOutput <- function(){
+   return(list(
+      box(title = "Figure settings",
+          collapsible = T, width = 4,
+          status = "warning",
+         radioButtons("sapFlowDensityPlot.scales","Scales", 
+                      c("fixed" = "fixed", "free" = "free"), inline = T),
+         checkboxInput("sapFlowDensityPlot.facetWrap", "Facet wrap", F),
+         selectInput("sapFlowDensityPlot.y", "Y-axis",
+                     choices = c("Sap flow per section" = "SFS",
+                                 "Sap-wood-related density" = "SFDsw")),
+         selectInput("sapFlowDensityPlot.color", "Color",
+                     choices = c("depth" = "depth",
+                                 "doy" = "doy")),
+         selectInput("sapFlowDensityPlot.facet", "Facet",
+                     choices = c("doy" = "doy",
+                                 "depth" = "depth")),
+      ),
+      box(title = "Figure",
+       collapsible = T, width = 8,
+       status = "info",
+       actButton("save.sapFlowDensity", "Save figure", "saveFigure"),
+       actButton("save.sapFlowDensityPlot", "Save csv", "saveCsv"),
+       output.figure("sapFlowDensity")
+   )
+   ))
+}
 
 ###################
 ### DIAGNOSTICS ###
