@@ -71,32 +71,29 @@ shinyServer(function(input, output, session) {
     #### Variables ####
     
     rawData <- reactive({
-        print(input$inputType)
+      if (is.null(input$file1)){
+        defaultData = "./tests/ICT_rawdata.csv"
+        print("Default data")
+        return(get.temperatures.ICT(defaultData,
+                                    header = T, sep = ",",
+                                    skip = 10))
+      } else {
         return(get.rawData(input$file1, input$inputType,
-                          header = input$header, sep = input$sep,
-                          skip = input$skip))
+                           header = input$header, sep = input$sep,
+                           skip = input$skip))
+      }
+        
     })
     
     deltaTempLong <- reactive({
-        if (input$inputType == "ICT_raw"){
-            d = get.delta.from.temp(rawData(), depths())
-        }
-        if (input$inputType == "ICT_delta"){
-            d = get.delta.temp(rawData(), depths())
-        }
-        # print(as.Date(input$daterange[1]) - 1)
-        # print(as.Date(input$daterange[2]) + 1)
-        # 
-        # print(paste("Nrow before:  ", nrow(d)))
-        # 
-        # d = d[which(as.POSIXct(d$datetime) > as.Date(input$daterange[1]) - 1  &
-        #                 as.POSIXct(d$datetime) < as.Date(input$daterange[2]) + 1), ]
-        # print(paste("Nrow after:  ", nrow(d)))
-        # 
-        # print(paste("Nrow before:  ", nrow(d)))
-        
-        
-        return(d)
+      # req(input$setData)
+      if (input$inputType == "ICT_raw"){
+          d = get.delta.from.temp(rawData(), depths())
+      }
+      if (input$inputType == "ICT_delta"){
+          d = get.delta.temp(rawData(), depths())
+      }
+      return(d)
     })
     
     deltaTempLong.depth <- reactive({
@@ -105,10 +102,20 @@ shinyServer(function(input, output, session) {
     })
     
     depths <- reactive({
-        return(get.depths(depthManual = input$depthManual,
-                          inputType = input$inputType,
-                          dataSource = rawData(),
-                          depthInput = input$depthInput))
+      # req(input$setData)
+      if (is.null(input$file1)){
+        depths = get.depths(depthManual = input$depthManual,
+                            inputType = input$inputType,
+                            dataSource = rawData(),
+                            depthInput = input$depthInput)
+      } else {
+        req(input$setData)
+        depths = get.depths(depthManual = input$depthManual,
+                            inputType = input$inputType,
+                            dataSource = rawData(),
+                            depthInput = input$depthInput)
+      }
+      return(depths)
     })
     
     ### data file insights for ui ###
@@ -150,7 +157,7 @@ shinyServer(function(input, output, session) {
     #### Text output ####
     
     output$depths <- renderPrint({
-        cat("As atomic vector:\n")
+        # cat("As atomic vector:\n")
         print(depths())
     })
     
@@ -162,8 +169,8 @@ shinyServer(function(input, output, session) {
         plot.deltaTfacetWrap(data = deltaTempLong(), 
                              xRange = input$rawPlot.x, 
                              yRange = input$rawPlot.y, 
-                             scales = input$rawPlot.scales, 
-                             facetWrap = input$rawPlot.facetWrap,
+                             scales = input$rawPlot_scales, 
+                             facetWrap = input$rawPlot_facetWrap,
                              facet = input$rawPlot.facet)
     })
     
@@ -173,10 +180,10 @@ shinyServer(function(input, output, session) {
                                y.col = input$rawPlot.ycol, 
                                col.col = input$rawPlot.col,  
                                shape.col = input$rawPlot.shape, 
-                               facetWrap = input$rawPlot.facetWrap,
+                               facetWrap = input$rawPlot_facetWrap,
                                xRange = input$rawPlot.x,
                                yRange = input$rawPlot.y, 
-                               scales = input$rawPlot.scales,
+                               scales = input$rawPlot_scales,
                                facet = input$rawPlot.facet)
     })
     
@@ -226,6 +233,14 @@ shinyServer(function(input, output, session) {
     ### K-ESTIMATION ###
     ####################
     
+    #### UI #####
+    
+    output$kDepthSelect <- renderUI({
+      radioButtons("kDepthSelect", "Sensor ID/ depth",
+                   choices = depths(),
+                   selected = 1, inline = T)
+    })
+    
     #### Variables ####
     
     cleanedDataAndKvalues <- reactive({ # get cleaned data for regression plot
@@ -267,15 +282,20 @@ shinyServer(function(input, output, session) {
 
     values <- reactiveValues(df_data = NULL)  # create reactive value to store selected k-values
     
-    observeEvent(input$kCreate, {  # create empty dataframe with depths to store selected k-values
-        values$df_data <-  data.frame(depth = depths(),  
-                                      method = rep(NA),
-                                      k = rep(NA))
-    })
-    
     observeEvent(input$setK, {  # store selected k-value in data.frame
+      if (input$setK[1] == 1){
+        values$df_data <-  data.frame(depth = depths(),  
+                                     method = rep(NA),
+                                     k = rep(NA))
         values$df_data[values$df_data$depth == input$kDepthSelect, 2:3] <- cbind(method = as.character(input$kMethod),
                                                                                  k = round(kValue(), 3))
+        
+        
+      } else {
+        values$df_data[values$df_data$depth == input$kDepthSelect, 2:3] <- cbind(method = as.character(input$kMethod),
+                                                                                 k = round(kValue(), 3))
+      }
+        
     })
     
 
@@ -397,7 +417,7 @@ shinyServer(function(input, output, session) {
                      "sapFlowIndexComplete", sep = "")
         obj = plot.sapFlowIndex(deltaTempLong(), 
                                 input$sfIndexPlot.y, 
-                                input$sfIndexPlot.scales,
+                                input$sfIndexPlot_scales,
                                 input$sfIndexPlot.wrap)
         save.figure(name, obj, figTitle(), input$figFor)
     })
@@ -409,7 +429,7 @@ shinyServer(function(input, output, session) {
         obj = plot.sapFlowIndex.Day(deltaTempLong(), 
                                     input$sfIndexPlot.x, 
                                     input$sfIndexPlot.y, 
-                                    input$sfIndexPlot.scales)
+                                    input$sfIndexPlot_scales)
         save.figure(name, obj, figTitle(), input$figFor)
     })
     
@@ -419,7 +439,7 @@ shinyServer(function(input, output, session) {
     output$sapFlowIndex <- renderPlot({
         plot.sapFlowIndex(deltaTempLong(), 
                           input$sfIndexPlot.y, 
-                          input$sfIndexPlot.scales,
+                          input$sfIndexPlot_scales,
                           input$sfIndexPlot.wrap)
     })
     
@@ -427,7 +447,7 @@ shinyServer(function(input, output, session) {
         plot.sapFlowIndex.Day(deltaTempLong(), 
                               input$sfIndexPlot.x, 
                               input$sfIndexPlot.y, 
-                              input$sfIndexPlot.scales)
+                              input$sfIndexPlot_scales)
     })
     
     sapFlowDensityPlot = reactive({
