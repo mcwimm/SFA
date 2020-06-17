@@ -47,17 +47,24 @@ actButton <- function(ID, label, type){
 
 buttonStyles = function(type = "blue"){
    if (type == "blue")
-   {
-      return("color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 2rem")
+   { ##14B3EE#337ab7
+      return("color: #fff; background-color: #14B3EE; border-color: #2e6da4; margin-bottom: 2rem; margin-top: 2rem")
    }
    if (type == "red")
-   {
-      return("color: #fff; background-color: #cc0000; border-color: #990000; margin-bottom: 2rem")
+   {#orange: #F07221 #red:cc0000
+      return("color: #fff; background-color: #F07221; border-color: #990000; margin-bottom: 2rem; margin-top: 2rem")
    }
    if (type == "green")
    {
-      return("color: #fff; background-color: #42C728; border-color: #38A822; margin-bottom: 2rem")
+      return("color: #fff; background-color: #42C728; border-color: #38A822; margin-bottom: 2rem; margin-top: 2rem")
    }
+}
+
+
+numericInputRow <- function(inputId, label, value = ""){
+   div(style="display:inline-block",
+       tags$label(label, `for` = inputId), 
+       tags$input(id = inputId, type = "text", value = value, class="input-small"))
 }
 
 ############
@@ -66,21 +73,21 @@ buttonStyles = function(type = "blue"){
 
 menuOutput = function(){
    return(list(
-      menuItem("About", tabName = "about"),
-      menuItem("Project settings", tabName = "sett"),
-      menuItem("Data", tabName = "data",
+      menuItem("About", tabName = "about", icon = icon("th")),
+      menuItem("Project settings", tabName = "sett", icon = icon("chevron-down")),
+      menuItem("Data", tabName = "data", icon = icon("chevron-down"),
                menuSubItem("Upload", tabName = "dat_upl"), 
                menuSubItem("View", tabName = "dat_view")),
-      menuItem("K-value", tabName = "k_values",
+      menuItem("K-value", tabName = "k_values", icon = icon("chevron-down"),
                menuSubItem("Description", tabName = "k_des"), 
                menuSubItem("Estimation", tabName = "k_est")),
-      menuItem("Sap Flow", tabName = "sap_flow",
+      menuItem("Sap Flow", tabName = "sap_flow", icon = icon("chevron-down"),
                menuSubItem("Description", tabName = "sf_des"), 
                menuSubItem("Sap Flow Index", tabName = "sf_ind"),
                menuSubItem("Sap Flow Density", tabName = "sf_dens"),
                menuSubItem("Sap Flow", tabName = "sf_flow"),
                menuSubItem("Tree Water Use", tabName = "sf_twu")),
-      menuItem("Diagnostics", tabName = "diagnostics",
+      menuItem("Diagnostics", tabName = "diagnostics", icon = icon("th"),
                menuSubItem("VPD", tabName = "vpd"))
       # br(), tags$hr(), br(),
       # downloadButton("DownloadProject", "Download project",
@@ -95,22 +102,26 @@ menuOutput = function(){
 
 introOutput = function(){
    return(list(
-      box(title = "Objective",
-          status = "info", solidHeader = F, #height = 300,
-          collapsible = T,
-          includeMarkdown("./man/des_main_rm.md")),
-      box(title = "Functions",
-          status = "warning", solidHeader = F, #height = 300,
-          collapsible = T,
-          includeMarkdown("./man/des_main_data.md")),
-      box(title = "Methods",
-          status = "primary", solidHeader = F, #height = 300,
-          collapsible = T,
-          includeMarkdown("./man/des_main_meth.md")),
-      box(title = "Outputs",
-          status = "success", solidHeader = F, #height = 300,
-          collapsible = T,
-          includeMarkdown("./man/des_main_out.md"))
+      fluidRow(
+         box(title = "Objective",
+             status = "info", solidHeader = F, #height = 300,
+             collapsible = T,
+             includeMarkdown("./man/des_main_rm.md")),
+         box(title = "Guide",
+             status = "warning", solidHeader = F, #height = 300,
+             collapsible = T,
+             includeMarkdown("./man/des_main_guide.md"))  
+      ),
+      fluidRow(
+         box(title = "Methods",
+             status = "primary", solidHeader = F, #height = 300,
+             collapsible = T,
+             includeMarkdown("./man/des_main_meth.md")),
+         box(title = "Outputs",
+             status = "success", solidHeader = F, #height = 300,
+             collapsible = T,
+             includeMarkdown("./man/des_main_out.md"))
+      )
    ))   
 }
 
@@ -220,7 +231,8 @@ box.dat_upl.upload = function(){
                    choices = c(Comma = ",",
                                Semicolon = ";",
                                Tab = "\t"),
-                   selected = ",")
+                   selected = ","),
+      actButton("setData", "Use data", "create")
    ))
 }
 
@@ -243,8 +255,7 @@ dataUplOutput = function(){
       box(title = "Description",
           collapsible = T,
           status = "info",
-          includeMarkdown("./man/des_data.md"), br(),
-          tags$hr()),
+          includeMarkdown("./man/des_data.md")),
       box(title = "Upload file",
           collapsible = T,
           status = "warning",
@@ -260,7 +271,7 @@ dataUplOutput = function(){
                      actButton("save_dat_upl", "Save csv", "saveCsv"),
                      br(),
                      output.table("raw.long")))),
-      box(title = "Other",
+      box(title = "Optional settings",
           collapsible = T,
           status = "info",
           h4("Sensor depths"),
@@ -268,7 +279,7 @@ dataUplOutput = function(){
           tags$hr(),
           h4("Subset data"),
           p("NOT WORKING!!!", style = "color:red"),
-          actButton("getTimeRange", "Get time", "update"),
+          #actButton("getTimeRange", "Get time", "update"),
           dateRangeInput("daterange", "Date range:"),
           actButton("updateTime", "Update time", "update"))
 
@@ -282,20 +293,39 @@ dataViewOutput = function(){
       box(title = "Settings",
           collapsible = T, width = 4,
           status = "warning",
-          sliderInput("rawPlot.x", "x-axis range",
-                      min = -10, max = 10, step = 0.25,
-                      value = c(-0.5, 1.5)),
-          sliderInput("rawPlot.y", "y-axis range",
-                      min = -10, max = 10, step = 0.25,
-                      value = c(-2, 2)),
-          radioButtons("rawPlot.scales","Scales", 
+          
+          radioButtons("rawPlot_scales","Scales", 
                         choiceNames =  list(
                            HTML("<span title='choose free'>free</span>"),
                            HTML("<span title='choose fixed'>fixed</span>")
                         ),
                        choiceValues = list("free", "fixed"),
                        inline=T),
-          checkboxInput("rawPlot.facetWrap", "Facet wrap", F),
+          conditionalPanel(
+             condition = "input.rawPlot_scales == 'fixed'",
+             
+             sliderInput("rawPlot.x", "x-axis range",
+                         min = -10, max = 10, step = 0.25,
+                         value = c(-0.5, 1.5)),
+             sliderInput("rawPlot.y", "y-axis range",
+                         min = -10, max = 10, step = 0.25,
+                         value = c(-2, 2))
+          ),
+          
+          checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
+          conditionalPanel(
+             condition = "input.rawPlot_facetWrap == 'fixed'",
+             
+             selectInput("rawPlot.facet", "Facet",
+                         choices = c("depth" = "depth",
+                                     "day time" = "dTime",
+                                     "doy" = "doy"))
+          ),
+          
+          tags$hr(),
+          p(strong("Optional settings only available for figure 'Variable'")),
+          
+          
           selectInput("rawPlot.xcol", "X-axis",
                       choices = c("dTsym.dTas" = "dTsym.dTas",
                                   "dTas" = "dTas",
@@ -312,10 +342,6 @@ dataViewOutput = function(){
                                   "depth" = "depth")),
           selectInput("rawPlot.shape", "Shape",
                       choices = c("depth" = "depth",
-                                  "doy" = "doy")),
-          selectInput("rawPlot.facet", "Facet",
-                      choices = c("depth" = "depth",
-                                  "day time" = "dTime",
                                   "doy" = "doy"))
       ),
       box(title = "Figures",
@@ -323,11 +349,11 @@ dataViewOutput = function(){
           status = "info",
           tabsetPanel(
              tabPanel("Temperature difference", br(),
-                      actButton("save.deltaTfacetWrap", "Save figure", "saveFigure"),
-                      output.figure("deltaTfacetWrap")),
+                      output.figure("deltaTfacetWrap"),
+                      actButton("save.deltaTfacetWrap", "Save figure", "saveFigure")),
             tabPanel("Variable", br(),
-                     actButton("save.deltaTSingle", "Save figure", "saveFigure"),
-                      output.figure("deltaTSingle"))
+                     output.figure("deltaTSingle"),
+                     actButton("save.deltaTSingle", "Save figure", "saveFigure"))
           ))
    ))   
 }
@@ -356,11 +382,17 @@ kValueOutput <- function(){
           status = "warning",
           # sliderInput("kDepthSelect", "Depth", value = 1, 
           #             min = 1, max = 10, step = 1), 
-          radioButtons("kDepthSelect", "Sensor ID/ depth",
-                       choices = c(1:10), selected = 1, inline = T),
+          
+          uiOutput("kDepthSelect"),
+          
+          # .form-group .shiny-input-radiogroup .shiny-input-container .shiny-input-container-inline 
+          # .shiny-bound-input .element.style{               .shiny-options-group element.style {
+          #    background-color: #428bca;
+          #       padding: 10px 10px 30px 10px;
+          # }
+          
+          tags$hr(),
 
-          sliderInput("kRegressionDataPoints", "% data points used for regression",
-                      value = c(0, 100), min = 0, max = 100),
           selectInput("kMethod", "Method",
                       choices = c("regression" = "regression",
                                   "closest" = "closest",
@@ -375,7 +407,15 @@ kValueOutput <- function(){
              numericInput("kManual", "Enter k manually", value = 1.11)
           ),
 
-          actButton("kCreate", "Create new selection", "create"),
+          checkboxInput("dTimeFilter", "Filter data points by time", F),
+          conditionalPanel(
+             condition = "input.dTimeFilter == true",
+             numericInputRow("kRegressionTime.min", label = "Min",
+                             value = 0),
+             numericInputRow("kRegressionTime.max", label = "Max",
+                             value = 24),
+          ),
+          
           actButton("setK", "Set k-value", "setValue"),
           
           tabsetPanel(
@@ -491,27 +531,30 @@ sfIndexOutput <- function(){
       box(title = "Settings",
           collapsible = T, width = 4,
           status = "warning",
-          sliderInput("sfIndexPlot.x", "x-axis range",
-                      min = 0, max = 24, step = 0.25,
-                      value = c(0, 24)),
-          sliderInput("sfIndexPlot.y", "y-axis range",
-                      min = -10, max = 10, step = 0.25,
-                      value = c(-0.5, 2)),
-          checkboxInput("sfIndexPlot.scales", "Scales free",
+          # ToDO: Conditional panel not working
+          checkboxInput("sfIndexPlot_scales", "Scales free",
                         value = F),
+          conditionalPanel(condition = "input.sfIndexPlot_scales == 'FALSE'",
+                           sliderInput("sfIndexPlot.x", "x-axis range",
+                                       min = 0, max = 24, step = 0.25,
+                                       value = c(0, 24)),
+                           sliderInput("sfIndexPlot.y", "y-axis range",
+                                       min = -10, max = 10, step = 0.25,
+                                       value = c(-0.5, 2))
+                           ),
           checkboxInput("sfIndexPlot.wrap", "Facet wrap",
-                        value = T),
-          br(), tags$hr(), br(),
-          actButton("save.sfIndex", "Save figure `Complete`", "saveFigure"),
-          actButton("save.sfIndex.day", "Save figure `Daily`", "saveFigure")),
+                        value = T)
+          ),
       box(title = "Sap Flow Index",
           collapsible = T, width = 8,
           status = "info",
           tabsetPanel(
              tabPanel("Complete", br(),
-                      output.figure("sapFlowIndex")),
+                      output.figure("sapFlowIndex"),
+                      actButton("save.sfIndex", "Save figure", "saveFigure")),
              tabPanel("Daily", br(),
-                      output.figure("sapFlowIndex.Day"))
+                      output.figure("sapFlowIndex.Day"),
+                      actButton("save.sfIndex.day", "Save figure", "saveFigure"))
           ))
    ))   
 }

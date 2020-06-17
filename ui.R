@@ -9,9 +9,10 @@ shinyUI(
         dashboardSidebar(
             br(), br(), br(),
             sidebarMenu(menuOutput()),
+
             br(), br(), br(), tags$hr(),
             tags$footer("By Marie-Christin Wimmler", align = "center"),
-            tags$footer("05-2020", align = "center"),
+            tags$footer("06-2020", align = "center"),
             tags$hr()
             
         ),
@@ -49,7 +50,15 @@ shinyUI(
             fluidPage(
                 tags$script(src = "project-settings.js"),
                 tags$link(href = "styles.css",
-                          rel = "stylesheet")
+                          rel = "stylesheet"),
+                tags$head(tags$style(HTML(
+                    ".skin-black .sidebar-menu>li.active>a,
+                    .skin-black .sidebar-menu>li:hover>a {
+                        color: #fff;
+                        background: #1882ad;
+                        border-left-color: #fff;}
+                    "
+                    )))
             )
         )
 ))

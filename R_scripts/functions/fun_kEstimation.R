@@ -117,7 +117,7 @@ clean.data.iteration = function(data, initial.cutoff){
       # print(paste("nrow(data)  ", nrow(data)))
       
       if (nrow(data) < 50){
-         print("Less than 50 data points remaining.")
+         print("[Warning] Less than 3 data points were used for the regression.")
          data = data.n1
          break
       }

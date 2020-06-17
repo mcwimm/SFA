@@ -1,22 +1,22 @@
 get.rawData = function(file, inputType, header, sep, skip){
-   if (is.null(file)){
-      defaultData = "./tests/ICT_rawdata.csv"
-      print("Default data")
-      
-      return(get.temperatures.ICT(defaultData,
-                                  header = T, sep = ",",
-                                  skip = 10))
-   }
+   # if (is.null(file)){
+   #    defaultData = "./tests/ICT_rawdata.csv"
+   #    print("Default data")
+   #    
+   #    return(get.temperatures.ICT(defaultData,
+   #                                header = T, sep = ",",
+   #                                skip = 10))
+   # }
    # req(input$file1)
-   print(file)
+   # print(file)
    if (inputType == "ICT_raw"){
-      print("ICT_raw")
+      # print("ICT_raw")
       return(get.temperatures.ICT(file$datapath,
                                   header = header, sep = sep,
                                   skip = skip))
    }
    if (inputType == "ICT_delta"){
-      print("ICT_delta")
+      # print("ICT_delta")
       return(get.temp.differences.ICT(file$datapath,
                                       header = header, sep = sep,
                                       skip = skip))
@@ -234,9 +234,23 @@ save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
    plotObject = plotObject +
       ggtitle(prjName) +
       theme_bw(base_size = 14)
-   res = try(ggsave(plotObject, filename = paste(name, format,
-                                 sep = "."),
-             width = 12, height = 6, dpi = 600))
+   if (format == "svg"){
+      res = try(ggsave(plotObject, filename = paste(name, format,
+                                                    sep = "."),
+                       width = 12, height = 6))
+   }
+   if (format == "pdf"){
+      res = try(ggsave(plotObject, filename = paste(name, format,
+                                                    sep = "."),
+                       device=cairo_pdf,
+                       width = 12, height = 6))
+   }
+   if (format == "jpg"){
+      res = try(ggsave(plotObject, filename = paste(name, format,
+                                                    sep = "."),
+                       width = 12, height = 6, dpi = 900))
+   }
+
    if (is.null(res)){
       showNotification("File saved successfully!",
                        type = "message")
