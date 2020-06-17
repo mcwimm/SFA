@@ -23,7 +23,8 @@ shinyUI(
                         settingsOutput()),
                 
                 tabItem(tabName = "dat_upl",
-                        fluidRow(dataUplOutput())),
+                        dataUplOutput()),
+                        # fluidRow(dataUplOutput())),
                 tabItem(tabName = "dat_view",
                         fluidRow(dataViewOutput())),
                 

@@ -125,7 +125,7 @@ settingsOutput = function(){
           status = "warning", solidHeader = F, #height = 300,
           collapsible = T,
           
-          p("Please select a current project or create a new folder:"),
+          p("Please select a project or create a new folder:"),
           
           shinyDirButton('folder', 
                          'Folder select', 
@@ -197,6 +197,17 @@ box.dat_upl.upload = function(){
       br(), 
       # Input: Select a file ----
       fileInput("file1", "Choose CSV File",
+                buttonLabel = HTML("<span 
+                class='btn btn-primary' 
+                style='margin: -8px -13px;
+                  position: relative;
+                  top: -2px;
+                  border-radius: 0;margin: -8px -13px;
+                   position: relative;
+                   top: -2px;
+                   border-radius: 0;'>
+                                   Browse...
+                                   </span>"),
                 multiple = F,
                 accept = c("text/csv",
                            "text/comma-separated-values,text/plain",
@@ -228,19 +239,17 @@ box.dat_upl.depths = function(){
 
 dataUplOutput = function(){
    return(list(
+      fluidRow(
       box(title = "Description",
           collapsible = T,
           status = "info",
           includeMarkdown("./man/des_data.md"), br(),
-          tags$hr(),
-          # downloadButton("save_dat_upl", "Save csv"),
-          actButton("save_dat_upl", "Save csv", "saveCsv"),
-          br()),
+          tags$hr()),
       box(title = "Upload file",
           collapsible = T,
           status = "warning",
-          box.dat_upl.upload()),
-      box(title = "Data",
+          box.dat_upl.upload())),
+      fluidRow(box(title = "Data",
           collapsible = T,
           status = "info",
           
@@ -248,6 +257,8 @@ dataUplOutput = function(){
             tabPanel("wide", br(),
                      output.table("raw.wide")),
             tabPanel("long", br(),
+                     actButton("save_dat_upl", "Save csv", "saveCsv"),
+                     br(),
                      output.table("raw.long")))),
       box(title = "Other",
           collapsible = T,
@@ -259,7 +270,7 @@ dataUplOutput = function(){
           p("NOT WORKING!!!", style = "color:red"),
           actButton("getTimeRange", "Get time", "update"),
           dateRangeInput("daterange", "Date range:"),
-          actButton("updateTime", "Update time", "update")
+          actButton("updateTime", "Update time", "update"))
 
       )
       
@@ -277,7 +288,13 @@ dataViewOutput = function(){
           sliderInput("rawPlot.y", "y-axis range",
                       min = -10, max = 10, step = 0.25,
                       value = c(-2, 2)),
-          radioButtons("rawPlot.scales","Scales", c("free" = "free", "fixed" = "fixed"), inline=T),
+          radioButtons("rawPlot.scales","Scales", 
+                        choiceNames =  list(
+                           HTML("<span title='choose free'>free</span>"),
+                           HTML("<span title='choose fixed'>fixed</span>")
+                        ),
+                       choiceValues = list("free", "fixed"),
+                       inline=T),
           checkboxInput("rawPlot.facetWrap", "Facet wrap", F),
           selectInput("rawPlot.xcol", "X-axis",
                       choices = c("dTsym.dTas" = "dTsym.dTas",
@@ -334,20 +351,14 @@ kDescriptionOutput <- function(){
 
 kValueOutput <- function(){
    return(list(
-      box(title = "Settings",
+      box(title = "K-value estimation",
           collapsible = T, #width = 8,
           status = "warning",
-          sliderInput("kDepthSelect", "Depth", value = 1, 
-                      min = 1, max = 10, step = 1), 
-          tags$hr(),
-          radioButtons("k1Plot.scales","Scales", c("free" = "false", "fixed" = "true"), inline=T),
-          sliderInput("k1Plot.x", "x-axis range",
-                      min = -10, max = 10, step = 0.25,
-                      value = c(-2, 2)),
-          checkboxInput("k1Plot.fullrange", "Fullrange regression", 
-                        value = F),
-          
-          tags$hr(), 
+          # sliderInput("kDepthSelect", "Depth", value = 1, 
+          #             min = 1, max = 10, step = 1), 
+          radioButtons("kDepthSelect", "Sensor ID/ depth",
+                       choices = c(1:10), selected = 1, inline = T),
+
           sliderInput("kRegressionDataPoints", "% data points used for regression",
                       value = c(0, 100), min = 0, max = 100),
           selectInput("kMethod", "Method",
@@ -363,33 +374,16 @@ kValueOutput <- function(){
              condition = "input.kMethod == `manual`",
              numericInput("kManual", "Enter k manually", value = 1.11)
           ),
-          tags$hr(),
-          
+
           actButton("kCreate", "Create new selection", "create"),
-          actButton("setK", "Set k-value", "setValue")
-          ),
-      box(title = "Figures",
-          collapsible = T,
-          status = "info",
-          actButton("save.kPlots", "Save figures", "saveFigure"),
-          tabsetPanel(
-             tabPanel("Plot 1", br(),
-                      output.figure("kvaluePlot1")),
-             tabPanel("Plot 2", br(),
-                      output.figure("kvaluePlot2")),
-             tabPanel("Plot 3", br(),
-                      output.figure("kvaluePlot3"))
-             )
-          ),
-      box(title = "K-values",
-          collapsible = T,
-          status = "info",
+          actButton("setK", "Set k-value", "setValue"),
+          
           tabsetPanel(
              
              tabPanel("Selected", br(),
                       br(),
-                      actButton("save.kValues", "Save csv", "saveCsv"),
-                      output.table("kSelected")),
+                      output.table("kSelected"),
+                      actButton("save.kValues", "Save csv", "saveCsv")),
              tabPanel("Regression", br(),
                       output.table("kRegression")),
              tabPanel("Closest",
@@ -413,8 +407,36 @@ kValueOutput <- function(){
                                                   Tab = "\t"),
                                       selected = ",")),
                       output.table("uploadedKvalues"))
-             )
+          )
+          ),
+      box(title = "Control plots",
+          collapsible = T,
+          status = "info",
           
+          # radioButtons("k1Plot.scales", "Scales", c("free" = "false", "fixed" = "true"), inline=T),
+          radioButtons("k1Plot_scales", "Scales", c("free" = F, "fixed" = T), inline=T),
+          
+          conditionalPanel(
+             condition = "input.k1Plot_scales == 'TRUE'",
+             
+             sliderInput("k1Plot.x", "x-axis range",
+                         min = -10, max = 10, step = 0.25,
+                         value = c(-2, 2))
+             ),
+          
+          
+          checkboxInput("k1Plot.fullrange", "Fullrange regression", 
+                        value = F),
+          
+          tabsetPanel(
+             tabPanel("Plot 1", br(),
+                      output.figure("kvaluePlot1")),
+             tabPanel("Plot 2", br(),
+                      output.figure("kvaluePlot2")),
+             tabPanel("Plot 3", br(),
+                      output.figure("kvaluePlot3"))
+             ),
+          actButton("save.kPlots", "Save figures", "saveFigure")
           )
    ))
 }
@@ -502,23 +524,24 @@ sfDensityOutput <- function(){
           status = "warning",
          radioButtons("sapFlowDensityPlot.scales","Scales", 
                       c("fixed" = "fixed", "free" = "free"), inline = T),
-         checkboxInput("sapFlowDensityPlot.facetWrap", "Facet wrap", F),
          selectInput("sapFlowDensityPlot.y", "Y-axis",
                      choices = c("Sap flow per section" = "SFS",
                                  "Sap-wood-related density" = "SFDsw")),
          selectInput("sapFlowDensityPlot.color", "Color",
                      choices = c("depth" = "depth",
                                  "doy" = "doy")),
-         selectInput("sapFlowDensityPlot.facet", "Facet",
-                     choices = c("doy" = "doy",
-                                 "depth" = "depth")),
+         checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
+         conditionalPanel(condition = "input.sapFlowDensityPlot_facetWrap",# == 'TRUE'",
+                          selectInput("sapFlowDensityPlot.facet", "Facet",
+                                      choices = c("doy" = "doy",
+                                                  "depth" = "depth")))
       ),
       box(title = "Figure",
        collapsible = T, width = 8,
        status = "info",
+       output.figure("sapFlowDensity"),
        actButton("save.sapFlowDensity", "Save figure", "saveFigure"),
-       actButton("save.sapFlowDensityPlot", "Save csv", "saveCsv"),
-       output.figure("sapFlowDensity")
+       actButton("save.sapFlowDensityPlot", "Save csv", "saveCsv")
    )
    ))
 }

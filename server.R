@@ -13,8 +13,12 @@ shinyServer(function(input, output, session) {
         parseDirPath(c(wd='.'), input$folder)
     })
 
+    # projectName <- reactive({
+    #     return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
+    # })
+    
     projectName <- reactive({
-        return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
+      return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
     })
     
     figTitle <- reactive({
@@ -313,7 +317,7 @@ shinyServer(function(input, output, session) {
                    cleanedDataAndKvalues()[[1]],
                    input$k1Plot.x,
                    input$k1Plot.fullrange,
-                   input$k1Plot.scales)
+                   input$k1Plot_scales)
     })
     
     kplot2 <- reactive({
@@ -322,7 +326,7 @@ shinyServer(function(input, output, session) {
                    kValue(),
                    input$k1Plot.x,
                    input$k1Plot.fullrange,
-                   input$k1Plot.scales)
+                   input$k1Plot_scales)
     })
     
     kplot3 <- reactive({
@@ -431,7 +435,7 @@ shinyServer(function(input, output, session) {
                           y = input$sapFlowDensityPlot.y,
                           col = input$sapFlowDensityPlot.color, 
                           scales = input$sapFlowDensityPlot.scales, 
-                          facetWrap = input$sapFlowDensityPlot.facetWrap, 
+                          facetWrap = input$sapFlowDensityPlot_facetWrap, 
                           facet.col = input$sapFlowDensityPlot.facet)
     })
     
