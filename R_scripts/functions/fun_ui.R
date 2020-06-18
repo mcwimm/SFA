@@ -77,6 +77,7 @@ menuOutput = function(){
       menuItem("Project settings", tabName = "sett", icon = icon("chevron-down")),
       menuItem("Data", tabName = "data", icon = icon("chevron-down"),
                menuSubItem("Upload", tabName = "dat_upl"), 
+               menuSubItem("Filter", tabName = "dat_filter"),
                menuSubItem("View", tabName = "dat_view")),
       menuItem("K-value", tabName = "k_values", icon = icon("chevron-down"),
                menuSubItem("Description", tabName = "k_des"), 
@@ -290,14 +291,14 @@ dataUplOutput = function(){
           collapsible = T,
           status = "info",
           h4("Sensor depths"),
-          box.dat_upl.depths(),
-          tags$hr(),
-          h4("Subset data"),
-          p("NOT WORKING!!!", style = "color:red"),
-          #actButton("getTimeRange", "Get time", "update"),
-          dateRangeInput("daterange", "Date range:"),
-          actButton("updateTime", "Update time", "update"))
-
+          box.dat_upl.depths()#,
+          # tags$hr(),
+          # h4("Subset data"),
+          # p("NOT WORKING!!!", style = "color:red"),
+          # #actButton("getTimeRange", "Get time", "update"),
+          # dateRangeInput("daterange", "Date range:"),
+          # actButton("updateTime", "Update time", "update"))
+         )
       )
       
    ))
@@ -615,8 +616,8 @@ sfDensityOutput <- function(){
        collapsible = T, width = 8,
        status = "info",
        output.figure("sapFlowDensity"),
-       actButton("save.sapFlowDensity", "Save figure", "saveFigure"),
-       actButton("save.sapFlowDensityPlot", "Save csv", "saveCsv")
+       actButton("save.sapFlowDensityPlot", "Save figure", "saveFigure"),
+       actButton("save.sapFlowDensity", "Save csv", "saveCsv")
    )
    ))
 }

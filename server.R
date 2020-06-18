@@ -85,14 +85,53 @@ shinyServer(function(input, output, session) {
         
     })
     
-    deltaTempLong <- reactive({
-      # req(input$setData)
+    deltaTempLongNoFilter <- reactive({
       if (input$inputType == "ICT_raw"){
-          d = get.delta.from.temp(rawData(), depths())
+        d = get.delta.from.temp(rawData(), depths())
       }
       if (input$inputType == "ICT_delta"){
-          d = get.delta.temp(rawData(), depths())
+        d = get.delta.temp(rawData(), depths())
       }
+      return(d)
+      
+    })
+    
+    observeEvent(input$filter, {
+      print("Subset data")
+      deltaTempLong()
+    })
+    
+    filterData <- function(d){
+      print(nrow(d))
+      
+      d$doy <- as.numeric(d$doy)
+      
+      minDoy = as.numeric(strftime(input$daterange[1], format = "%j"))
+      maxDoy = as.numeric(strftime(input$daterange[2], format = "%j"))
+      
+      start = input$timerangeStart
+      end = input$timerangeEnd
+      
+      d = d %>%
+        filter(doy >= minDoy) %>%
+        filter(doy <= maxDoy)
+      
+      d = d %>%
+        filter(dTime >= start) %>% 
+        filter(dTime <= end)
+      print(nrow(d))
+      return(d)
+    }
+    
+    deltaTempLong <- reactive({
+      d = deltaTempLongNoFilter()
+      
+      print(input$filter[1])
+      if (input$filter[1] != 0){
+        print(input$filter[1])
+        d = filterData(d)
+      }
+
       return(d)
     })
     
@@ -117,24 +156,30 @@ shinyServer(function(input, output, session) {
     ### data file insights for ui ###
 
     minMaxDatetime <- reactive({
-        # d = deltaTempLong()
-        d = rawData()
-        minDate = as.Date(d[which.min(as.POSIXct(d$datetime)),
-                            "datetime"])
-        maxDate = as.Date(d[which.max(as.POSIXct(d$datetime)),
-                            "datetime"])
-        print(c(minDate, maxDate))
-        return(c(minDate, maxDate))
+      if (!is.null(input$file1)){
+        req(input$setData)
+        print("Require set data1")
+      } 
+      # d = deltaTempLong()
+      d = rawData()
+      minDate = as.Date(d[which.min(as.POSIXct(d$datetime)),
+                          "datetime"])
+      maxDate = as.Date(d[which.max(as.POSIXct(d$datetime)),
+                          "datetime"])
+      print(c(minDate, maxDate))
+      return(c(minDate, maxDate))
     })
     
-    observe({
-        req(input$getTimeRange)
+    observeEvent(input$LoadFilter, {
+      if (!is.null(input$file1)){
+        req(input$setData)
+      } 
+      updateDateRangeInput(session, "daterange",
+                           start = minMaxDatetime()[1],
+                           end = minMaxDatetime()[2],
+                           min = minMaxDatetime()[1],
+                           max = minMaxDatetime()[2])
 
-        updateDateRangeInput(session, "daterange",
-                             start = minMaxDatetime()[1],
-                             end = minMaxDatetime()[2],
-                             min = minMaxDatetime()[1],
-                             max = minMaxDatetime()[2])
     })
     
 
@@ -348,7 +393,10 @@ shinyServer(function(input, output, session) {
     kplot3 <- reactive({
         plot.kEst3(deltaTempLong.depth(), 
                    cleanedDataAndKvalues()[[1]],
-                   kValue())
+                   kValue(),
+                   input$k1Plot.x,
+                   input$k1Plot.fullrange,
+                   input$k1Plot_scales)
     })
     
     output$kvaluePlot1 <- renderPlot({ kplot1() })
@@ -426,10 +474,7 @@ shinyServer(function(input, output, session) {
         name = paste(projectPath(),
                      "/graphics/",
                      "sapFlowIndexComplete", sep = "")
-        obj = plot.sapFlowIndex(deltaTempLong(), 
-                                input$sfIndexPlot.y, 
-                                input$sfIndexPlot_scales,
-                                input$sfIndexPlot.wrap)
+        obj = sapFlowIndex()
         save.figure(name, obj, figTitle(), input$figFor)
     })
     
@@ -437,29 +482,32 @@ shinyServer(function(input, output, session) {
         name = paste(projectPath(),
                      "/graphics/",
                      "sapFlowIndexDaily", sep = "")
-        obj = plot.sapFlowIndex.Day(deltaTempLong(), 
-                                    input$sfIndexPlot.x, 
-                                    input$sfIndexPlot.y, 
-                                    input$sfIndexPlot_scales)
+        obj = sapFlowIndex.Day()
         save.figure(name, obj, figTitle(), input$figFor)
     })
     
     
     #### Graphics ####
+    sapFlowIndex <- reactive({
+      plot.sapFlowIndex(deltaTempLong(), 
+                        input$sfIndexPlot.y, 
+                        input$sfIndexPlot_scales,
+                        input$sfIndexPlot.wrap)
+    })
     
+    sapFlowIndex.Day <- reactive({
+      plot.sapFlowIndex.Day(deltaTempLong(), 
+                            input$sfIndexPlot.x, 
+                            input$sfIndexPlot.y, 
+                            input$sfIndexPlot_scales,
+                            input$sfIndexPlot.wrap)
+    })
     output$sapFlowIndex <- renderPlot({
-        plot.sapFlowIndex(deltaTempLong(), 
-                          input$sfIndexPlot.y, 
-                          input$sfIndexPlot_scales,
-                          input$sfIndexPlot.wrap)
+      sapFlowIndex()
     })
     
     output$sapFlowIndex.Day <- renderPlot({
-        plot.sapFlowIndex.Day(deltaTempLong(), 
-                              input$sfIndexPlot.x, 
-                              input$sfIndexPlot.y, 
-                              input$sfIndexPlot_scales,
-                              input$sfIndexPlot.wrap)
+      sapFlowIndex.Day()
     })
     
     sapFlowDensityPlot = reactive({
@@ -490,7 +538,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save.sapFlowDensityPlot, {
       name = paste(projectPath(),
                    "/graphics/",
-                   "sapFlowDensityPlot", sep = "")
+                   "sf_", input$sapFlowDensityPlot.y, sep = "")
       obj = sapFlowDensityPlot()
       save.figure(name, obj, figTitle(), input$figFor)
     })

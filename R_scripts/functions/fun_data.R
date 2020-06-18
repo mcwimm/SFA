@@ -235,6 +235,10 @@ save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
       ggtitle(prjName) +
       theme_bw(base_size = 14)
    
+   if (file.exists(paste(name, format, sep = "."))){
+      name = paste(name, as.numeric(Sys.time()), sep = "_")
+   }
+   
    if (format == "svg"){
       svg(filename = paste(name, format, sep = "."),
           width = 12, height = 6)

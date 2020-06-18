@@ -25,7 +25,27 @@ shinyUI(
                 
                 tabItem(tabName = "dat_upl",
                         dataUplOutput()),
-                        # fluidRow(dataUplOutput())),
+                
+                tabItem(tabName = "dat_filter",
+                        fluidRow(
+                            box(title = "Subset data",
+                                actButton("LoadFilter", "Load filter option", "update"),
+                                
+                                dateRangeInput("daterange", "Date range:"),
+                                # actButton("updateDate", "Update data", "update"),
+                                fluidRow(
+                                    column(6, numericInput("timerangeStart", "Start", value = 0)),
+                                    column(6, numericInput("timerangeEnd", "End", value = 24)),
+                                ),
+                                checkboxInput("removeOutlier", "Remove outlier", F),
+                                
+                                
+                                
+                                actButton("filter", "Apply filter", "update"),
+                                ),
+                            box(title = "Figures")
+                        )),
+            
                 tabItem(tabName = "dat_view",
                         fluidRow(dataViewOutput())),
                 
