@@ -234,24 +234,29 @@ save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
    plotObject = plotObject +
       ggtitle(prjName) +
       theme_bw(base_size = 14)
+   
    if (format == "svg"){
-      res = try(ggsave(plotObject, filename = paste(name, format,
-                                                    sep = "."),
-                       width = 12, height = 6))
+      svg(filename = paste(name, format, sep = "."),
+          width = 12, height = 6)
+      print(plotObject)
+      dev.off()
+      res = ifelse(file.exists(paste(name, format, sep = ".")) &
+                      file.info(paste(name, format, sep = "."))$size > 1, T, F)
    }
+   
    if (format == "pdf"){
-      res = try(ggsave(plotObject, filename = paste(name, format,
-                                                    sep = "."),
-                       device=cairo_pdf,
+      res = try(ggsave(plotObject, filename = paste(name, format, sep = "."),
                        width = 12, height = 6))
    }
+   
    if (format == "jpg"){
       res = try(ggsave(plotObject, filename = paste(name, format,
                                                     sep = "."),
                        width = 12, height = 6, dpi = 900))
    }
 
-   if (is.null(res)){
+   print(res)
+   if (is.null(res) || res){
       showNotification("File saved successfully!",
                        type = "message")
    } else {

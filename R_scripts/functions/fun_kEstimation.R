@@ -161,10 +161,12 @@ get.closestKvalues <- function(data){
    
    return(data %>% 
              group_by(depth) %>% 
-             summarise("Min dTsym.dTas" = min(dTsym.dTas),
-                       "k" = get_min_at_min(dTsym.dTas, dTas)))
-   
+             mutate(abs = abs((dTsym.dTas))) %>% 
+             summarise("min abs(dTsym.dTas)" = min(abs),
+                       "k" = get_min_at_min(abs, dTas)) 
+   )
 }
+
 
 
 #################

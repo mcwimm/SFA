@@ -50,15 +50,7 @@ shinyUI(
             fluidPage(
                 tags$script(src = "project-settings.js"),
                 tags$link(href = "styles.css",
-                          rel = "stylesheet"),
-                tags$head(tags$style(HTML(
-                    ".skin-black .sidebar-menu>li.active>a,
-                    .skin-black .sidebar-menu>li:hover>a {
-                        color: #fff;
-                        background: #1882ad;
-                        border-left-color: #fff;}
-                    "
-                    )))
+                          rel = "stylesheet")
             )
         )
 ))

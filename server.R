@@ -103,18 +103,14 @@ shinyServer(function(input, output, session) {
     
     depths <- reactive({
       # req(input$setData)
-      if (is.null(input$file1)){
-        depths = get.depths(depthManual = input$depthManual,
-                            inputType = input$inputType,
-                            dataSource = rawData(),
-                            depthInput = input$depthInput)
-      } else {
+      if (!is.null(input$file1)){
         req(input$setData)
-        depths = get.depths(depthManual = input$depthManual,
-                            inputType = input$inputType,
-                            dataSource = rawData(),
-                            depthInput = input$depthInput)
-      }
+      } 
+      
+      depths = get.depths(depthManual = input$depthManual,
+                          inputType = input$inputType,
+                          dataSource = rawData(),
+                          depthInput = input$depthInput)
       return(depths)
     })
     
@@ -382,13 +378,28 @@ shinyServer(function(input, output, session) {
                     kplot3(), figTitle(), input$figFor)
     })
 
-    #########################
-    ##### SAP FLOW INDEX ####
-    #########################
+    ####################
+    ##### SAP FLOW  ####
+    ####################
     
     
     
     #### Variables ####
+    
+    sapWoodDepth <- reactive({
+      if (input$sapWoodDepth == 0){
+        if (input$stemDiameter == 0){
+          swd = ((input$stemCircumference / pi) - input$barkThickness) / 2
+        } else {
+          swd = (input$stemDiameter - input$barkThickness) / 2
+        }
+      } else {
+        swd = input$sapWoodDepth
+      }
+      return(swd)
+    })
+    
+    
     sapFlow <- reactive({
       req(input$setK)
       kValues = values$df_data
@@ -401,7 +412,7 @@ shinyServer(function(input, output, session) {
       
       data = get.sapFlowDensity(method = "HFD",
                                 data = data,
-                                sapWoodDepth = input$sapWoodDepth,
+                                sapWoodDepth = sapWoodDepth(),
                                 Dst = input$ThermalDiffusivity,
                                 Zax = input$Zax, 
                                 Ztg = input$Ztg)
@@ -447,16 +458,27 @@ shinyServer(function(input, output, session) {
         plot.sapFlowIndex.Day(deltaTempLong(), 
                               input$sfIndexPlot.x, 
                               input$sfIndexPlot.y, 
-                              input$sfIndexPlot_scales)
+                              input$sfIndexPlot_scales,
+                              input$sfIndexPlot.wrap)
     })
     
     sapFlowDensityPlot = reactive({
-      plot.sapFlowDensity(data = sapFlow(), 
-                          y = input$sapFlowDensityPlot.y,
-                          col = input$sapFlowDensityPlot.color, 
-                          scales = input$sapFlowDensityPlot.scales, 
-                          facetWrap = input$sapFlowDensityPlot_facetWrap, 
-                          facet.col = input$sapFlowDensityPlot.facet)
+      print(input$setK)
+      if (input$setK[1] == 0){
+        ggplot() +
+          annotate(geom="text", x=5, y=5, 
+                   label="No k-values have been set yet.",
+                   color="red", size = 8) +
+          theme_void()
+      } else {
+        plot.sapFlowDensity(data = sapFlow(), 
+                            y = input$sapFlowDensityPlot.y,
+                            col = input$sapFlowDensityPlot.color, 
+                            scales = input$sapFlowDensityPlot_scales, 
+                            facetWrap = input$sapFlowDensityPlot_facetWrap, 
+                            facet.col = input$sapFlowDensityPlot.facet)
+      }
+      
     })
     
     output$sapFlowDensity <- renderPlot({

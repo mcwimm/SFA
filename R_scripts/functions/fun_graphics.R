@@ -26,6 +26,8 @@ get.labelledFacets = function(data, facet.col){
    return(factor(facet, labels = labs))
 }
 
+######### labels working in shiny ggplot
+# mit den Labels funktioniert die Anzeige, aber nicht das speichern an svg und beim pdf fehlen delta fehlt
 labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "dTas" = "dTas",
                "dTsa" = "dTsa",
@@ -38,6 +40,39 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "SFI" = "Sap Flow Index (\u00B0 C)",
                "SFS" = expression(paste("Sap Flow Density (g \u22C5 ", cm^-2, "\u22C5", s^-1, ")")),
                "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5", cm^-1, "\u22C5", s^-1, ")")))
+
+
+######### labels working for PDF but not in shiny
+# labels <- list("dTsym.dTas" = expression(dTsym~"·"~dTas^-1),
+#                "dTas" = "dTas",
+#                "dTsa" = "dTsa",
+#                "dTSym" = "dTSym",
+#                "dT" = expression(Delta~T~("°"~C)),
+#                "T" = expression(Delta~Temperature~("°"~C)),
+#                "doy" = "Day of year",
+#                "dTime" = "Time (h)",
+#                "depth" = "Sensor depth",
+#                "SFI" = "Sap Flow Index (°C)",
+#                "SFS" = expression(Sap~Flow~Density~(g~"·"~cm^-2~"·"~s^-1)),
+#                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~"·"~cm^-1~"·"~s^-1)))
+
+
+
+
+######### labels working for SVG
+# "·" in expression doesn't work = can not evaluate the combination of expression and "string"
+# labels <- list("dTsym.dTas" = expression(dTsym~~dTas^-1),
+#                "dTas" = "dTas",
+#                "dTsa" = "dTsa",
+#                "dTSym" = "dTSym",
+#                "dT" = "Δ T (°C)",
+#                "T" = "Δ Temperature (°C)",
+#                "doy" = "Day of year",
+#                "dTime" = "Time (h)",
+#                "depth" = "Sensor depth",
+#                "SFI" = "Sap Flow Index (°C)",
+#                "SFS" = expression(Sap~Flow~Density~(g~cm^-2~s^-1)),
+#                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~cm^-1~s^-1)))
 
 
 ######## TEMPERATURES ########
@@ -228,8 +263,9 @@ plot.kEst3 <- function(data.complete, data.adj, k){
 
 ######## SAP FLOW INDEX ########
 
-plot.sapFlowIndex = function(data, yRange, free, wrap){
-   scales = ifelse(free, "free", "fixed")
+plot.sapFlowIndex = function(data, yRange, scales, facetWrap){
+   # data$date <- as.POSIXct(data$datetime)
+   # print(class(data$date))
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = datetime, y = dTSym, col = factor(depth))) +
@@ -238,20 +274,34 @@ plot.sapFlowIndex = function(data, yRange, free, wrap){
            col = labels["depth"][[1]]) +
       theme_bw()
    
-   if (wrap){
+   if (facetWrap){
+      # timelist.minor = seq(from = min(data[data$dTime == 6, ]$datetime),
+      #                      to = max(data[data$dTime == 6, ]$datetime) + 1,
+      #                      by = "day")
+      # timelist = seq(from = min(data[data$dTime == 12, ]$datetime),
+      #                to = max(data[data$dTime == 12, ]$datetime) + 1,
+      #                by = "day")
+      # print(timelist)
       p = p +
-         facet_wrap(~ depth, labeller = label_both, scales = scales)
+         facet_wrap(~ depth, labeller = label_both, scales = scales) +
+         scale_x_datetime(#minor_breaks = date_breaks("6 hours"), 
+                          # breaks = timelist,
+                          labels = date_format("%d-%m\n%H:%M"))
+      
    }
+   
    if (scales == "fixed"){
       p = p +
          ylim(yRange[1], yRange[2]) 
    }
+   
+  
    return(p)
 }
 
-plot.sapFlowIndex.Day = function(data, xRange, yRange, free){
-   scales = ifelse(free, "free", "fixed")
-   
+
+
+plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap){
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = dTime, y = dTSym, group = doy, col = doy)) +
@@ -261,11 +311,17 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, free){
            y = labels["SFI"][[1]]) +
       theme_bw() 
    
+   if (facetWrap){
+      p = p +
+         facet_wrap(~ depth, labeller = label_both, scales = scales)
+   }
+   
    if (scales == "fixed"){
       p = p +
          xlim(xRange[1], xRange[2]) +
-         ylim(yRange[1], yRange[2]) 
+         ylim(yRange[1], yRange[2])
    }
+
    return(p)
 }
 
@@ -275,7 +331,8 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, free){
 plot.sapFlowDensity <- function(data, 
                                 y,
                                 col, 
-                                scales, facetWrap = T, facet.col){
+                                scales, 
+                                facetWrap = T, facet.col){
    y.col = data[, y]
    col.col = factor(data[, col])
    
@@ -285,9 +342,9 @@ plot.sapFlowDensity <- function(data,
       labs(x = labels["dTime"][[1]], 
            col = labels[col][[1]],
            y = labels[y][[1]]) +
-              #expression(paste("Sap Flow Density (g ", m^-2, s^-1, ")"))) +
       theme_bw() 
    
+
    if (facetWrap){
       facet = get.labelledFacets(data, facet.col)
       p = p +

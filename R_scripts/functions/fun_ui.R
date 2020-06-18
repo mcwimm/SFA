@@ -131,67 +131,81 @@ introOutput = function(){
 ################
 
 settingsOutput = function(){
-   return(list(
-      box(title = "Project",
-          status = "warning", solidHeader = F, #height = 300,
-          collapsible = T,
-          
-          p("Please select a project or create a new folder:"),
-          
-          shinyDirButton('folder', 
-                         'Folder select', 
-                         'Please select a folder', 
-                         # multiple = FALSE,
-                         style = buttonStyles("red"),
-                         icon = icon("folder-open")),
-          actButton("crtPrj", "Create/set project", "create"),
-          br(), br(),
-          h4("Current project"),
-          verbatimTextOutput("prjName"),
-          h4("Current project directory"),
-          verbatimTextOutput("prjDir")
-      ),
-      box(title = "Measuring environment",
-          status = "warning",
-          collapsible = T,
-          h4("Wood properties"),
-          numericInput("stemCircumference", "Stem circumference (cm)",
-                       value = 0.0),
-          numericInput("stemDiameter", "Stem diameter (cm)",
-                       value = 0.0),
-          # numericInput("barkThickness", "Bark thickness (cm)"),
-          numericInput("sapWoodDepth", "Sap wood depth (cm)",
-                       value = 5.0),
-          numericInput("ThermalDiffusivity", "Thermal diffusivity (cm/s)",
-                       value = 0.0025),
-          
-          h4("Sensor properties"),
-          numericInput("Zax", "Axial sensor distance Zax (mm)",
-                       value = 5),
-          numericInput("Ztg", "Tangential sensor distance Ztg (mm)",
-                       value = 10)
+   return(#list(
+      fluidRow(column(6,
+         fluidRow(
+          box(title = "Project",
+              status = "warning", solidHeader = F, #height = 300,
+              collapsible = T, width = 12,
+              
+              p("Please select a project or create a new folder:"),
+              
+              shinyDirButton('folder', 
+                             'Folder select', 
+                             'Please select a folder', 
+                             # multiple = FALSE,
+                             style = buttonStyles("red"),
+                             icon = icon("folder-open")),
+              actButton("crtPrj", "Create/set project", "create"),
+              br(), br(),
+              h4("Current project"),
+              verbatimTextOutput("prjName"),
+              h4("Current project directory"),
+              verbatimTextOutput("prjDir")
           ),
-      box(title = "Output",
-          status = "info", solidHeader = F, #height = 300,
-          collapsible = T,
-          p("These inputs are optional."),
-          selectInput("figFor", "Figure format",
-                      c("svg" = "svg",
-                        "pdf" = "pdf",
-                        "jpg" = "jpg")),
-          checkboxInput("prjNameAsTitle", "Use project name as title", value = T),
-          conditionalPanel(
-             condition = "input.prjNameAsTitle != true",
-             textInput("figTitle", "Figure title", placeholder = "Tree species")
-          ),
-          p(strong("Visualization")),
-          p("NOT WORKING!!!", style = "color:red"),
-          
-          textInput("gradientColorLow", "Gradient color low", placeholder = "#d8b365"),
-          textInput("gradientColorHigh", "Gradient color high", placeholder = "#5ab4ac")
-          
+          box(title = "Measuring environment",
+              status = "warning",
+              collapsible = T, width = 12,
+              h4("Wood properties"),
+              fluidRow(
+                 column(6, numericInput("stemCircumference", "Stem circumference (cm)",
+                                        value = 0.0)),
+                 column(6, numericInput("stemDiameter", "Stem diameter (cm)",
+                              value = 0.0))
+              ),
+              fluidRow(
+                 column(6, numericInput("sapWoodDepth", "Sap wood depth (cm)",
+                                        value = 0.0)),
+                 column(6, numericInput("barkThickness", "Bark thickness (cm)",
+                                        value = 0.0))
+              ),
+              numericInput("ThermalDiffusivity", "Thermal diffusivity (cm/s)",
+                           value = 0.0025),
+              
+              h4("Sensor properties"),
+              fluidRow(
+                 column(6, numericInput("Zax", "Axial sensor distance Zax (mm)",
+                                        value = 5)),
+                 column(6, numericInput("Ztg", "Tangential sensor distance Ztg (mm)",
+                                        value = 10))
+              )
           )
-   ))
+      )),
+      
+      column(6,
+         fluidRow(box(title = "Output",
+             status = "info", solidHeader = F, #height = 300,
+             collapsible = T, width = 12,
+             p("These inputs are optional."),
+             selectInput("figFor", "Figure format",
+                         c(#"svg" = "svg",
+                           "pdf" = "pdf",
+                           "jpg" = "jpg")),
+             checkboxInput("prjNameAsTitle", "Use project name as title", value = T),
+             conditionalPanel(
+                condition = "input.prjNameAsTitle != true",
+                textInput("figTitle", "Figure title", placeholder = "Tree species")
+             ),
+             p(strong("Visualization")),
+             p("NOT WORKING!!!", style = "color:red"),
+             
+             textInput("gradientColorLow", "Gradient color low", placeholder = "#d8b365"),
+             textInput("gradientColorHigh", "Gradient color high", placeholder = "#5ab4ac")
+             
+             )
+      ))
+   )
+   )
 }
 
 
@@ -201,14 +215,10 @@ settingsOutput = function(){
 
 box.dat_upl.upload = function(){
    return(list(
-      br(),
-      selectInput("inputType", "Input file type/ manufacturer",
-                  c("ICT_raw" = "ICT_raw", 
-                    "ICT_delta" = "ICT_delta")),
-      br(), 
       # Input: Select a file ----
-      fileInput("file1", "Choose CSV File",
-                buttonLabel = HTML("<span 
+      fluidRow(
+        column(6, fileInput("file1", "Choose CSV File",
+                            buttonLabel = HTML("<span 
                 class='btn btn-primary' 
                 style='margin: -8px -13px;
                   position: relative;
@@ -219,19 +229,24 @@ box.dat_upl.upload = function(){
                    border-radius: 0;'>
                                    Browse...
                                    </span>"),
-                multiple = F,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
+                            multiple = F,
+                            accept = c("text/csv",
+                                       "text/comma-separated-values,text/plain",
+                                       ".csv"))),
+        column(6,  selectInput("sep", "Separator", 
+                               choices = c("Semicolon" = ";",
+                                           "Comma" = ",",
+                                           "Tab" = "\t")))
+      ),
+      
+      selectInput("inputType", "Input file type/ manufacturer",
+                  c("ICT_raw" = "ICT_raw", 
+                    "ICT_delta" = "ICT_delta")),
       numericInput("skip", "Skip:", min = 0, max = 100, 10),
       # Input: Checkbox if file has header ----
       checkboxInput("header", "Header", TRUE),
       # Input: Select separator ----
-      radioButtons("sep", "Separator",
-                   choices = c(Comma = ",",
-                               Semicolon = ";",
-                               Tab = "\t"),
-                   selected = ","),
+     
       actButton("setData", "Use data", "create")
    ))
 }
@@ -314,7 +329,7 @@ dataViewOutput = function(){
           
           checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
           conditionalPanel(
-             condition = "input.rawPlot_facetWrap == 'fixed'",
+             condition = "input.rawPlot_facetWrap == true",
              
              selectInput("rawPlot.facet", "Facet",
                          choices = c("depth" = "depth",
@@ -380,17 +395,9 @@ kValueOutput <- function(){
       box(title = "K-value estimation",
           collapsible = T, #width = 8,
           status = "warning",
-          # sliderInput("kDepthSelect", "Depth", value = 1, 
-          #             min = 1, max = 10, step = 1), 
-          
+
           uiOutput("kDepthSelect"),
-          
-          # .form-group .shiny-input-radiogroup .shiny-input-container .shiny-input-container-inline 
-          # .shiny-bound-input .element.style{               .shiny-options-group element.style {
-          #    background-color: #428bca;
-          #       padding: 10px 10px 30px 10px;
-          # }
-          
+
           tags$hr(),
 
           selectInput("kMethod", "Method",
@@ -407,13 +414,19 @@ kValueOutput <- function(){
              numericInput("kManual", "Enter k manually", value = 1.11)
           ),
 
-          checkboxInput("dTimeFilter", "Filter data points by time", F),
+          checkboxInput("dTimeFilter", "Set custom night time", F),
           conditionalPanel(
              condition = "input.dTimeFilter == true",
-             numericInputRow("kRegressionTime.min", label = "Min",
-                             value = 0),
-             numericInputRow("kRegressionTime.max", label = "Max",
-                             value = 24),
+             fluidRow(
+                column(6, numericInput("kRegressionTime.start", label = "Start (0-24 h)",
+                                value = 0)),
+                column(6, numericInput("kRegressionTime.end", label = "End (0-24 h)",
+                                value = 24))
+             )
+             # numericInputRow("kRegressionTime.min", label = "Min",
+             #                 value = 0),
+             # numericInputRow("kRegressionTime.max", label = "Max",
+             #                 value = 24),
           ),
           
           actButton("setK", "Set k-value", "setValue"),
@@ -532,18 +545,29 @@ sfIndexOutput <- function(){
           collapsible = T, width = 4,
           status = "warning",
           # ToDO: Conditional panel not working
-          checkboxInput("sfIndexPlot_scales", "Scales free",
-                        value = F),
-          conditionalPanel(condition = "input.sfIndexPlot_scales == 'FALSE'",
-                           sliderInput("sfIndexPlot.x", "x-axis range",
-                                       min = 0, max = 24, step = 0.25,
-                                       value = c(0, 24)),
-                           sliderInput("sfIndexPlot.y", "y-axis range",
-                                       min = -10, max = 10, step = 0.25,
-                                       value = c(-0.5, 2))
-                           ),
-          checkboxInput("sfIndexPlot.wrap", "Facet wrap",
-                        value = T)
+
+          radioButtons("sfIndexPlot_scales","Scales", 
+                       choiceNames =  list(
+                          HTML("<span title='choose free'>free</span>"),
+                          HTML("<span title='choose fixed'>fixed</span>")
+                       ),
+                       choiceValues = list("free", "fixed"),
+                       inline=T),
+          conditionalPanel(
+             condition = "input.sfIndexPlot_scales == 'fixed'",
+             
+             sliderInput("sfIndexPlot.x", "Time slider (0-24 h), only available for 'Daily'-figure",
+                         min = 0, max = 24, step = 0.25,
+                         value = c(0, 24)),
+             sliderInput("sfIndexPlot.y", "y-axis range",
+                         min = -10, max = 10, step = 0.25,
+                         value = c(-0.5, 2))
+          ),
+
+          
+          checkboxInput("sfIndexPlot.wrap", "Facet wrap", T)
+          
+          
           ),
       box(title = "Sap Flow Index",
           collapsible = T, width = 8,
@@ -565,19 +589,27 @@ sfDensityOutput <- function(){
       box(title = "Figure settings",
           collapsible = T, width = 4,
           status = "warning",
-         radioButtons("sapFlowDensityPlot.scales","Scales", 
-                      c("fixed" = "fixed", "free" = "free"), inline = T),
+         
+         checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
+         conditionalPanel(
+            condition = "input.sapFlowDensityPlot_facetWrap == true",
+            radioButtons("sapFlowDensityPlot_scales","Scales", 
+                         choiceNames =  list(
+                            HTML("<span title='choose free'>free</span>"),
+                            HTML("<span title='choose fixed'>fixed</span>")
+                         ),
+                         choiceValues = list("free", "fixed"),
+                         inline=T),
+            selectInput("sapFlowDensityPlot.facet", "Facet",
+                        choices = c("doy" = "doy",
+                                    "depth" = "depth"))),
+
          selectInput("sapFlowDensityPlot.y", "Y-axis",
                      choices = c("Sap flow per section" = "SFS",
                                  "Sap-wood-related density" = "SFDsw")),
          selectInput("sapFlowDensityPlot.color", "Color",
                      choices = c("depth" = "depth",
-                                 "doy" = "doy")),
-         checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
-         conditionalPanel(condition = "input.sapFlowDensityPlot_facetWrap",# == 'TRUE'",
-                          selectInput("sapFlowDensityPlot.facet", "Facet",
-                                      choices = c("doy" = "doy",
-                                                  "depth" = "depth")))
+                                 "doy" = "doy"))
       ),
       box(title = "Figure",
        collapsible = T, width = 8,
