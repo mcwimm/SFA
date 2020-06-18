@@ -395,7 +395,6 @@ shinyServer(function(input, output, session) {
                    cleanedDataAndKvalues()[[1]],
                    kValue(),
                    input$k1Plot.x,
-                   input$k1Plot.fullrange,
                    input$k1Plot_scales)
     })
     

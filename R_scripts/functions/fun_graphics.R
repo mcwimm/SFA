@@ -201,7 +201,8 @@ plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScal
    return(p)
 }
 
-plot.kEst2 <- function(data.complete, data.adj, k, xRange, fullrange = F, fixedScales = T){
+plot.kEst2 <- function(data.complete, data.adj, k, 
+                       xRange, fullrange = F, fixedScales = T){
    d = data.complete %>% 
       mutate("K+dTsa" = (dTsa + k)) %>% 
       gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`)
@@ -235,7 +236,8 @@ plot.kEst2 <- function(data.complete, data.adj, k, xRange, fullrange = F, fixedS
    return(p)
 }
 
-plot.kEst3 <- function(data.complete, data.adj, k){
+plot.kEst3 <- function(data.complete, data.adj, k,
+                       xRange, fixedScales = T){
    d = data.complete %>%
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
@@ -258,6 +260,11 @@ plot.kEst3 <- function(data.complete, data.adj, k){
             shape = labels["T"][[1]]) +
       theme_bw()
    
+   if (fixedScales){
+      p = p +
+         xlim(xRange[1], xRange[2])
+   }
+
    return(p)
 }
 
@@ -305,7 +312,6 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap){
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = dTime, y = dTSym, group = doy, col = doy)) +
-      facet_wrap(~ depth, labeller = label_both, scales = scales) +
       labs(x = labels["dTime"][[1]], 
            col = labels["doy"][[1]],
            y = labels["SFI"][[1]]) +
