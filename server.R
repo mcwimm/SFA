@@ -70,6 +70,8 @@ shinyServer(function(input, output, session) {
     
     #### Variables ####
     
+    values <- reactiveValues(deltaTempLong = NULL)
+    
     rawData <- reactive({
       if (is.null(input$file1)){
         defaultData = "./tests/ICT_rawdata.csv"
@@ -95,15 +97,68 @@ shinyServer(function(input, output, session) {
       return(d)
       
     })
-    
-    observeEvent(input$filter, {
-      print("Subset data")
-      deltaTempLong()
+  
+    deltaTempLong <- reactive({
+      if (is.null(values$deltaTempLong)){
+        values$deltaTempLong <- deltaTempLongNoFilter()
+        
+      }
+      
+      return(values$deltaTempLong)
     })
     
-    filterData <- function(d){
-      print(nrow(d))
+
+    deltaTempLong.depth <- reactive({
+      deltaTempLong() %>% 
+        filter(depth == input$kDepthSelect)
+    })
+    
+    
+    depths <- reactive({
+      # req(input$setData)
+      if (!is.null(input$file1)){  # ToDO replace with req(input$file1)
+        req(input$setData)
+      } 
       
+      depths = get.depths(depthManual = input$depthManual,
+                          inputType = input$inputType,
+                          dataSource = rawData(),
+                          depthInput = input$depthInput)
+      return(depths)
+    })
+    
+    
+    observeEvent(input$LoadFilter, {
+      values$deltaTempLong <- deltaTempLongNoFilter()
+    })
+    
+    observeEvent(input$FilterApply, {
+      print("Within filter apply")
+      print(paste("nrow(data) before  ", nrow(data)))
+      
+      temp <- filterData(values$deltaTempLong)
+      
+      print(paste("nrow(data) after  ", nrow(temp)))
+      values$deltaTempLong <- temp
+      
+    })
+    
+    observeEvent(input$FilterDelete, {
+      print("Within filter delete")
+      
+      temp <- deltaTempLongNoFilter()
+      
+      values$deltaTempLong <- temp
+      
+      print(paste("nrow(data) after filter delete ", nrow(temp)))
+      
+      
+    })
+    
+    #### FILTER ####
+    
+    filterData <- function(d){
+
       d$doy <- as.numeric(d$doy)
       
       minDoy = as.numeric(strftime(input$daterange[1], format = "%j"))
@@ -119,41 +174,23 @@ shinyServer(function(input, output, session) {
       d = d %>%
         filter(dTime >= start) %>% 
         filter(dTime <= end)
+      
+      
+      if (input$removeOutlier){
+        d = remove.outlier(d, input$filterPlot_X)
+      }
+      
+      if (input$removeNA){
+        d = d[complete.cases(d), ]
+      }
+      
+      
       print(nrow(d))
       return(d)
     }
-    
-    deltaTempLong <- reactive({
-      d = deltaTempLongNoFilter()
-      
-      print(input$filter[1])
-      if (input$filter[1] != 0){
-        print(input$filter[1])
-        d = filterData(d)
-      }
 
-      return(d)
-    })
     
-    deltaTempLong.depth <- reactive({
-        deltaTempLong() %>% 
-            filter(depth == input$kDepthSelect)
-    })
-    
-    depths <- reactive({
-      # req(input$setData)
-      if (!is.null(input$file1)){
-        req(input$setData)
-      } 
-      
-      depths = get.depths(depthManual = input$depthManual,
-                          inputType = input$inputType,
-                          dataSource = rawData(),
-                          depthInput = input$depthInput)
-      return(depths)
-    })
-    
-    ### data file insights for ui ###
+    #### UI ####
 
     minMaxDatetime <- reactive({
       if (!is.null(input$file1)){
@@ -174,6 +211,30 @@ shinyServer(function(input, output, session) {
       if (!is.null(input$file1)){
         req(input$setData)
       } 
+      
+      output$filterOptions <- renderUI({
+        req(input$LoadFilter)
+        
+        tagList(
+          dateRangeInput("daterange", "Date range:"),
+          # actButton("updateDate", "Update data", "update"),
+          fluidRow(
+            column(6, numericInput("timerangeStart", "Start", value = 0)),
+            column(6, numericInput("timerangeEnd", "End", value = 24)),
+          ),
+          checkboxInput("removeOutlier", "Remove outlier", F),
+          
+          checkboxInput("removeNA", "Remove NA-rows", F),
+
+          fluidRow(
+            column(5, (actButton("FilterApply", "Apply filter", "update"))),
+            column(5, (actButton("FilterDelete", "Delete filter", "update"))),
+          ),
+          
+          textOutput("dataPoints")
+        )
+      })
+      
       updateDateRangeInput(session, "daterange",
                            start = minMaxDatetime()[1],
                            end = minMaxDatetime()[2],
@@ -181,6 +242,8 @@ shinyServer(function(input, output, session) {
                            max = minMaxDatetime()[2])
 
     })
+    
+    
     
 
     
@@ -202,9 +265,23 @@ shinyServer(function(input, output, session) {
         print(depths())
     })
     
+    output$dataPoints <- renderText({
+      paste(nrow(deltaTempLong()), " data points remaing.")
+    })
     
     #### Graphics ####
 
+    filterPlot <- reactive({
+      plot.histogram(data = deltaTempLong(), 
+                     x.col = input$filterPlot_X, 
+                     fill.col = input$filterPlot_col, 
+                     binwidth = input$filterPlot_binwidth,
+                     type = input$filterPlot_type,
+                     facetGrid = input$filterPlot_facetGrid,
+                     scales = input$filterPlot_scales)
+      
+    })
+    
     
     deltaTfacetWrap <- reactive({
         plot.deltaTfacetWrap(data = deltaTempLong(), 
@@ -228,12 +305,16 @@ shinyServer(function(input, output, session) {
                                facet = input$rawPlot.facet)
     })
     
+    output$filterPlot <- renderPlot({
+      filterPlot()
+    })
+    
     output$deltaTfacetWrap <- renderPlot({
-        deltaTfacetWrap()
+      deltaTfacetWrap()
     })
     
     output$deltaTSingle <- renderPlot({
-        deltaTSingle()
+      deltaTSingle()
     })
     
     #### Buttons ####
@@ -435,12 +516,11 @@ shinyServer(function(input, output, session) {
     
     sapWoodDepth <- reactive({
       if (input$sapWoodDepth == 0){
-        if (input$stemDiameter == 0){
-          swd = ((input$stemCircumference / pi) - input$barkThickness) / 2
+        if (input$stemCircumference == 0){
+          swd = input$stemDiameter/2 - input$barkThickness - input$hardWoodDepth
         } else {
-          swd = (input$stemDiameter - input$barkThickness) / 2
-        }
-      } else {
+          swd = input$stemCircumference / (2*pi) - input$barkThickness - input$hardWoodDepth
+        }} else {
         swd = input$sapWoodDepth
       }
       return(swd)

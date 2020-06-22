@@ -228,6 +228,21 @@ get.depths = function(depthManual = F, inputType,
 }
 
 
+########### CLEAN #############
+
+remove.outlier <- function(data, data.vector){
+   d = data[, data.vector]
+   Q <- quantile(d, probs=c(.25, .75), na.rm = FALSE)
+   iqr <- IQR(d)
+   up <-  Q[2] + 1.5 * iqr # Upper Range  
+   low <- Q[1] - 1.5 * iqr # Lower Range
+
+   data <- subset(data, data[, data.vector] > (Q[1] - 1.5*iqr) & 
+                     data[, data.vector] < (Q[2]+1.5*iqr))
+   return(data)
+}
+
+
 ########### SAVE #############
 
 save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){

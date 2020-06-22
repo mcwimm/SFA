@@ -159,17 +159,21 @@ settingsOutput = function(){
               collapsible = T, width = 12,
               h4("Wood properties"),
               fluidRow(
+                 column(4, numericInput("sapWoodDepth", "Sap wood depth (cm)",
+                                        value = 0.0)),
+                 column(4, numericInput("hardWoodDepth", "Hard wood depth (cm)",
+                                        value = 0.0)),
+                 column(4, numericInput("barkThickness", "Bark thickness (cm)",
+                                        value = 0.0))
+              ),
+              
+              fluidRow(
                  column(6, numericInput("stemCircumference", "Stem circumference (cm)",
                                         value = 0.0)),
                  column(6, numericInput("stemDiameter", "Stem diameter (cm)",
                               value = 0.0))
               ),
-              fluidRow(
-                 column(6, numericInput("sapWoodDepth", "Sap wood depth (cm)",
-                                        value = 0.0)),
-                 column(6, numericInput("barkThickness", "Bark thickness (cm)",
-                                        value = 0.0))
-              ),
+              
               numericInput("ThermalDiffusivity", "Thermal diffusivity (cm/s)",
                            value = 0.0025),
               
@@ -301,6 +305,56 @@ dataUplOutput = function(){
          )
       )
       
+   ))
+}
+
+dataFilterOutput = function(){
+   return(list(
+      fluidRow(
+         box(title = "Subset data",
+             collapsible = T, width = 4,
+             actButton("LoadFilter", "Load filter options", "update"),
+             
+             uiOutput("filterOptions")
+             
+         ),
+         
+         box(title = "Figures",
+             collapsible = T, width = 8,
+             
+             fluidRow(
+                column(4, checkboxInput("filterPlot_facetGrid", "Facet grid", F)),
+                column(4, 
+                       conditionalPanel(condition = "input.filterPlot_facetGrid == true",
+                                        
+                                        radioButtons("filterPlot_scales", "Scales", inline = T,
+                                                     choices = c("fixed" = "fixed", 
+                                                                 "free" = "free")))
+                )
+             ),
+             
+             radioButtons("filterPlot_type", "Diagram type", inline = T,
+                          choices = c("Boxplot" = "boxp",
+                                      "Histogram" = "hist", 
+                                      "Frequency polygons" = "freq")),
+             
+             fluidRow(
+                column(4, selectInput("filterPlot_X", "Variable",
+                                      choices = c("dTsym.dTas" = "dTsym.dTas",
+                                                  "dTas" = "dTas",
+                                                  "dTsa" = "dTsa",
+                                                  "dTSym" = "dTSym"))),
+                column(4, selectInput("filterPlot_col", "Color",
+                                      choices = c("none" = "none",
+                                                   "doy" = "doy",
+                                                  "depth" = "depth"))),
+                column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
+             ),
+             
+             output.figure("filterPlot"),
+             
+         )
+      )
    ))
 }
 

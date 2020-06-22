@@ -75,6 +75,66 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
 #                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~cm^-1~s^-1)))
 
 
+######## FILTER ########
+
+plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
+                           type, facetGrid = T, scales){
+   
+   x = data[, x.col]
+
+   if (fill.col != "none"){
+      fill = factor(data[, fill.col])
+      
+      p = data %>% 
+         ggplot(., aes(fill = fill, col = fill)) +
+         labs(fill = labels[fill.col][[1]],
+              col = labels[fill.col][[1]]) +
+         theme_bw()
+   } else {
+      p = data %>% 
+         ggplot(.) +
+         labs(fill = labels[fill.col][[1]],
+              col = labels[fill.col][[1]]) +
+         theme_bw()
+   }
+   
+   
+
+   
+   if (type == "hist"){
+      p = p +
+         geom_histogram(mapping=aes(x = x), binwidth = binwidth) + #, fill = fill
+         labs(x = labels[x.col][[1]])
+      
+   } 
+   if (type == "freq"){
+      p = p +
+         # geom_freqpoly(mapping=aes(x = x, col = fill), binwidth = binwidth)  +
+         geom_freqpoly(mapping=aes(x = x), binwidth = binwidth)  +
+         
+         labs(x = labels[x.col][[1]])
+   }
+   
+   if (type == "boxp"){
+      p = p +
+         geom_boxplot(mapping=aes(y = x), alpha = 0.1)  + #, group = fill, col = fill, fill = fill
+         labs(y = labels[x.col][[1]]) +
+         theme(axis.title.x=element_blank(),
+               axis.text.x=element_blank(),
+               axis.ticks.x=element_blank())
+   }
+   
+   
+   if (facetGrid){
+      p = p +
+         facet_grid(depth ~ doy, labeller = label_both, scales = scales)
+   }
+   
+
+   return(p)
+}
+
+
 ######## TEMPERATURES ########
 
 
@@ -311,7 +371,7 @@ plot.sapFlowIndex = function(data, yRange, scales, facetWrap){
 plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap){
    p = data %>% 
       ggplot(.) +
-      geom_line(aes(x = dTime, y = dTSym, group = doy, col = doy)) +
+      geom_line(aes(x = dTime, y = dTSym, group = factor(doy), col = factor(doy))) +
       labs(x = labels["dTime"][[1]], 
            col = labels["doy"][[1]],
            y = labels["SFI"][[1]]) +

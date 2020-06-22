@@ -50,17 +50,6 @@ get.regressionKvalues <- function(data){
 
 #### data cleaing
 
-remove.outlier <- function(data, data.vector){
-   Q <- quantile(data.vector, probs=c(.25, .75), na.rm = FALSE)
-   iqr <- IQR(data.vector)
-   up <-  Q[2] + 1.5 * iqr # Upper Range  
-   low <- Q[1] - 1.5 * iqr # Lower Range???
-   
-   data <- subset(data, data.vector > (Q[1] - 1.5*iqr) & 
-                     data.vector < (Q[2]+1.5*iqr))
-   return(data)
-}
-
 remove.right <- function(data, x.col, y.col){
    y.max <- max(data[, y.col])
    x.cutoff <- data[data[, y.col] == y.max, x.col]
@@ -79,8 +68,8 @@ remove.below <- function(data,  x.col, y.col){
 }
 
 cleaning <- function(data, x.col, y.col){
-   data <- remove.outlier(data, data[, x.col])
-   data <- remove.outlier(data, data[, y.col])
+   # data <- remove.outlier(data, data[, x.col])
+   # data <- remove.outlier(data, data[, y.col])
    
    data <- remove.below(data, x.col, y.col)
    data <- remove.right(data, x.col, y.col)
@@ -117,7 +106,7 @@ clean.data.iteration = function(data, initial.cutoff){
       # print(paste("nrow(data)  ", nrow(data)))
       
       if (nrow(data) < 50){
-         print("[Warning] Less than 3 data points were used for the regression.")
+         print("[Warning] Less than 50 data points were used for the regression.")
          data = data.n1
          break
       }
