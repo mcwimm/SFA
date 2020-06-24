@@ -27,3 +27,16 @@ body > .wrapper > header{
     position: sticky;
     top: 0
 }
+
+#kDepthSelect {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.skin-black .sidebar-menu>li.active>a,
+.skin-black .sidebar-menu>li:hover>a {
+    color: #fff;
+    background: #1882ad;
+    border-left-color: #fff;
+}
