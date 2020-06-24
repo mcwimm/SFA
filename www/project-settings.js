@@ -1,5 +1,5 @@
 /**
-* Stringmanager allows filname and projecttitle to be appended to the app's topbar
+* Stringmanager allows filename and projecttitle to be appended to the app's topbar
 */
 function StringManager(settings){
     this.element = settings.element || null;
