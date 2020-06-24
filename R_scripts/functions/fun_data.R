@@ -69,25 +69,25 @@ get.datetime.format = function(datetime){
 }
 
 
-#' Symetric and asymetric temperature differences for each needle depth.
+#' Symetric and asymetric temperature differences for each needle position.
 #' 
 #' @description 
 #' Returns asymetric and symetric temperature differences as well as 
-#' their ratio for each sensor depth.
+#' their ratio for each sensor position.
 #' 
 #' @details 
 #' The differences are calculated from raw temperature measurments of 
 #' sensors installed above, below and alongside the heater.
 #' 
-#' @usage get.delta.temp.depth(rawData, depth)
+#' @usage get.delta.temp.depth(rawData, position)
 #' 
-get.delta.from.temp.depth <- function(rawData, depth){
+get.delta.from.temp.depth <- function(rawData, position){
    raw_temperatures <- rawData[, grepl("Temp", colnames(rawData))]
    raw_temperatures <- raw_temperatures[, !grepl("Batt", colnames(raw_temperatures))]
    
-   reg.U <- paste(depth, "U", sep=".")
-   reg.L <- paste(depth, "L", sep=".")
-   reg.S <- paste(depth, "S", sep=".")
+   reg.U <- paste(position, "U", sep=".")
+   reg.L <- paste(position, "L", sep=".")
+   reg.S <- paste(position, "S", sep=".")
    
    t_up <- matrix(raw_temperatures[, grepl(reg.U,
                                                colnames(raw_temperatures))])
@@ -99,7 +99,7 @@ get.delta.from.temp.depth <- function(rawData, depth){
                                                  colnames(raw_temperatures))])
    
    if ((ncol(t_up) != 1) | (ncol(t_low) != 1) | (ncol(t_side) != 1)){
-      print(paste("There is more than one temperature dataset for depth ", depth,
+      print(paste("There is more than one temperature dataset for position ", position,
             ". Please check your raw data file.", sep = ""))
    }
    
@@ -130,11 +130,11 @@ get.delta.from.temp.depth <- function(rawData, depth){
 #' Returns asymetric and symetric temperature differences as well as 
 #' their ratio.
 #' 
-get.delta.from.temp = function(rawData, depths){
+get.delta.from.temp = function(rawData, positions){
    delta.temp = do.call(rbind, 
-                        lapply(depths, function(x)
-      cbind(depth = x, 
-            get.delta.from.temp.depth(rawData = rawData, depth = x))))
+                        lapply(positions, function(x)
+      cbind(position = x, 
+            get.delta.from.temp.depth(rawData = rawData, position = x))))
    
    # add hour of day and date of year
    delta.temp$dTime = convertTimeToDeci(as.character(rawData$Time))
@@ -146,9 +146,9 @@ get.delta.from.temp = function(rawData, depths){
 
 #' Helper function for get.delta.temp
 #' 
-get.delta.temp.depth = function(rawData, depth){
-   reg.sym <- paste("dTSym", depth, sep = "")
-   reg.asym <- paste("dTas", depth, sep = "")
+get.delta.temp.depth = function(rawData, position){
+   reg.sym <- paste("dTSym", position, sep = "")
+   reg.asym <- paste("dTas", position, sep = "")
 
    sym <- matrix(rawData[, grepl(reg.sym,
                                            colnames(rawData))])
@@ -157,7 +157,7 @@ get.delta.temp.depth = function(rawData, depth){
                                             colnames(rawData))])
    
    if ((ncol(sym) != 1) | (ncol(asym) != 1)){
-      print(paste("There is more than one temperature dataset for depth ", depth,
+      print(paste("There is more than one temperature dataset for position ", position,
                   ". Please check your raw data file.", sep = ""))
    }
    delta.temp <- data.frame(
@@ -177,12 +177,12 @@ get.delta.temp.depth = function(rawData, depth){
 }
 
 #' Make long format delta temperature data from wide format
-get.delta.temp = function(rawData, depths){
+get.delta.temp = function(rawData, positions){
    delta.temp = do.call(rbind, 
-           lapply(depths, function(x)
-              cbind(depth = x, 
+           lapply(positions, function(x)
+              cbind(position = x, 
                     get.delta.temp.depth(rawData = rawData, 
-                                         depth = x))))
+                                         position = x))))
    
    delta.temp$dTime = convertTimeToDeci(as.character(rawData$Time))
    delta.temp$doy <- strftime(rawData$datetime, format = "%j")
@@ -200,14 +200,14 @@ convertTimeToDeci <- function(time){
    return(dt)
 }
 
-#' Sensor depths
+#' Sensor positions
 #' 
 #' @description 
-#' Sensor depths are either extracted from raw data file or
+#' Sensor positions are either extracted from raw data file or
 #' entered manually
 #' 
-get.depths = function(depthManual = F, inputType,
-                      dataSource, depthInput){
+get.positions = function(positionManual = F, inputType,
+                      dataSource, positionInput){
 
    if (inputType == "ICT_raw"){
       reg = "Asym"
@@ -217,14 +217,14 @@ get.depths = function(depthManual = F, inputType,
       reg = "dTSym"
    }
    
-   if (depthManual){
-      depths = as.numeric(unlist(strsplit(depthInput,",")))
+   if (positionManual){
+      positions = as.numeric(unlist(strsplit(positionInput,",")))
    } else {
-      depths = c(1:ncol(dataSource[, grepl(reg, 
+      positions = c(1:ncol(dataSource[, grepl(reg, 
                                           colnames(dataSource))]))
    }
    
-   return(depths)
+   return(positions)
 }
 
 

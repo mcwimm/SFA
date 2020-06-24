@@ -1,17 +1,17 @@
 
-get.kByMethod <- function(method, data, depth, kManual = 1.11){
-   sensorDepth = depth
+get.kByMethod <- function(method, data, position, kManual = 1.11){
+   sensorDepth = position
    if (method == "manual"){
       k = kManual
    }
    
    if (method == "regression"){
-      k = get.regressionK.depth(data, depth)[, "k"]
+      k = get.regressionK.depth(data, sensorDepth)[, "k"]
    }
    
    if (method == "closest"){
       allK = get.closestKvalues(data)
-      k = allK[allK$depth == sensorDepth, "k"][[1]]
+      k = allK[allK$position == sensorDepth, "k"][[1]]
    }
    
    if (method == "csv"){
@@ -29,10 +29,10 @@ get.kByMethodAll <- function(data){
 ### regression ###
 ##################
 
-get.regressionK.depth <- function(data, depth){
-   sensorDepth = depth
+get.regressionK.depth <- function(data, position){
+   sensorDepth = position
    data = data %>% 
-      filter(depth == sensorDepth)
+      filter(position == sensorDepth)
    data.adj = clean.data.iteration(data, 0)
    
    df = data.frame(kAs = data.adj[[2]][[1]],
@@ -44,8 +44,8 @@ get.regressionK.depth <- function(data, depth){
 }
 
 get.regressionKvalues <- function(data){
-   depths = unique(data$depth)
-   return(do.call(rbind, lapply(depths, function(x) get.regressionK.depth(data, x))))
+   positions = unique(data$position)
+   return(do.call(rbind, lapply(positions, function(x) get.regressionK.depth(data, x))))
 }
 
 #### data cleaing
@@ -149,7 +149,7 @@ get_min_at_min <- function(vec1, vec2) {
 get.closestKvalues <- function(data){
    
    return(data %>% 
-             group_by(depth) %>% 
+             group_by(position) %>% 
              mutate(abs = abs((dTsym.dTas))) %>% 
              summarise("min abs(dTsym.dTas)" = min(abs),
                        "k" = get_min_at_min(abs, dTas)) 

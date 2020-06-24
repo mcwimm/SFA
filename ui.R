@@ -43,7 +43,27 @@ shinyUI(
                 tabItem(tabName = "sf_ind",
                         sfIndexOutput()),
                 tabItem(tabName = "sf_dens",
-                        sfDensityOutput())
+                        sfDensityOutput()),
+                tabItem(tabName = "sf_flow",
+                        
+                        fluidRow(
+                            box(title = "Settings",
+                                collapsible = T, width = 4,
+                                status = "warning",
+
+                                checkboxInput("treeScaleSimple1", "Method 1: SFD * Asd", F),
+                                checkboxInput("treeScaleSimple2", "Method 2: SFS / swd", F),
+                                checkboxInput("treeScaleSimple3", "Method 3: SFS * Csd", F)
+                                
+                            ),
+                            box(title = "Figures",
+                                collapsible = T, width = 8,
+                                status = "info",
+                                
+                                output.figure("SapFlowPlot"),
+                                actButton("save.SapFlow", "Save figures", "saveFigure")
+                            )
+                        ))
                     
             ),
             

@@ -36,10 +36,10 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "T" = paste("Temperature (\u00B0", "C)", sep = ""),
                "doy" = "Day of year",
                "dTime" = "Time (h)",
-               "depth" = "Sensor depth",
+               "position" = "Sensor position",
                "SFI" = "Sap Flow Index (\u00B0 C)",
-               "SFS" = expression(paste("Sap Flow Density (g \u22C5 ", cm^-2, "\u22C5", s^-1, ")")),
-               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5", cm^-1, "\u22C5", s^-1, ")")))
+               "SFS" = expression(paste("Sap Flow Density (g \u22C5 ", cm^-2, "\u22C5", h^-1, ")")),
+               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5", cm^-1, "\u22C5", h^-1, ")")))
 
 
 ######### labels working for PDF but not in shiny
@@ -51,7 +51,7 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
 #                "T" = expression(Delta~Temperature~("°"~C)),
 #                "doy" = "Day of year",
 #                "dTime" = "Time (h)",
-#                "depth" = "Sensor depth",
+#                "position" = "Sensor position",
 #                "SFI" = "Sap Flow Index (°C)",
 #                "SFS" = expression(Sap~Flow~Density~(g~"·"~cm^-2~"·"~s^-1)),
 #                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~"·"~cm^-1~"·"~s^-1)))
@@ -69,7 +69,7 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
 #                "T" = "Δ Temperature (°C)",
 #                "doy" = "Day of year",
 #                "dTime" = "Time (h)",
-#                "depth" = "Sensor depth",
+#                "position" = "Sensor position",
 #                "SFI" = "Sap Flow Index (°C)",
 #                "SFS" = expression(Sap~Flow~Density~(g~cm^-2~s^-1)),
 #                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~cm^-1~s^-1)))
@@ -127,7 +127,7 @@ plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
    
    if (facetGrid){
       p = p +
-         facet_grid(depth ~ doy, labeller = label_both, scales = scales)
+         facet_grid(position ~ doy, labeller = label_both, scales = scales)
    }
    
 
@@ -335,10 +335,10 @@ plot.sapFlowIndex = function(data, yRange, scales, facetWrap){
    # print(class(data$date))
    p = data %>% 
       ggplot(.) +
-      geom_line(aes(x = datetime, y = dTSym, col = factor(depth))) +
+      geom_line(aes(x = datetime, y = dTSym, col = factor(position))) +
       labs(x = "", 
            y = labels["SFI"][[1]],
-           col = labels["depth"][[1]]) +
+           col = labels["position"][[1]]) +
       theme_bw()
    
    if (facetWrap){
@@ -350,7 +350,7 @@ plot.sapFlowIndex = function(data, yRange, scales, facetWrap){
       #                by = "day")
       # print(timelist)
       p = p +
-         facet_wrap(~ depth, labeller = label_both, scales = scales) +
+         facet_wrap(~ position, labeller = label_both, scales = scales) +
          scale_x_datetime(#minor_breaks = date_breaks("6 hours"), 
                           # breaks = timelist,
                           labels = date_format("%d-%m\n%H:%M"))
@@ -379,7 +379,7 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap){
    
    if (facetWrap){
       p = p +
-         facet_wrap(~ depth, labeller = label_both, scales = scales)
+         facet_wrap(~ position, labeller = label_both, scales = scales)
    }
    
    if (scales == "fixed"){

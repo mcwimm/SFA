@@ -133,7 +133,7 @@ introOutput = function(){
 
 settingsOutput = function(){
    return(#list(
-      fluidRow(column(6,
+      fluidRow(column(8,
          fluidRow(
           box(title = "Project",
               status = "warning", solidHeader = F, #height = 300,
@@ -161,7 +161,7 @@ settingsOutput = function(){
               fluidRow(
                  column(4, numericInput("sapWoodDepth", "Sap wood depth (cm)",
                                         value = 0.0)),
-                 column(4, numericInput("hardWoodDepth", "Hard wood depth (cm)",
+                 column(4, numericInput("heartWoodDepth", "Heart wood depth (cm)",
                                         value = 0.0)),
                  column(4, numericInput("barkThickness", "Bark thickness (cm)",
                                         value = 0.0))
@@ -187,7 +187,7 @@ settingsOutput = function(){
           )
       )),
       
-      column(6,
+      column(4,
          fluidRow(box(title = "Output",
              status = "info", solidHeader = F, #height = 300,
              collapsible = T, width = 12,
@@ -258,14 +258,16 @@ box.dat_upl.upload = function(){
 
 box.dat_upl.depths = function(){
    return(list(
-      checkboxInput("depthManual", "Manual input",
+      checkboxInput("positionManual", "Manual input",
                     F),
       conditionalPanel(
-         condition = "input.depthManual == true",
-         textInput("depthInput", "Sensor depths",
-                   placeholder = "Sensor depths as vector (comma delimited): 1, 2, 3")),
-      h5('Extracted sensor depths'),
-      verbatimTextOutput("depths")
+         condition = "input.positionManual == true",
+         textInput("positionInput", "Sensor positions",
+                   placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3")),
+      h5('Extracted sensor positions'),
+      verbatimTextOutput("positions"),
+      img(src='./www/stemProfile.png')
+      
    ))
 }
 
@@ -294,7 +296,7 @@ dataUplOutput = function(){
       box(title = "Optional settings",
           collapsible = T,
           status = "info",
-          h4("Sensor depths"),
+          h4("Sensor positions"),
           box.dat_upl.depths()#,
           # tags$hr(),
           # h4("Subset data"),
@@ -347,7 +349,7 @@ dataFilterOutput = function(){
                 column(4, selectInput("filterPlot_col", "Color",
                                       choices = c("none" = "none",
                                                    "doy" = "doy",
-                                                  "depth" = "depth"))),
+                                                  "position" = "position"))),
                 column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
              ),
              
@@ -387,7 +389,7 @@ dataViewOutput = function(){
              condition = "input.rawPlot_facetWrap == true",
              
              selectInput("rawPlot.facet", "Facet",
-                         choices = c("depth" = "depth",
+                         choices = c("position" = "position",
                                      "day time" = "dTime",
                                      "doy" = "doy"))
           ),
@@ -409,9 +411,9 @@ dataViewOutput = function(){
           selectInput("rawPlot.col", "Color",
                       choices = c("day time" = "dTime",
                                   "doy" = "doy",
-                                  "depth" = "depth")),
+                                  "position" = "position")),
           selectInput("rawPlot.shape", "Shape",
-                      choices = c("depth" = "depth",
+                      choices = c("position" = "position",
                                   "doy" = "doy"))
       ),
       box(title = "Figures",
@@ -451,7 +453,7 @@ kValueOutput <- function(){
           collapsible = T, #width = 8,
           status = "warning",
 
-          uiOutput("kDepthSelect"),
+          uiOutput("kPositionSelect"),
 
           tags$hr(),
 
@@ -657,13 +659,13 @@ sfDensityOutput <- function(){
                          inline=T),
             selectInput("sapFlowDensityPlot.facet", "Facet",
                         choices = c("doy" = "doy",
-                                    "depth" = "depth"))),
+                                    "position" = "position"))),
 
          selectInput("sapFlowDensityPlot.y", "Y-axis",
                      choices = c("Sap flow per section" = "SFS",
                                  "Sap-wood-related density" = "SFDsw")),
          selectInput("sapFlowDensityPlot.color", "Color",
-                     choices = c("depth" = "depth",
+                     choices = c("position" = "position",
                                  "doy" = "doy"))
       ),
       box(title = "Figure",
