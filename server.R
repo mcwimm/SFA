@@ -116,7 +116,7 @@ shinyServer(function(input, output, session) {
     
     positions <- reactive({
       # req(input$setData)
-      if (!is.null(input$file1)){  # ToDO replace with req(input$file1)
+      if (!is.null(input$file1)){  
         req(input$setData)
       } 
       
@@ -124,7 +124,21 @@ shinyServer(function(input, output, session) {
                           inputType = input$inputType,
                           dataSource = rawData(),
                           positionInput = input$positionInput)
+
       return(positions)
+    })
+    
+    depths <- reactive({
+      if (!is.null(input$file1)){
+        req(input$setData)
+      }
+
+      depths = get.depths(depthManual = input$depthManual,
+                          inputType = input$sensorType,
+                          positions = positions(),
+                          rxy = input$stemDiameter / 2 - input$barkThickness,
+                          depth = input$depthInput)
+      return(depths)
     })
     
     
@@ -254,7 +268,8 @@ shinyServer(function(input, output, session) {
     }, options = list(scrollX = TRUE))
     
     output$raw.long <- DT::renderDataTable({ # raw data
-        return(deltaTempLong())
+        return(deltaTempLong() %>% 
+                 mutate_if(is.numeric, round, 3))
     }, options = list(scrollX = TRUE))
     
     
@@ -263,6 +278,12 @@ shinyServer(function(input, output, session) {
     output$positions <- renderPrint({
         # cat("As atomic vector:\n")
         print(positions())
+    })
+    
+    
+    output$depths <- renderPrint({
+      # cat("As atomic vector:\n")
+      print(depths())
     })
     
     output$dataPoints <- renderText({
@@ -369,6 +390,14 @@ shinyServer(function(input, output, session) {
     cleanedDataAndKvalues <- reactive({ # get cleaned data for regression plot
         d = deltaTempLong() %>%
             filter(position == input$kPositionSelect)
+        
+        if (input$dTimeFilter){
+          print(nrow(d))
+          d = d %>% 
+            filter(dTime >= input$kRegressionTime.start | dTime <= input$kRegressionTime.end) 
+          print(nrow(d))
+          
+        }
         return(clean.data.iteration(d, 0))
     })
     
@@ -381,23 +410,29 @@ shinyServer(function(input, output, session) {
             d = kFromCsv()
             kManual = d[d$position == input$kPositionSelect, "k"]
         }
+        
         get.kByMethod(method = input$kMethod, 
                       data = deltaTempLong(),
                       position = input$kPositionSelect,
+                      nightTimeStart = input$kRegressionTime.start, 
+                      nightTimeEnd = input$kRegressionTime.end,
                       kManual = kManual)
     })
 
     kComplete <- reactive({  # get k-values for all positions for closest, regression
-        get.kByMethodAll(deltaTempLong())
+        get.kByMethodAll(deltaTempLong(),
+                         nightTimeStart = input$kRegressionTime.start, 
+                         nightTimeEnd = input$kRegressionTime.end)
     })
     
     
     kFromCsv <- reactive({
-        kcsv = get.csvKvalues(input$file2, 
-                              header = input$header2, 
-                              sep = input$sep2,
-                              skip = input$skip2)
-        return(kcsv)
+      req(input$file2)
+      kcsv = get.csvKvalues(input$file2, 
+                            header = input$header2, 
+                            sep = input$sep2,
+                            skip = input$skip2)
+      return(kcsv)
         
     })
     
@@ -406,22 +441,30 @@ shinyServer(function(input, output, session) {
     values <- reactiveValues(df_data = NULL)  # create reactive value to store selected k-values
     
     observeEvent(input$setK, {  # store selected k-value in data.frame
-      if (input$setK[1] == 1){
+      if (input$setK[1] == 1 && is.null(input$file2)){
         values$df_data <-  data.frame(position = positions(),  
-                                     method = rep(NA),
-                                     k = rep(NA))
-        values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(method = as.character(input$kMethod),
-                                                                                 k = round(kValue(), 3))
-        
-        
-      } else {
-        values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(method = as.character(input$kMethod),
-                                                                                 k = round(kValue(), 3))
+                                      method = rep(NA),
+                                      k = rep(NA))
       }
-        
+      
+      values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(method = as.character(input$kMethod),
+                                                                                       k = round(kValue(), 3))
+      
     })
     
+    observeEvent(input$setKfromCsv, {
+      values$df_data <-  data.frame(position = positions(),  
+                                    method = rep(NA),
+                                    k = rep(NA))
+      csvK = kFromCsv()
 
+      for (pos in unique(csvK[, "position"])){
+        print(pos)
+        values$df_data[values$df_data$position == pos, 2:3] <- cbind(method = ifelse(is.null(as.character(csvK$method)), "csv", 
+                                                                                     as.character(csvK[csvK$position == pos, "method"])),
+                                                                     k = csvK[csvK$position == pos, "k"])
+      }
+    })
    
 
     #### Text outputs ####
@@ -548,6 +591,20 @@ shinyServer(function(input, output, session) {
       
     })
     
+    sensor.dist <- reactive({
+      if (input$distManual){
+        return(input$distInput)
+      } else {
+        if (input$sensorType == "HFD8-50"){
+          return(0.5)
+        }
+        if (input$sensorType == "HFD8-100"){
+          return(1)
+        }
+      }
+      
+    })
+    
     sapFlow <- reactive({
       methods <- list("treeScaleSimple1" = input$treeScaleSimple1,
                    "treeScaleSimple2" = input$treeScaleSimple2,
@@ -561,20 +618,19 @@ shinyServer(function(input, output, session) {
         if (methods[[m]]){
           method = names(methods)[m]
           print(method)
-          d = get.sapFlowByMethod(data = deltaTempLong(),
+          d = get.sapFlowByMethod(data = sapFlowDens(),
                                   method = method, 
                                   swd = sapWoodDepth(), 
-                                  sensor.dist = 10) %>% 
+                                  depths = depths(),
+                                  sensor.dist = sensor.dist()) %>% 
             mutate(sfMethod = method)
-          print("HEAD D")
-          
-          print(head(d))
+
           df = bind_rows(df, d)
           
         } 
       }        
-      print("HEAD DF")
-      print(head(df))
+
+      print(paste("SAP WOOD DEPTH  ", sapWoodDepth()))
       return(df)
     })
     
@@ -617,7 +673,10 @@ shinyServer(function(input, output, session) {
     sapFlowTreePlot <- reactive({
       sapFlow() %>% 
         ggplot(.)+
-        geom_line(aes(x = datetime, y = sf*100, color = sfMethod)) +
+        geom_line(aes(x = datetime, y = sf, color = sfMethod)) +
+        labs(x = "",
+             y = "Sap flow rate (kg/h)", 
+             color = "Scaling method") +
         theme_bw()
     })
     
@@ -632,7 +691,7 @@ shinyServer(function(input, output, session) {
     
     sapFlowDensityPlot = reactive({
       print(input$setK)
-      if (input$setK[1] == 0){
+      if (input$setK[1] == 0 && is.null(input$file2)){
         ggplot() +
           annotate(geom="text", x=5, y=5, 
                    label="No k-values have been set yet.",

@@ -228,6 +228,35 @@ get.positions = function(positionManual = F, inputType,
 }
 
 
+#' Sensor positions
+#' 
+get.depths <- function(depthManual = F, inputType,
+                       positions, rxy, depthInput){
+
+   if (depthManual){
+      df = data.frame(position = positions,
+                      depth = as.numeric(unlist(strsplit(depthInput, ","))))
+   } else {
+
+      if (inputType == "HFD8-50"){ # sensorLength = 6.2
+         df = data.frame(position = c(1:8),
+                         depth = seq((rxy-2), (rxy-2-3.5), by = -0.5))
+         
+      }
+      if (inputType == "HFD8-100"){ # sensorLength = 9.7
+         df = data.frame(position = c(1:8),
+                         depth = seq((rxy-2), (rxy-2-7), by = -1))
+         
+      }
+      
+      df = df[df$position %in% positions, ]
+      
+   }
+   
+   return(df)
+   
+}
+
 ########### CLEAN #############
 
 remove.outlier <- function(data, data.vector){

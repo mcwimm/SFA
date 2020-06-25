@@ -258,14 +258,39 @@ box.dat_upl.upload = function(){
 
 box.dat_upl.depths = function(){
    return(list(
-      checkboxInput("positionManual", "Manual input",
-                    F),
+      fluidRow(
+        column(4, checkboxInput("positionManual", "Manual position input",
+                                F)),
+        column(4, checkboxInput("depthManual", "Manual depth input",
+                                F)),
+        column(4, checkboxInput("distManual", "Manual sensor distance input",
+                                F))
+      ),
+      
       conditionalPanel(
          condition = "input.positionManual == true",
          textInput("positionInput", "Sensor positions",
                    placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3")),
-      h5('Extracted sensor positions'),
-      verbatimTextOutput("positions"),
+
+      conditionalPanel(
+         condition = "input.depthManual == true",
+         textInput("depthInput", "Sensor depths",
+                   placeholder = "Sensor depths (cm) as vector (comma delimited): 10, 8, 7.5")),
+      
+      conditionalPanel(
+         condition = "input.distManual == true",
+         numericInput("distInput", "Distance between sensors (cm)",
+                      value = 1)),
+      
+      selectInput("sensorType", "Sensor type",
+                  choices = c("HFD8-50", "HFD8-100")),
+
+      verbatimTextOutput("depths"),
+      
+      p("* negative values for 'depth' indicate that the sensor is longer than 
+        tree radius (DBH / 2 - barkthickness) and the respective sensor positions are on the opposite side of the tree. "),
+      
+      
       img(src='./www/stemProfile.png')
       
    ))
@@ -296,14 +321,8 @@ dataUplOutput = function(){
       box(title = "Optional settings",
           collapsible = T,
           status = "info",
-          h4("Sensor positions"),
           box.dat_upl.depths()#,
-          # tags$hr(),
-          # h4("Subset data"),
-          # p("NOT WORKING!!!", style = "color:red"),
-          # #actButton("getTimeRange", "Get time", "update"),
-          # dateRangeInput("daterange", "Date range:"),
-          # actButton("updateTime", "Update time", "update"))
+          
          )
       )
       
@@ -509,14 +528,18 @@ kValueOutput <- function(){
                       conditionalPanel(
                          condition = "input.moreOptions == 1",
                          
-                         numericInput("skip2", "Skip:", min = 0, max = 100, 0),
-                         checkboxInput("header2", "Header", TRUE),
-                         radioButtons("sep2", "Separator",
+                         fluidRow(
+                            column(6, numericInput("skip2", "Skip:", min = 0, max = 100, 0)),
+                            column(6, checkboxInput("header2", "Header", TRUE))
+                         ),
+                         radioButtons("sep2", "Separator", inline = T,
                                       choices = c(Comma = ",",
                                                   Semicolon = ";",
                                                   Tab = "\t"),
                                       selected = ",")),
-                      output.table("uploadedKvalues"))
+                      output.table("uploadedKvalues"),
+                      actButton("setKfromCsv", "Use k-values", "setValue")
+             )
           )
           ),
       box(title = "Control plots",

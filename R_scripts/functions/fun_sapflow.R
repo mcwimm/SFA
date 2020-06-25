@@ -14,7 +14,7 @@ get.sapFlowDensity <- function(method = "HFD", data, Dst, Zax, Ztg,
 #### Scale tree-level ####
 
 treeScaleSimple1 = function(data.depth, sensor.dist){
-   depth = data.depth$depth[1]
+   depth = abs(data.depth$depth[1])
    data.depth$Asd = pi * (depth^2 - (depth - sensor.dist)^2)
    data.depth$sfdepth = data.depth$SFDsw * data.depth$Asd
    return(data.depth)
@@ -22,7 +22,11 @@ treeScaleSimple1 = function(data.depth, sensor.dist){
 
 
 treeScaleSimple2 = function(data, swd){
-   Asw = pi * (max(data$depth[1])^2 - swd^2)
+   if (max(abs(data$depth[1]) <= swd)){
+      Asw = pi * max(abs(data$depth[1]))^2
+   } else {
+      Asw = pi * (max(abs(data$depth[1]))^2 - swd^2)
+   }
    
    data = data %>% 
       group_by(datetime) %>% 
@@ -34,8 +38,8 @@ treeScaleSimple2 = function(data, swd){
 }
 
 treeScaleSimple3 = function(data.depth){
-   depth = data.depth$depth[1]
-   
+   depth = abs(data.depth$depth[1]) -0.5
+
    data.depth$Csd = 2 * pi * depth
    data.depth$sfdepth = data.depth$SFS * data.depth$Csd
    return(data.depth)
@@ -43,22 +47,24 @@ treeScaleSimple3 = function(data.depth){
 
 
 get.sapFlowByMethod <- function(data, method,
-                                swd,
-                                sensor.dist = 10){
-   print("Head data in get.sapFlowByMethod")
-   print(head(data))
+                                swd, depths,
+                                sensor.dist){
+
    print("Method in get.sapFlowByMethod")
    print(method)
    
+   data = merge(data, depths, by = "position")                                 
    depths = unique(data$depth)
    
+  
    if (method == "treeScaleSimple1"){
-      
+      print("In method 1")
       d = do.call(rbind, 
                   lapply(depths, function(x)
                      treeScaleSimple1(data.depth = data[data$depth == x, ], 
                                       sensor.dist = sensor.dist)
                   ))
+      print(head(d))
       newData = d %>% 
          group_by(datetime) %>% 
          distinct(sf = sum(sfdepth) / 1000, doy = doy, dTime = dTime)
@@ -77,7 +83,7 @@ get.sapFlowByMethod <- function(data, method,
                   ))
       newData = d %>% 
          group_by(datetime) %>% 
-         distinct(sf = sum(sfdepth) / 1000, doy = doy, dTime = dTime) %>% 
+         distinct(sf = mean(sfdepth) / 1000, doy = doy, dTime = dTime) %>% 
          ungroup()
    }
    return(newData)

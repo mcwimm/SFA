@@ -1,12 +1,12 @@
 
-get.kByMethod <- function(method, data, position, kManual = 1.11){
+get.kByMethod <- function(method, data, position, nightTimeStart, nightTimeEnd, kManual = 1.11){
    sensorDepth = position
    if (method == "manual"){
       k = kManual
    }
    
    if (method == "regression"){
-      k = get.regressionK.depth(data, sensorDepth)[, "k"]
+      k = get.regressionK.depth(data, sensorDepth, nightTimeStart, nightTimeEnd)[, "k"]
    }
    
    if (method == "closest"){
@@ -20,8 +20,8 @@ get.kByMethod <- function(method, data, position, kManual = 1.11){
    return(k)
 }
 
-get.kByMethodAll <- function(data){
-   return(list( "regression" = get.regressionKvalues(data),
+get.kByMethodAll <- function(data, nightTimeStart, nightTimeEnd){
+   return(list( "regression" = get.regressionKvalues(data, nightTimeStart, nightTimeEnd),
                 "closest" = get.closestKvalues(data)))
 }
 
@@ -29,10 +29,11 @@ get.kByMethodAll <- function(data){
 ### regression ###
 ##################
 
-get.regressionK.depth <- function(data, position){
+get.regressionK.depth <- function(data, position, nightTimeStart, nightTimeEnd){
    sensorDepth = position
    data = data %>% 
-      filter(position == sensorDepth)
+      filter(position == sensorDepth) %>% 
+      filter(dTime >= nightTimeStart | dTime <= nightTimeEnd) 
    data.adj = clean.data.iteration(data, 0)
    
    df = data.frame(kAs = data.adj[[2]][[1]],
@@ -43,9 +44,9 @@ get.regressionK.depth <- function(data, position){
    return(df)
 }
 
-get.regressionKvalues <- function(data){
+get.regressionKvalues <- function(data, nightTimeStart, nightTimeEnd){
    positions = unique(data$position)
-   return(do.call(rbind, lapply(positions, function(x) get.regressionK.depth(data, x))))
+   return(do.call(rbind, lapply(positions, function(x) get.regressionK.depth(data, x, nightTimeStart, nightTimeEnd))))
 }
 
 #### data cleaing
@@ -106,7 +107,7 @@ clean.data.iteration = function(data, initial.cutoff){
       # print(paste("nrow(data)  ", nrow(data)))
       
       if (nrow(data) < 50){
-         print("[Warning] Less than 50 data points were used for the regression.")
+         print(paste("[Warning] Only ", nrow(data), " data points were used for the regression."))
          data = data.n1
          break
       }
