@@ -180,9 +180,9 @@ settingsOutput = function(){
               h4("Sensor properties"),
               fluidRow(
                  column(6, numericInput("Zax", "Axial sensor distance Zax (mm)",
-                                        value = 5)),
+                                        value = 15)),
                  column(6, numericInput("Ztg", "Tangential sensor distance Ztg (mm)",
-                                        value = 10))
+                                        value = 5))
               )
           )
       )),
