@@ -609,29 +609,36 @@ shinyServer(function(input, output, session) {
       methods <- list("treeScaleSimple1" = input$treeScaleSimple1,
                    "treeScaleSimple2" = input$treeScaleSimple2,
                    "treeScaleSimple3" = input$treeScaleSimple3)
-      print("METHODS")
-      print(methods)
+      # print("METHODS")
+      # print(methods)
       
-      df = data.frame()
-      for (m in 1:length(methods)){
-        print(m)
+      data = sapFlowDens()
+      print(names(data))
+      data = merge(data, depths(), by = "position")
+      
+      # df = data.frame()
+      for (m in c(1:length(methods))){
+        # print(m)
         if (methods[[m]]){
           method = names(methods)[m]
           print(method)
-          d = get.sapFlowByMethod(data = sapFlowDens(),
-                                  method = method, 
-                                  swd = sapWoodDepth(), 
-                                  depths = depths(),
-                                  sensor.dist = sensor.dist()) %>% 
-            mutate(sfMethod = method)
-
-          df = bind_rows(df, d)
+          data = get.sapFlowByMethod(data = data,
+                                     method = method, 
+                                     swd = sapWoodDepth()) 
+          # d = get.sapFlowByMethod(data = sapFlowDens(),
+          #                         method = method, 
+          #                         swd = sapWoodDepth(), 
+          #                         depths = depths(),
+          #                         sensor.dist = sensor.dist()) %>% 
+          #   mutate(sfMethod = method)
+          # 
+          # df = bind_rows(df, d)
           
         } 
       }        
 
       print(paste("SAP WOOD DEPTH  ", sapWoodDepth()))
-      return(df)
+      return(data)
     })
     
     #### Buttons ####
@@ -669,26 +676,6 @@ shinyServer(function(input, output, session) {
                             input$sfIndexPlot.wrap)
     })
     
-    
-    sapFlowTreePlot <- reactive({
-      sapFlow() %>% 
-        ggplot(.)+
-        geom_line(aes(x = datetime, y = sf, color = sfMethod)) +
-        labs(x = "",
-             y = "Sap flow rate (kg/h)", 
-             color = "Scaling method") +
-        theme_bw()
-    })
-    
-    
-    output$sapFlowIndex <- renderPlot({
-      sapFlowIndex()
-    })
-    
-    output$sapFlowIndex.Day <- renderPlot({
-      sapFlowIndex.Day()
-    })
-    
     sapFlowDensityPlot = reactive({
       print(input$setK)
       if (input$setK[1] == 0 && is.null(input$file2)){
@@ -706,6 +693,26 @@ shinyServer(function(input, output, session) {
                             facet.col = input$sapFlowDensityPlot.facet)
       }
       
+    })
+    
+    sapFlowTreePlot <- reactive({
+      sapFlow() %>% 
+        gather(., method, value, sfM1, sfM2, sfM3) %>% 
+        ggplot(.)+
+        geom_line(aes(x = datetime, y = value, color = method)) +
+        labs(x = "",
+             y = "Sap flow rate (kg/h)", 
+             color = "Scaling method") +
+        theme_bw()
+    })
+    
+    
+    output$sapFlowIndex <- renderPlot({
+      sapFlowIndex()
+    })
+    
+    output$sapFlowIndex.Day <- renderPlot({
+      sapFlowIndex.Day()
     })
     
     output$sapFlowDensity <- renderPlot({
@@ -743,4 +750,19 @@ shinyServer(function(input, output, session) {
       save.csv(name, obj)
     })
     
+    observeEvent(input$save.SapFlow, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "sapFlow_scaled", sep = "")
+      obj = sapFlowTreePlot()
+      save.figure(name, obj, figTitle(), input$figFor)
+    })
+    
+    observeEvent(input$save.SapFlowCsv, {
+      name = paste(projectPath(),
+                   "/csv-files/",
+                   "sapFlow_scaled", sep = "")
+      obj = sapFlow()
+      save.csv(name, obj)
+    })
 })
