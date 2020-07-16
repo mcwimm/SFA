@@ -6,11 +6,20 @@ shinyServer(function(input, output, session) {
     ###############
     
     #### Variables ####
+    volumes = getVolumes()
+    # folderInput1 <- shinyDirChoose(input, 'folder',
+    #                                roots = volumes,
+    #                                # session = session,
+    #                                filetypes = c('', 'txt'))
+    
     folderInput1 <- shinyDirChoose(input, 'folder',
                    roots=c(wd='.'), filetypes=c('', 'txt'))
     
     projectPath <- reactive({
-        parseDirPath(c(wd='.'), input$folder)
+        # parseDirPath(c(wd='.'), input$folder)
+      # getwd()
+      parseDirPath(c(wd=getwd()), input$folder)
+      
     })
 
     # projectName <- reactive({
