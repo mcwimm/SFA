@@ -283,7 +283,8 @@ box.dat_upl.depths = function(){
                       value = 1)),
       
       selectInput("sensorType", "Sensor type",
-                  choices = c("HFD8-50", "HFD8-100")),
+                  choices = c("HFD8-50", "HFD8-100"),
+                  selected = "HFD8-100"),
 
       verbatimTextOutput("depths"),
       
