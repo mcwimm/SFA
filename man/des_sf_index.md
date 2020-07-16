@@ -1,8 +1,4 @@
-= raw symmetrical temperature difference dT<sub>Sym</sub> 
+Raw symmetrical temperature difference dT<sub>Sym</sub>.
 
-- can be an indicator for water stress
-
-
-Equation example
-    h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
-
+"The ratio of predawn SFI to midday SFI and the period between the two daily SFI maxima [...] can be used to characterize internal plant water balance."
+Nadezhdina (1999)

@@ -292,7 +292,7 @@ box.dat_upl.depths = function(){
         tree radius (DBH / 2 - barkthickness) and the respective sensor positions are on the opposite side of the tree. "),
       
       
-      img(src='./www/stemProfile.png')
+      img(src='stemProfile.png', width = "100%")
       
    ))
 }
@@ -463,7 +463,12 @@ kDescriptionOutput <- function(){
       box(title = "K-diagrams",
           collapsible = T,
           status = "info",
-          includeMarkdown("./man/des_k_diagrams.md"))
+          includeMarkdown("./man/des_k_diagrams.md"),
+          img(src='Nadezhdina_2018_fig1.png', width = "80%"),
+          p(HTML('&nbsp;'),
+            a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"))
+          
+      )
    ))
 }
 
@@ -580,44 +585,54 @@ kValueOutput <- function(){
 ################
 
 sdDescriptionOutput <- function(){
-   return(list(
-      box(title = "Sap Flow Index",
-          collapsible = T, status = "info",
-          includeMarkdown("./man/des_sf_index.md")),
-      box(title = "Sap Flow Density",
-          collapsible = T, status = "info",
-          includeMarkdown("./man/des_sf_density.md")),
-      box(title = "Sap Flow",
-          collapsible = T, status = "info",
-          includeMarkdown("./man/des_sf.md")),
-      box(title = "Tree water use",
-          collapsible = T, status = "info",
-          includeMarkdown("./man/des_sf_twu.md")),
-      box(title = "References",
-          collapsible = T, status = "info",
-          p(strong("Sap flow index:"), 
-            HTML('&nbsp;'),
-            a("Nadezhdina et al. (2015)", href="https://content.sciendo.com/view/journals/johh/63/2/article-p124.xml",
-              target="_blank"), ",", 
-            HTML('&nbsp;'),
-            a("Nadezhdina (1999)", href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
-          p(strong("Sap flow density:"), 
-            HTML('&nbsp;'),
-            a("Nadezhdina (2018", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
-            HTML('&nbsp;'),
-            a("Author", href="", target="_blank")),
-          p(strong("Sap flow:"), 
-            HTML('&nbsp;'),
-            a("Author", href="", target="_blank"), ",",
-            HTML('&nbsp;'),
-            a("Author", href="", target="_blank")),
-          p(strong("Tree water use:"), 
-            HTML('&nbsp;'),
-            a("Author", href="", target="_blank"), ",",
-            HTML('&nbsp;'),
-            a("Author", href="", target="_blank")))
+   return(
+      fluidRow(
+         column(6,
+                box(title = "Sap Flow Index", width = "100%",
+                    collapsible = T, status = "info",
+                    includeMarkdown("./man/des_sf_index.md")),
+                box(title = "Sap Flow",
+                    collapsible = T, status = "info", width = "100%",
+                    includeMarkdown("./man/des_sf.md")),
+                box(title = "References",
+                    collapsible = T, status = "info", width = "100%",
+                    p(strong("Sap flow index:"), 
+                      HTML('&nbsp;'),
+                      a("Nadezhdina et al. (2015)", href="https://content.sciendo.com/view/journals/johh/63/2/article-p124.xml",
+                        target="_blank"), ",", 
+                      HTML('&nbsp;'),
+                      a("Nadezhdina (1999)", href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
+                    p(strong("Sap flow density:"), 
+                      HTML('&nbsp;'),
+                      a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
+                      HTML('&nbsp;'),
+                      a("Author", href="", target="_blank")),
+                    p(strong("Sap flow:"), 
+                      HTML('&nbsp;'),
+                      a("Author", href="", target="_blank"), ",",
+                      HTML('&nbsp;'),
+                      a("Author", href="", target="_blank")),
+                    p(strong("Tree water use:"), 
+                      HTML('&nbsp;'),
+                      a("Author", href="", target="_blank"), ",",
+                      HTML('&nbsp;'),
+                      a("Author", href="", target="_blank")))
+                ),
+         
+         
+         column(6,
+                box(title = "Sap Flow Density", width = "100%",
+                    collapsible = T, status = "info",
+                    includeMarkdown("./man/des_sf_density.md")),
+                
+                box(title = "Tree water use", width = "100%",
+                    collapsible = T, status = "info",
+                    includeMarkdown("./man/des_sf_twu.md"))
+                )
+         
+      )
       
-   ))
+   )
 }
 
 sfIndexOutput <- function(){

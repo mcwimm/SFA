@@ -1,2 +1,3 @@
-"What is K-value and how is it measured?  
-As we have shown, K-value is an extremely important parameter characteriz- ing the conducting properties at the sensor insertion place under local, specific mea- surement conditions. It involves informa- tion about the basic wood properties and heat conductivity in both axial and tangen- tial directions in a tangential section of a tree organ. K-value depends on the sensor geometry (the distances of thermocouples from the heater) and the surrounding con- ditions, including power supply levels and the degree of insulation. It also depends on the length of the heater and its relative po- sition in the SW/HW." (Nadezhdina, 2018)
+The K value is the absolute value of the temperature difference at zero sap flow and is used to calculate sap flow based on recorded temperature measurements.
+In zero flow conditions, K-values can be easily determined as intersection of dTas or dTs-a with Y axis of a K-diagram. In the case of no zero flow conditions, the K-value can be extrapolated. 
+
