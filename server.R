@@ -662,18 +662,20 @@ shinyServer(function(input, output, session) {
     
     #### Graphics ####
     sapFlowIndex <- reactive({
-      plot.sapFlowIndex(deltaTempLong(), 
-                        input$sfIndexPlot.y, 
-                        input$sfIndexPlot_scales,
-                        input$sfIndexPlot.wrap)
+      plot.sapFlowIndex(data = deltaTempLong(), 
+                        yRange = input$sfIndexPlot.y, 
+                        scales = input$sfIndexPlot_scales,
+                        facetWrap = input$sfIndexPlot_wrap,
+                        facet.col = input$sfIndexPlot.facet)
     })
     
     sapFlowIndex.Day <- reactive({
-      plot.sapFlowIndex.Day(deltaTempLong(), 
-                            input$sfIndexPlot.x, 
-                            input$sfIndexPlot.y, 
-                            input$sfIndexPlot_scales,
-                            input$sfIndexPlot.wrap)
+      plot.sapFlowIndex.Day(data = deltaTempLong(), 
+                            xRange = input$sfIndexPlot.x, 
+                            yRange = input$sfIndexPlot.y, 
+                            scales = input$sfIndexPlot_scales,
+                            facetWrap = input$sfIndexPlot_wrap,
+                            facet.col = input$sfIndexPlot.facet)
     })
     
     sapFlowDensityPlot = reactive({

@@ -344,7 +344,7 @@ dataFilterOutput = function(){
              collapsible = T, width = 8,
              
              fluidRow(
-                column(4, checkboxInput("filterPlot_facetGrid", "Facet grid", F)),
+                column(4, checkboxInput("filterPlot_facetGrid", "Facet wrap", F)),
                 column(4, 
                        conditionalPanel(condition = "input.filterPlot_facetGrid == true",
                                         
@@ -645,8 +645,14 @@ sfIndexOutput <- function(){
           ),
 
           
-          checkboxInput("sfIndexPlot.wrap", "Facet wrap", T)
-          
+          checkboxInput("sfIndexPlot_wrap", "Facet wrap", T),
+          conditionalPanel(
+             condition = "input.sfIndexPlot_wrap == true",
+             
+             selectInput("sfIndexPlot.facet", "Facet",
+                         choices = c("doy" = "doy",
+                                     "position" = "position"))
+          )
           
           ),
       box(title = "Sap Flow Index",
