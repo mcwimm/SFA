@@ -466,8 +466,8 @@ kDescriptionOutput <- function(){
           includeMarkdown("./man/des_k_diagrams.md"),
           img(src='Nadezhdina_2018_fig1.png', width = "80%"),
           p(HTML('&nbsp;'),
-            a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"))
-          
+            a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank")),
+          includeMarkdown("./man/des_k_diagrams2.md")
       )
    ))
 }
@@ -568,11 +568,11 @@ kValueOutput <- function(){
                         value = F),
           
           tabsetPanel(
-             tabPanel("Plot 1", br(),
+             tabPanel("K-diagram 1", br(),
                       output.figure("kvaluePlot1")),
-             tabPanel("Plot 2", br(),
+             tabPanel("Control-diagram 2", br(),
                       output.figure("kvaluePlot2")),
-             tabPanel("Plot 3", br(),
+             tabPanel("Control-diagram 3", br(),
                       output.figure("kvaluePlot3"))
              ),
           actButton("save.kPlots", "Save figures", "saveFigure")
