@@ -505,10 +505,6 @@ kValueOutput <- function(){
                 column(6, numericInput("kRegressionTime.end", label = "End (0-24 h)",
                                 value = 24))
              )
-             # numericInputRow("kRegressionTime.min", label = "Min",
-             #                 value = 0),
-             # numericInputRow("kRegressionTime.max", label = "Max",
-             #                 value = 24),
           ),
           
           actButton("setK", "Set k-value", "setValue"),
@@ -559,15 +555,15 @@ kValueOutput <- function(){
           uiOutput("xRangeSlider"),
 
           tabsetPanel(
-             tabPanel("K-diagram 1", br(),
+             tabPanel("K-diagram", br(),
                       checkboxInput("k1Plot.fullrange", "Fullrange regression", 
                                     value = F),
                       output.figure("kvaluePlot1")),
-             tabPanel("Control-diagram 2", br(),
+             tabPanel("Control-diagram 1", br(),
                       checkboxInput("k1Plot.forceOrigin", "Force regression through origin", 
                                     value = F),
                       output.figure("kvaluePlot2")),
-             tabPanel("Control-diagram 3", br(),
+             tabPanel("Control-diagram 2", br(),
                       output.figure("kvaluePlot3")),
              tabPanel("Night time", br(),
                       output.figure("kNightTimePlot"))
