@@ -555,26 +555,24 @@ kValueOutput <- function(){
           # radioButtons("k1Plot.scales", "Scales", c("free" = "false", "fixed" = "true"), inline=T),
           radioButtons("k1Plot_scales", "Scales", c("free" = F, "fixed" = T), inline=T),
           
-          conditionalPanel(
-             condition = "input.k1Plot_scales == 'TRUE'",
-             
-             sliderInput("k1Plot.x", "x-axis range",
-                         min = -10, max = 10, step = 0.25,
-                         value = c(-2, 2))
-             ),
           
-          
-          checkboxInput("k1Plot.fullrange", "Fullrange regression", 
-                        value = F),
-          
+          uiOutput("xRangeSlider"),
+
           tabsetPanel(
              tabPanel("K-diagram 1", br(),
+                      checkboxInput("k1Plot.fullrange", "Fullrange regression", 
+                                    value = F),
                       output.figure("kvaluePlot1")),
              tabPanel("Control-diagram 2", br(),
+                      checkboxInput("k1Plot.forceOrigin", "Force regression through origin", 
+                                    value = F),
                       output.figure("kvaluePlot2")),
              tabPanel("Control-diagram 3", br(),
-                      output.figure("kvaluePlot3"))
+                      output.figure("kvaluePlot3")),
+             tabPanel("Night time", br(),
+                      output.figure("kNightTimePlot"))
              ),
+          
           actButton("save.kPlots", "Save figures", "saveFigure")
           )
    ))

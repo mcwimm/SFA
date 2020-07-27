@@ -9,7 +9,7 @@ shinyUI(
         dashboardSidebar(
             br(), br(), br(),
             sidebarMenu(menuOutput()),
-
+            br(), br(), br(),
             br(), br(), br(), tags$hr(),
             tags$footer("By Marie-Christin Wimmler", align = "center"),
             tags$footer("06-2020", align = "center"),

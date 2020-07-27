@@ -389,6 +389,22 @@ shinyServer(function(input, output, session) {
                    selected = 1, inline = T)
     })
     
+    
+    output$xRangeSlider <- renderUI({
+      
+      min = round(min(deltaTempLong.depth()$dTsym.dTas), 2)
+      max = round(max(deltaTempLong.depth()$dTsym.dTas), 2)
+      tagList(
+        conditionalPanel(
+          condition = "input.k1Plot_scales == 'TRUE'",
+          fluidRow(
+            column(6, numericInput("k1Plot.x.min", "Min x-value", min)),
+            column(6, numericInput("k1Plot.x.max", "Max x-value", max))
+          )
+        ))
+    })
+    
+    
     #### Variables ####
     
     cleanedDataAndKvalues <- reactive({ # get cleaned data for regression plot
@@ -428,7 +444,6 @@ shinyServer(function(input, output, session) {
                          nightTimeStart = input$kRegressionTime.start, 
                          nightTimeEnd = input$kRegressionTime.end)
     })
-    
     
     kFromCsv <- reactive({
       req(input$file2)
@@ -502,31 +517,38 @@ shinyServer(function(input, output, session) {
     
     
     #### Graphics ####
+    kNightTime <- reactive({
+      plot.nighttime(data.complete = deltaTempLong.depth())
+
+    })
+    
     kplot1 <- reactive({
-        plot.kEst1(deltaTempLong.depth(),
-                   cleanedDataAndKvalues()[[1]],
-                   input$k1Plot.x,
-                   input$k1Plot.fullrange,
-                   input$k1Plot_scales)
+      plot.kEst1(data.complete = deltaTempLong.depth(),
+                 data.adj = cleanedDataAndKvalues()[[1]],
+                 xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
+                 fullrange = input$k1Plot.fullrange,
+                 fixedScales = input$k1Plot_scales)
     })
     
     kplot2 <- reactive({
-        plot.kEst2(deltaTempLong.depth(),
-                   cleanedDataAndKvalues()[[1]],
-                   kValue(),
-                   input$k1Plot.x,
-                   input$k1Plot.fullrange,
-                   input$k1Plot_scales)
+      plot.kEst2(data.complete = deltaTempLong.depth(),
+                 data.adj =cleanedDataAndKvalues()[[1]],
+                 k = kValue(),
+                 xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
+                 fullrange = input$k1Plot.fullrange,
+                 fixedScales = input$k1Plot_scales,
+                 force = input$k1Plot.forceOrigin)
     })
     
     kplot3 <- reactive({
-        plot.kEst3(deltaTempLong.depth(), 
-                   cleanedDataAndKvalues()[[1]],
-                   kValue(),
-                   input$k1Plot.x,
-                   input$k1Plot_scales)
+        plot.kEst3(data.complete = deltaTempLong.depth(), 
+                   data.adj = cleanedDataAndKvalues()[[1]],
+                   k = kValue(),
+                   xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
+                   fixedScales = input$k1Plot_scales)
     })
     
+    output$kNightTimePlot <- renderPlot({ kNightTime() })
     output$kvaluePlot1 <- renderPlot({ kplot1() })
     output$kvaluePlot2 <- renderPlot({ kplot2() })
     output$kvaluePlot3 <- renderPlot({ kplot3() })

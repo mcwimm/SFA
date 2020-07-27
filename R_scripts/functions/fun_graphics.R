@@ -221,11 +221,36 @@ plot.singleTemperature <- function(data, x.col, y.col, col.col, shape.col, facet
 
 ######## K-ESTIMATION ######## 
 
+get.intersection <- function(data, y.col, x.col1, x.col2){
+   m1 = lm(data[, y.col] ~ data[, x.col1], data = data)
+   m2 = lm(data[, y.col] ~ data[, x.col2], data = data)
+   a = coef(m1) - coef(m2)
+   x = -a[[1]] / a[[2]]
+   y = coef(m1)[[2]]*x + coef(m1)[[1]]
+   return(c(x, y))
+}
+
+plot.nighttime <- function(data.complete){
+   return(ggplot(data.complete, aes(x = dTime, y = dTsym.dTas,
+                             col = doy, group = doy)) +
+      # ylim(0, max(data.complete$dTsym.dTas)) +
+      geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
+      geom_line() +
+      labs(x = "Time (h)", y = labels["dTsym.dTas"][[1]]) +
+      theme_bw())
+}
+
 plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScales = T){
    d = data.complete %>% 
       gather(., temp, value, dTsa, dTas, dTSym)
    ad = data.adj %>% 
       gather(., temp, value, dTsa, dTas)
+   
+   if (min(data.complete$dTsym.dTas < 0)){
+      xmin = min(data.complete$dTsym.dTas < 0)
+   } else {
+      xmin = -0.1
+   }
    
    p = ggplot() +
       geom_point(d, 
@@ -242,9 +267,13 @@ plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScal
                                         label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
                             label.y.npc = c("top", "bottom")) + #"center", 
       scale_color_manual(values=fillcolors(3)) +
+      xlim(xmin, max(d$dTsym.dTas)) +
+      geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
+      
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
-           col = labels["T"][[1]]) +
+           col = labels["T"][[1]],
+           caption = "* Black cross (x): data point used for regression") +
       theme_bw()
    
    if (fixedScales){
@@ -262,24 +291,53 @@ plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScal
 }
 
 plot.kEst2 <- function(data.complete, data.adj, k, 
-                       xRange, fullrange = F, fixedScales = T){
+                       xRange, fullrange = F, fixedScales = T, force = T){
+   
+   if (min(data.complete$dTsym.dTas < 0)){
+      xmin = min(data.complete$dTsym.dTas < 0)
+   } else {
+      xmin = -0.1
+   }
+   
+   fit = ifelse(force, "y ~ x + 0", "y ~ x")
+   
    d = data.complete %>% 
       mutate("K+dTsa" = (dTsa + k)) %>% 
       gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`)
+
+   newAdj = data.adj %>% 
+      mutate("K+dTsa" = (dTsa + k))%>% 
+      gather(., temp, value, dTSym, `K+dTsa`) #dTsa, dTas, 
+   
 
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
                              col = temp), shape = 1) +
-      stat_smooth(data.adj, method = "lm", 
-                  mapping=aes(x = dTsym.dTas, y = dTas),
-                  col = "red") +
+      geom_point(newAdj, 
+                 mapping=aes(x = dTsym.dTas, y = value), 
+                 shape = 4) +
+      stat_smooth(newAdj, method = "lm", formula = fit,
+                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                              col = temp),
+                  col = "red", size = 0.5,
+                  fullrange = T, se = F) +
+      stat_regline_equation(newAdj,
+                            formula = fit, #force through origin x+0
+                            mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                                        label =  ..adj.rr.label..),
+                            label.y.npc = c("top", "bottom")) + 
       geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                      label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
       scale_color_manual(values=fillcolors(4)) +
+      xlim(xmin, max(d$dTsym.dTas)) +
+      ylim(min(d$value), max(d$value)) +
+      geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
+      geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
-           col = labels["T"][[1]]) +
+           col = labels["T"][[1]],
+           caption = "* Black cross (x): data point used for regression") +
       theme_bw()
    
    if (fixedScales){
@@ -302,22 +360,69 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
    
+   newAdj = data.adj %>% 
+      mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) 
+   names(newAdj)
+   int1 = round(get.intersection(newAdj, "dTas", "dTsym.dTas", "R = (k + dTsa) / dTas"), 2)
+   int2 = round(get.intersection(newAdj, "dTsa", "dTsym.dTas", "R = (k + dTsa) / dTas"), 2)
+
+   newAdj = data.adj %>% 
+      mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
+      gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
+   
+   if (min(data.complete$dTsym.dTas < 0)){
+      xmin = min(data.complete$dTsym.dTas < 0)
+   } else {
+      xmin = -0.1
+   }
+   
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = x.value, y = dTas, 
                              col = x.temp, shape = "dTas")) +
+      geom_point(newAdj, 
+                 mapping=aes(x = x.value, y = dTas), 
+                 shape = 4) +
+      stat_smooth(newAdj, method = "lm",
+                  mapping=aes(x = x.value, y = dTas,
+                              col = x.temp, group = x.temp),
+                  col = "red", size = 0.5,
+                  fullrange = T, se = F) +
+      
       geom_point(d, 
                  mapping=aes(x = x.value, y = dTsa, 
                              col = x.temp, shape = "dTsa")) +
-      scale_x_continuous("dTsa / dTas",
-                         sec.axis = sec_axis(~ . , name = "R = (k + dTsa) / dTas")) +
+      geom_point(newAdj, 
+                 mapping=aes(x = x.value, y = dTsa), 
+                 shape = 4) +
+      stat_smooth(newAdj, method = "lm",
+                  mapping=aes(x = x.value, y = dTsa,
+                              col = x.temp, group = x.temp),
+                  col = "red", size = 0.5,
+                  fullrange = T, se = F) +
+      
       geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
                      label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
+      geom_label(aes(x = 0, y = int1[2]*1.15,
+                     label = paste(int1[1], int1[2], sep = " | ")), 
+                     fill = "#C9C9C9", alpha = 0.5) +
+      geom_label(aes(x = 0, y = int2[2]*1.15,
+                     label = paste(int2[1], int2[2], sep = " | ")), 
+                 fill = "#C9C9C9", alpha = 0.5) +
+      
       scale_color_manual(values=fillcolors(2)) +
       scale_shape_manual(values = c(21, 24)) +
-      labs( y = labels["dT"][[1]], 
+      xlim(xmin, max(d$x.value)) +
+      ylim(-max(d$dTas), max(d$dTas)) +
+      
+      geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
+      
+      labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
+            y = labels["dT"][[1]], 
             col = "x-axis", 
-            shape = labels["T"][[1]]) +
+            shape = labels["T"][[1]],
+            caption = "* Black cross (x): data point used for regression.
+            Gray-shaded values indicate the point of intersection of the two lines.") +
       theme_bw()
    
    if (fixedScales){
