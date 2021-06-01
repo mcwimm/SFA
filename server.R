@@ -391,9 +391,10 @@ shinyServer(function(input, output, session) {
     
     
     output$xRangeSlider <- renderUI({
-      
+
       min = round(min(deltaTempLong.depth()$dTsym.dTas), 2)
       max = round(max(deltaTempLong.depth()$dTsym.dTas), 2)
+      
       tagList(
         conditionalPanel(
           condition = "input.k1Plot_scales == 'TRUE'",
