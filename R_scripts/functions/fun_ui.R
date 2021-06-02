@@ -262,8 +262,6 @@ box.dat_upl.depths = function(){
         column(4, checkboxInput("positionManual", "Manual position input",
                                 F)),
         column(4, checkboxInput("depthManual", "Manual depth input",
-                                F)),
-        column(4, checkboxInput("distManual", "Manual sensor distance input",
                                 F))
       ),
       
@@ -275,18 +273,22 @@ box.dat_upl.depths = function(){
       conditionalPanel(
          condition = "input.depthManual == true",
          textInput("depthInput", "Sensor depths",
-                   placeholder = "Sensor depths (cm) as vector (comma delimited): 10, 8, 7.5")),
+                   placeholder = "Sensor depths (cm) as vector (comma delimited): 
+                   10, 8, 7.5")),
+
+      
+      selectInput("sensorType", "Sensor type",
+                  choices = c("HFD8-50", "HFD8-100", "Manual"),
+                  selected = "HFD8-100"),
+
       
       conditionalPanel(
-         condition = "input.distManual == true",
+         condition = "input.sensorType == 'Manual'",
          numericInput("distInput", "Distance between sensors (cm)",
                       value = 1)),
       
-      selectInput("sensorType", "Sensor type",
-                  choices = c("HFD8-50", "HFD8-100"),
-                  selected = "HFD8-100"),
-
-      p("<Note> To calculate sensor depths, information on wood properties are required
+      
+      p("<Note> Information on wood properties are required to calculate sensor depths 
         (see 'Project Settings')."),
       
       verbatimTextOutput("depths"),

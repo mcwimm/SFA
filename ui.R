@@ -50,7 +50,10 @@ shinyUI(
                             box(title = "Settings",
                                 collapsible = T, width = 4,
                                 status = "warning",
-
+                                
+                                p("<Note> Be careful with negative depths that might occur 
+                                  if the sensor crosses the center of the tree."),
+                                
                                 checkboxInput("treeScaleSimple1", "Method 1: SFD * Asd", T),
                                 checkboxInput("treeScaleSimple2", "Method 2: SFS / swd", T),
                                 checkboxInput("treeScaleSimple3", "Method 3: SFS * Csd", T)

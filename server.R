@@ -148,7 +148,8 @@ shinyServer(function(input, output, session) {
                           inputType = input$sensorType,
                           positions = positions(),
                           rxy = rxy,
-                          depth = input$depthInput)
+                          depth = input$depthInput,
+                          sensor_distance = sensor.dist())
       return(depths)
     })
     
@@ -624,17 +625,15 @@ shinyServer(function(input, output, session) {
     })
     
     sensor.dist <- reactive({
-      if (input$distManual){
-        return(input$distInput)
-      } else {
-        if (input$sensorType == "HFD8-50"){
-          return(0.5)
-        }
-        if (input$sensorType == "HFD8-100"){
-          return(1)
-        }
+      if (input$sensorType == "HFD8-50"){
+        return(0.5)
       }
-      
+      if (input$sensorType == "HFD8-100"){
+        return(1)
+      }
+      if (input$sensorType == "Manual"){
+        return(input$distInput)
+      }
     })
     
     sapFlow <- reactive({
