@@ -286,6 +286,9 @@ box.dat_upl.depths = function(){
                   choices = c("HFD8-50", "HFD8-100"),
                   selected = "HFD8-100"),
 
+      p("<Note> To calculate sensor depths, information on wood properties are required
+        (see 'Project Settings')."),
+      
       verbatimTextOutput("depths"),
       
       p("* negative values for 'depth' indicate that the sensor is longer than 
