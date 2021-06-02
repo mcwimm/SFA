@@ -117,7 +117,7 @@ shinyServer(function(input, output, session) {
         filter(position == input$kPositionSelect)
     })
     
-    
+    # Get sensor positions (a vector numbering the sensors) from input file
     positions <- reactive({
       # req(input$setData)
       if (!is.null(input$file1)){  
@@ -136,11 +136,18 @@ shinyServer(function(input, output, session) {
       if (!is.null(input$file1)){
         req(input$setData)
       }
-
+      
+      # Calculate the distance Rxy from the stem center to the inner bark
+      # Prioritize information on sap wood depth over dbh
+      if (input$sapWoodDepth != 0){
+        rxy = input$sapWoodDepth + input$heartWoodDepth
+      } else {
+        rxy = input$stemDiameter / 2 - input$barkThickness
+      }
       depths = get.depths(depthManual = input$depthManual,
                           inputType = input$sensorType,
                           positions = positions(),
-                          rxy = input$stemDiameter / 2 - input$barkThickness,
+                          rxy = rxy,
                           depth = input$depthInput)
       return(depths)
     })
@@ -343,7 +350,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-#### Buttons ####
+    #### Buttons ####
     
     observeEvent(input$save_dat_upl, {
         csvObject = deltaTempLong()
@@ -581,8 +588,6 @@ shinyServer(function(input, output, session) {
     ##### SAP FLOW  ####
     ####################
     
-    
-    
     #### Variables ####
     
     sapWoodDepth <- reactive({
@@ -636,8 +641,9 @@ shinyServer(function(input, output, session) {
       methods <- list("treeScaleSimple1" = input$treeScaleSimple1,
                    "treeScaleSimple2" = input$treeScaleSimple2,
                    "treeScaleSimple3" = input$treeScaleSimple3)
-      # print("METHODS")
-      # print(methods)
+      print("METHODS")
+      print(methods)
+      
       
       data = sapFlowDens()
       print(names(data))
