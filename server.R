@@ -1,4 +1,4 @@
-
+theme_set(theme_bw())
 shinyServer(function(input, output, session) {
   
     ###############
@@ -725,14 +725,21 @@ shinyServer(function(input, output, session) {
     })
     
     sapFlowTreePlot <- reactive({
-      sapFlow() %>% 
-        gather(., method, value, sfM1, sfM2, sfM3) %>% 
-        ggplot(.)+
-        geom_line(aes(x = datetime, y = value, color = method)) +
-        labs(x = "",
-             y = "Sap flow rate (kg/h)", 
-             color = "Scaling method") +
-        theme_bw()
+      if (sapWoodDepth() == 0){
+        ggplot() +
+          annotate(geom="text", x=5, y=5, 
+                   label="Wood properties are missing (see 'Project settings').",
+                   color="red", size = 8) +
+          theme_void()
+      } else {
+        sapFlow() %>% 
+          gather(., method, value, sfM1, sfM2, sfM3) %>% 
+          ggplot(.)+
+          geom_line(aes(x = datetime, y = value, color = method)) +
+          labs(x = "",
+               y = "Sap flow rate (kg/h)", 
+               color = "Scaling method") 
+      }
     })
     
     
