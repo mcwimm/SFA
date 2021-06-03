@@ -280,12 +280,22 @@ shinyServer(function(input, output, session) {
     #### Table outputs #####
 
     output$raw.wide <- DT::renderDataTable({ # raw data
+      #print(str(rawData()))
         return(rawData())
     }, options = list(scrollX = TRUE))
     
     output$raw.long <- DT::renderDataTable({ # raw data
         return(deltaTempLong() %>% 
                  mutate_if(is.numeric, round, 3))
+    }, options = list(scrollX = TRUE))
+    
+    output$depth.table <- DT::renderDataTable({ # sensor positions etc
+      d = depths() %>%
+        mutate_at(vars(3, 4, 5), round, 1) %>%
+        select(-R) %>%
+        `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                        "Circ. (cm)"))
+      return(d)
     }, options = list(scrollX = TRUE))
     
     
@@ -299,7 +309,11 @@ shinyServer(function(input, output, session) {
     
     output$depths <- renderPrint({
       # cat("As atomic vector:\n")
-      print(depths())
+      d = depths() %>% mutate_at(vars(3, 4, 5), round, 1) %>% 
+        select(-R) %>%
+        `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                        "Circ. (cm)"))
+      print(d)
     })
     
     output$dataPoints <- renderText({

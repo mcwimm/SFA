@@ -288,15 +288,16 @@ box.dat_upl.depths = function(){
                       value = 1)),
       
       
-      p("<Note> Information on wood properties are required to calculate sensor depths 
-        (see 'Project Settings')."),
+     
+      # verbatimTextOutput("depths"),
+      output.table("depth.table"),
       
-      verbatimTextOutput("depths"),
-      
-      p("* negative values for 'depth' indicate that the sensor is longer than 
+      p("* negative values for 'Sensor R' indicate that the sensor is longer than 
         tree radius (DBH / 2 - barkthickness) and the respective sensor positions are on the opposite side of the tree. "),
+      p("** negative values for 'Area' indicate that the sensors are located in the heartwood. Please adjust wood properties."),
       
-      
+      br(),
+      p(strong("Schematic representation of an HFD sensor and its placement in the stem")),
       img(src='stemProfile.png', width = "100%")
       
    ))
@@ -317,18 +318,17 @@ dataUplOutput = function(){
           collapsible = T,
           status = "info",
           
-         tabsetPanel(
+          tabsetPanel(
             tabPanel("wide", br(),
                      output.table("raw.wide")),
             tabPanel("long", br(),
                      actButton("save_dat_upl", "Save csv", "saveCsv"),
                      br(),
                      output.table("raw.long")))),
-      box(title = "Optional settings",
+      box(title = "Sensor settings (optional)",
           collapsible = T,
-          status = "info",
-          box.dat_upl.depths()#,
-          
+          status = "warning",
+          box.dat_upl.depths()
          )
       )
       
