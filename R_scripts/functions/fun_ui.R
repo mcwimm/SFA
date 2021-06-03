@@ -363,7 +363,8 @@ dataFilterOutput = function(){
                 column(4, 
                        conditionalPanel(condition = "input.filterPlot_facetGrid == true",
                                         
-                                        radioButtons("filterPlot_scales", "Scales", inline = T,
+                                        radioButtons("filterPlot_scales", "Scales", 
+                                                     inline = T,
                                                      choices = c("fixed" = "fixed", 
                                                                  "free" = "free")))
                 )
@@ -547,7 +548,8 @@ kValueOutput <- function(){
                          condition = "input.moreOptions == 1",
                          
                          fluidRow(
-                            column(6, numericInput("skip2", "Skip:", min = 0, max = 100, 0)),
+                            column(6, numericInput("skip2", "Skip:", min = 0, 
+                                                   max = 100, 0)),
                             column(6, checkboxInput("header2", "Header", TRUE))
                          ),
                          radioButtons("sep2", "Separator", inline = T,
@@ -563,8 +565,6 @@ kValueOutput <- function(){
       box(title = "Control plots",
           collapsible = T,
           status = "info",
-          
-          # radioButtons("k1Plot.scales", "Scales", c("free" = "false", "fixed" = "true"), inline=T),
           radioButtons("k1Plot_scales", "Scales", c("free" = F, "fixed" = T), inline=T),
           
           
@@ -576,7 +576,8 @@ kValueOutput <- function(){
                                     value = F),
                       output.figure("kvaluePlot1")),
              tabPanel("Control-diagram 1", br(),
-                      checkboxInput("k1Plot.forceOrigin", "Force regression through origin", 
+                      checkboxInput("k1Plot.forceOrigin", 
+                                    "Force regression through origin", 
                                     value = F),
                       output.figure("kvaluePlot2")),
              tabPanel("Control-diagram 2", br(),

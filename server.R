@@ -17,10 +17,6 @@ shinyServer(function(input, output, session) {
       
     })
 
-    # projectName <- reactive({
-    #     return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
-    # })
-    
     projectName <- reactive({
       return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
     })
@@ -110,8 +106,7 @@ shinyServer(function(input, output, session) {
       
       return(values$deltaTempLong)
     })
-    
-
+  
     deltaTempLong.depth <- reactive({
       deltaTempLong() %>% 
         filter(position == input$kPositionSelect)
@@ -157,34 +152,7 @@ shinyServer(function(input, output, session) {
       return(depths)
     })
     
-    
-    observeEvent(input$LoadFilter, {
-      values$deltaTempLong <- deltaTempLongNoFilter()
-    })
-    
-    observeEvent(input$FilterApply, {
-      print("Within filter apply")
-      print(paste("nrow(data) before  ", nrow(data)))
-      
-      temp <- filterData(values$deltaTempLong)
-      
-      print(paste("nrow(data) after  ", nrow(temp)))
-      values$deltaTempLong <- temp
-      
-    })
-    
-    observeEvent(input$FilterDelete, {
-      print("Within filter delete")
-      
-      temp <- deltaTempLongNoFilter()
-      
-      values$deltaTempLong <- temp
-      
-      print(paste("nrow(data) after filter delete ", nrow(temp)))
-      
-      
-    })
-    
+
     #### FILTER ####
     
     filterData <- function(d){
@@ -219,6 +187,32 @@ shinyServer(function(input, output, session) {
       return(d)
     }
 
+    observeEvent(input$LoadFilter, {
+      values$deltaTempLong <- deltaTempLongNoFilter()
+    })
+    
+    observeEvent(input$FilterApply, {
+      print("Within filter apply")
+      print(paste("nrow(data) before  ", nrow(data)))
+      
+      temp <- filterData(values$deltaTempLong)
+      
+      print(paste("nrow(data) after  ", nrow(temp)))
+      values$deltaTempLong <- temp
+      
+    })
+    
+    observeEvent(input$FilterDelete, {
+      print("Within filter delete")
+      
+      temp <- deltaTempLongNoFilter()
+      
+      values$deltaTempLong <- temp
+      
+      print(paste("nrow(data) after filter delete ", nrow(temp)))
+      
+      
+    })
     
     #### UI ####
 
@@ -642,7 +636,6 @@ shinyServer(function(input, output, session) {
     ####################
     ##### SAP FLOW  ####
     ####################
-    
     #### Variables ####
     
     sapWoodDepth <- reactive({
@@ -650,7 +643,8 @@ shinyServer(function(input, output, session) {
         if (input$stemCircumference == 0){
           swd = input$stemDiameter/2 - input$barkThickness - input$heartWoodDepth
         } else {
-          swd = input$stemCircumference / (2*pi) - input$barkThickness - input$heartWoodDepth
+          swd = input$stemCircumference / (2*pi) - input$barkThickness -
+            input$heartWoodDepth
         }} else {
         swd = input$sapWoodDepth
       }
@@ -659,7 +653,7 @@ shinyServer(function(input, output, session) {
     
     
     sapFlowDens <- reactive({
-      req(input$setK)
+      #req(input$setK, input$setKfromRegression)
       kValues = values$df_data
       kValues[, "k"] = as.numeric(kValues[, "k"])
       positions = unique(kValues[!is.na(kValues$k), ]$position)
