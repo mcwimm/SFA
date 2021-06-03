@@ -46,7 +46,12 @@ get.regressionK.depth <- function(data, position, nightTimeStart, nightTimeEnd){
 
 get.regressionKvalues <- function(data, nightTimeStart, nightTimeEnd){
    positions = unique(data$position)
-   return(do.call(rbind, lapply(positions, function(x) get.regressionK.depth(data, x, nightTimeStart, nightTimeEnd))))
+   h = do.call(rbind, lapply(positions, 
+                                function(x) 
+                                   get.regressionK.depth(data, x,
+                                                         nightTimeStart, nightTimeEnd)))
+   h = cbind(position = positions, h)
+   return(h)
 }
 
 #### data cleaing
