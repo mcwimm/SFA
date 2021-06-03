@@ -533,3 +533,29 @@ plot.sapFlowDensity <- function(data,
    
    return(p)
 }
+
+
+######## SAP FLOW RATE ########
+
+plot.sapFLowRate = function(data, input){
+   
+   p = data %>% 
+      ggplot(.) +
+      labs(x = "",
+           y = "Sap flow rate (kg/h)",
+           color = "Scaling method")
+   if (input$treeScaleSimple1){
+      p = p +
+         geom_line(aes(x = datetime, y = sfM1, color = "method 1"))
+   }
+   if (input$treeScaleSimple2){
+      p = p +
+         geom_line(aes(x = datetime, y = sfM2, color = "method 2"))
+   }
+   if (input$treeScaleSimple3){
+      p = p +
+         geom_line(aes(x = datetime, y = sfM3, color = "method 3"))
+   }
+   return(p)
+}
+
