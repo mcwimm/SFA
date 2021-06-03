@@ -468,12 +468,13 @@ shinyServer(function(input, output, session) {
         
     })
     
-    #### Store and display selected k-values
+    #### Store and display selected k-values ####
     
     # create reactive value to store selected k-values
     values <- reactiveValues(df_data = NULL)  
     
-    observeEvent(input$setK, {  # store selected k-value in data.frame
+    #' Button to store single selected k-value in data.frame
+    observeEvent(input$setK, {  
       if (input$setK[1] == 1 && is.null(input$file2)){
         values$df_data <-  data.frame(position = positions(),  
                                       method = rep(NA),
@@ -494,7 +495,6 @@ shinyServer(function(input, output, session) {
       csvK = kFromCsv()
 
       for (pos in unique(csvK[, "position"])){
-        print(pos)
         values$df_data[values$df_data$position == pos, 2:3] <- cbind(
           method = ifelse(is.null(as.character(csvK$method)), "csv",
           as.character(csvK[csvK$position == pos, "method"])),
@@ -507,12 +507,28 @@ shinyServer(function(input, output, session) {
       values$df_data <-  data.frame(position = positions(),  
                                     method = rep(NA),
                                     k = rep(NA))
+      
       regK = kComplete()$regression %>% round(., 3)
+      
       for (pos in unique(regK[, "position"])){
-        print(pos)
         values$df_data[values$df_data$position == pos, 2:3] <- cbind(
           method = "auto. regression",
           k = regK[regK$position == pos, "k"])
+      }
+    })
+    
+    #' Button to use all k-Values from closest estimate
+    observeEvent(input$setKfromClosest, {
+      values$df_data <-  data.frame(position = positions(),  
+                                    method = rep(NA),
+                                    k = rep(NA))
+      
+      closK = kComplete()$closest %>% round(., 3)
+      
+      for (pos in unique(closK[, "position"])){
+        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
+          method = "closest",
+          k = closK[closK$position == pos, "k"])
       }
     })
 
@@ -719,9 +735,15 @@ shinyServer(function(input, output, session) {
                             facet.col = input$sfIndexPlot.facet)
     })
     
+    #' Check if any k-values have been set
+    click <- reactive(({
+      click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
+        input$setKfromClosest[1]
+    }))
+    
     sapFlowDensityPlot = reactive({
-      print(input$setK)
-      if (input$setK[1] == 0 && is.null(input$file2)){
+      print(paste('click ', click()))
+      if (click() == 0 && is.null(input$file2)){
         ggplot() +
           annotate(geom="text", x=5, y=5, 
                    label="No k-values have been set yet.",
