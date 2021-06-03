@@ -521,9 +521,11 @@ kValueOutput <- function(){
                       output.table("kSelected"),
                       actButton("save.kValues", "Save csv", "saveCsv")),
              tabPanel("Regression", br(),
-                      output.table("kRegression")),
+                      output.table("kRegression"),
+                      actButton("setKfromRegression", "Use k-values", "setValue")),
              tabPanel("Closest",
-                      output.table("kClosest")),
+                      output.table("kClosest"),
+                      actButton("setKfromClosest", "Use k-values", "setValue")),
              tabPanel("Read csv", br(),
                       # Input: Select a file ----
                       fileInput("file2", "Choose CSV File",
