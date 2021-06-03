@@ -232,7 +232,6 @@ get.positions = function(positionManual = F, inputType,
 #' 
 get.depths <- function(depthManual = F, inputType,
                        positions, rxy, depthInput, sensor_distance){
-
    if (depthManual){
       df = data.frame(position = positions,
                       depth = as.numeric(unlist(strsplit(depthInput, ","))))
@@ -260,6 +259,48 @@ get.depths <- function(depthManual = F, inputType,
    
    return(df)
    
+}
+
+#' Get area and circumference of circular ring to dataframe with positions and depths
+#'
+add.Props2DepthsHelper = function(depths, swd){
+
+   #depths = depths %>% arrange(desc(depth))
+   
+   depths = depths %>% 
+      mutate(Aring = pi*(depth^2 - lead(depth)^2),
+             R = (depth + lead(depth)) / 2,
+             Cring = 2*pi * R)
+   depths[nrow(depths), "Aring"] = pi*(depths[nrow(depths), "depth"]^2 - swd^2)
+   depths[nrow(depths), "R"] =(depths[nrow(depths), "depth"] + swd) / 2
+   
+   depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"] 
+   return(depths)
+}
+
+
+add.Props2Depths = function(depths, swd){
+   if (all(depths$depth > 0)){
+      depths = add.Props2DepthsHelper(depths = depths, swd = swd)
+   } else {
+      depths = bind_rows(
+         depths[depths[, "depth"] > 0,] %>% add.Props2DepthsHelper(., 0),
+         depths[depths[, "depth"] == 0,] %>% 
+            mutate(Aring = 0,
+                   R = 0,
+                   Cring = 0),
+         
+         depths[depths[, "depth"] < 0,] %>% 
+            mutate(depth_helper = depth,
+                  depth = abs(depth)) %>% 
+            arrange(desc(depth)) %>% 
+            add.Props2DepthsHelper(., 0) %>% 
+            mutate(depth = depth_helper) %>% 
+            select(-depth_helper) %>% 
+            arrange(position)
+      )
+   }
+   return(depths)
 }
 
 ########### CLEAN #############
