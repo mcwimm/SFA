@@ -258,6 +258,15 @@ box.dat_upl.upload = function(){
 
 box.dat_upl.depths = function(){
    return(list(
+      p(strong("<Note>"), 
+        "Here, optional settings on sensor positions and the resulting stem
+        radius can be defined. Therefore, information on wood properties (see
+        'Project Settings') and sensor distances are required. Based on the sensor
+        position the area and circumference
+        of the circular ring, which are required to calculate sap flow rates,
+        are estimated."),
+      p("Default: Position 1 is the outermost sensor position (i.e. closest to the bark) 
+      if not defined otherwise."),
       fluidRow(
         column(4, checkboxInput("positionManual", "Manual position input",
                                 F)),
