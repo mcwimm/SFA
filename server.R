@@ -465,8 +465,9 @@ shinyServer(function(input, output, session) {
     })
     
     #### Store and display selected k-values
-
-    values <- reactiveValues(df_data = NULL)  # create reactive value to store selected k-values
+    
+    # create reactive value to store selected k-values
+    values <- reactiveValues(df_data = NULL)  
     
     observeEvent(input$setK, {  # store selected k-value in data.frame
       if (input$setK[1] == 1 && is.null(input$file2)){
@@ -475,11 +476,13 @@ shinyServer(function(input, output, session) {
                                       k = rep(NA))
       }
       
-      values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(method = as.character(input$kMethod),
-                                                                                       k = round(kValue(), 3))
+      values$df_data[values$df_data$position == input$kPositionSelect, 
+                     2:3] <- cbind(method = as.character(input$kMethod),
+                                   k = round(kValue(), 3))
       
     })
     
+    #' Button to use uploaded k-Values
     observeEvent(input$setKfromCsv, {
       values$df_data <-  data.frame(position = positions(),  
                                     method = rep(NA),
@@ -488,28 +491,45 @@ shinyServer(function(input, output, session) {
 
       for (pos in unique(csvK[, "position"])){
         print(pos)
-        values$df_data[values$df_data$position == pos, 2:3] <- cbind(method = ifelse(is.null(as.character(csvK$method)), "csv", 
-                                                                                     as.character(csvK[csvK$position == pos, "method"])),
-                                                                     k = csvK[csvK$position == pos, "k"])
+        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
+          method = ifelse(is.null(as.character(csvK$method)), "csv",
+          as.character(csvK[csvK$position == pos, "method"])),
+          k = csvK[csvK$position == pos, "k"])
       }
     })
    
+    #' Button to use all k-Values from automatic regression
+    observeEvent(input$setKfromRegression, {
+      values$df_data <-  data.frame(position = positions(),  
+                                    method = rep(NA),
+                                    k = rep(NA))
+      regK = kComplete()$regression %>% round(., 3)
+      for (pos in unique(regK[, "position"])){
+        print(pos)
+        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
+          method = "auto. regression",
+          k = regK[regK$position == pos, "k"])
+      }
+    })
 
     #### Text outputs ####
 
-    output$kCurrent <- renderPrint({  # output current k-value (depends on selected position and method)
+    # output current k-value (depends on selected position and method)
+    output$kCurrent <- renderPrint({ 
         paste("K-value", round(kValue(), 3))
     })
     
     
     #### Table outputs ####
     
-    output$kSelected <- DT::renderDataTable({  # display selected k-values
+    output$kSelected <- DT::renderDataTable({  
+      # display selected k-values
         return(values$df_data)
     }, options = list(scrollX = TRUE))
     
     
-    output$kRegression <- DT::renderDataTable({  # display estimated k-values - by regression
+    output$kRegression <- DT::renderDataTable({  
+      # display estimated k-values - by regression
         return(kComplete()$regression  %>% round(., 2))
     }, options = list(scrollX = TRUE))
     
