@@ -662,34 +662,19 @@ shinyServer(function(input, output, session) {
     
     sapFlow <- reactive({
       methods <- list("treeScaleSimple1" = input$treeScaleSimple1,
-                   "treeScaleSimple2" = input$treeScaleSimple2,
-                   "treeScaleSimple3" = input$treeScaleSimple3)
-      print("METHODS")
-      print(methods)
-      
-      
+                      "treeScaleSimple2" = input$treeScaleSimple2,
+                      "treeScaleSimple3" = input$treeScaleSimple3)
+
       data = sapFlowDens()
-      print(names(data))
       data = merge(data, depths(), by = "position")
       
-      # df = data.frame()
       for (m in c(1:length(methods))){
-        # print(m)
         if (methods[[m]]){
           method = names(methods)[m]
-          print(method)
           data = get.sapFlowByMethod(data = data,
                                      method = method, 
                                      swd = sapWoodDepth()) 
-          # d = get.sapFlowByMethod(data = sapFlowDens(),
-          #                         method = method, 
-          #                         swd = sapWoodDepth(), 
-          #                         depths = depths(),
-          #                         sensor.dist = sensor.dist()) %>% 
-          #   mutate(sfMethod = method)
-          # 
-          # df = bind_rows(df, d)
-          
+
         } 
       }        
 
@@ -754,20 +739,24 @@ shinyServer(function(input, output, session) {
     })
     
     sapFlowTreePlot <- reactive({
-      if (sapWoodDepth() == 0){
+      print(paste('click ', click()))
+      if (click() == 0 && is.null(input$file2)){
         ggplot() +
           annotate(geom="text", x=5, y=5, 
-                   label="Wood properties are missing (see 'Project settings').",
+                   label="No k-values have been set yet.",
                    color="red", size = 8) +
           theme_void()
       } else {
-        sapFlow() %>% 
-          gather(., method, value, sfM1, sfM2, sfM3) %>% 
-          ggplot(.)+
-          geom_line(aes(x = datetime, y = value, color = method)) +
-          labs(x = "",
-               y = "Sap flow rate (kg/h)", 
-               color = "Scaling method") 
+        if (sapWoodDepth() == 0){
+          ggplot() +
+            annotate(geom="text", x=5, y=5, 
+                     label="Wood properties are missing (see 'Project settings').",
+                     color="red", size = 8) +
+            theme_void()
+        } else {
+          plot.sapFLowRate(data = sapFlow(), input = input)
+        }
+      
       }
     })
     
@@ -785,16 +774,7 @@ shinyServer(function(input, output, session) {
     })
     
     output$SapFlowPlot <- renderPlot({
-      print(length(sapFlow()))
-      if (length(sapFlow()) == 0){
-        ggplot() +
-          annotate(geom="text", x=5, y=5, 
-                   label="No k-values have been set yet or no method have been selected.",
-                   color="red", size = 8) +
-          theme_void()
-      } else {
-        sapFlowTreePlot()
-      }
+      sapFlowTreePlot()
     })
     
     #### Buttons ####
