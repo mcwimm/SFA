@@ -1,6 +1,6 @@
 #### 1. Create a project
 
-#### 2. Updoad data
+#### 2. Upload data
 
 #### 3. Estimate a k-value for each sensor depth
 

@@ -104,7 +104,7 @@ menuOutput = function(){
 introOutput = function(){
    return(list(
       fluidRow(
-         box(title = "Objective",
+         box(title = "Sap Flow Analyzer",
              status = "info", solidHeader = F, #height = 300,
              collapsible = T,
              includeMarkdown("./man/des_main_rm.md")),
@@ -114,10 +114,12 @@ introOutput = function(){
              includeMarkdown("./man/des_main_guide.md"))  
       ),
       fluidRow(
-         box(title = "Methods",
+         box(title = "Heat Field Deformation Method",
              status = "primary", solidHeader = F, #height = 300,
              collapsible = T,
-             includeMarkdown("./man/des_main_meth.md")),
+             includeMarkdown("./man/des_main_meth.md"),
+             img(src='hfd_principle.png', width = "100%")
+         ),
          box(title = "Outputs",
              status = "success", solidHeader = F, #height = 300,
              collapsible = T,
@@ -609,25 +611,28 @@ sdDescriptionOutput <- function(){
                     collapsible = T, status = "info", width = "100%",
                     p(strong("Sap flow index:"), 
                       HTML('&nbsp;'),
-                      a("Nadezhdina et al. (2015)", href="https://content.sciendo.com/view/journals/johh/63/2/article-p124.xml",
+                      a("Nadezhdina et al. (2015)", 
+                        href="https://content.sciendo.com/view/journals/johh/63/2/article-p124.xml",
                         target="_blank"), ",", 
                       HTML('&nbsp;'),
-                      a("Nadezhdina (1999)", href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
+                      a("Nadezhdina (1999)", 
+                        href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
                     p(strong("Sap flow density:"), 
                       HTML('&nbsp;'),
-                      a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
-                      HTML('&nbsp;'),
-                      a("Author", href="", target="_blank")),
-                    p(strong("Sap flow:"), 
-                      HTML('&nbsp;'),
-                      a("Author", href="", target="_blank"), ",",
-                      HTML('&nbsp;'),
-                      a("Author", href="", target="_blank")),
-                    p(strong("Tree water use:"), 
-                      HTML('&nbsp;'),
-                      a("Author", href="", target="_blank"), ",",
-                      HTML('&nbsp;'),
-                      a("Author", href="", target="_blank")))
+                      a("Nadezhdina (2018)", 
+                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ""))#,
+                      # HTML('&nbsp;'),
+                      # a("Author", href="", target="_blank")),
+                    # p(strong("Sap flow:"), 
+                    #   HTML('&nbsp;'),
+                    #   a("Author", href="", target="_blank"), ",",
+                    #   HTML('&nbsp;'),
+                    #   a("Author", href="", target="_blank")),
+                    # p(strong("Tree water use:"), 
+                    #   HTML('&nbsp;'),
+                    #   a("Author", href="", target="_blank"), ",",
+                    #   HTML('&nbsp;'),
+                    #   a("Author", href="", target="_blank")))
                 ),
          
          
