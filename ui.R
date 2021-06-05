@@ -25,16 +25,13 @@ shinyUI(
                 
                 tabItem(tabName = "dat_upl",
                         dataUplOutput()),
-                
                 tabItem(tabName = "dat_filter",
                         dataFilterOutput()),
-            
                 tabItem(tabName = "dat_view",
                         fluidRow(dataViewOutput())),
                 
                 tabItem(tabName = "k_des",
                         kDescriptionOutput()),
-                
                 tabItem(tabName = "k_est",
                         kValueOutput()),
                 
