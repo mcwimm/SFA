@@ -706,6 +706,16 @@ shinyServer(function(input, output, session) {
       return(data)
     })
     
+    #' Calculate daily tree water use in kg per h and kg per day
+    treeWaterUse <- reactive({
+      if (click() > 0){
+        get.treeWaterUseByMethod(data = sapFlow(),
+                                 input = input)
+      } else {
+        return(data.frame(x = "No k-values have been set yet."))
+      }
+    })
+    
     #### Buttons ####
     
     observeEvent(input$save.sfIndex, {
@@ -840,4 +850,21 @@ shinyServer(function(input, output, session) {
       obj = sapFlow()
       save.csv(name, obj)
     })
+    
+    
+    observeEvent(input$save.TreeWaterUseCsv, {
+      name = paste(projectPath(),
+                   "/csv-files/",
+                   "treeWaterUsePerDay", sep = "")
+      obj = treeWaterUse()
+      save.csv(name, obj)
+    })
+    
+    
+    #### Table ####
+    
+    # Table with daily tree water use
+    output$twu.table <- DT::renderDataTable({ 
+      treeWaterUse()
+    }, options = list(scrollX = TRUE))
 })
