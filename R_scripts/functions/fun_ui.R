@@ -74,20 +74,19 @@ numericInputRow <- function(inputId, label, value = ""){
 menuOutput = function(){
    return(list(
       menuItem("About", tabName = "about", icon = icon("th")),
-      menuItem("Project settings", tabName = "sett", icon = icon("chevron-down")),
-      menuItem("Data", tabName = "data", icon = icon("chevron-down"),
+      menuItem("Project settings", tabName = "sett", icon = icon("circle-notch")),
+      menuItem("Data", tabName = "data", icon = icon("circle-notch"),
                menuSubItem("Upload", tabName = "dat_upl"), 
                menuSubItem("Filter", tabName = "dat_filter"),
                menuSubItem("View", tabName = "dat_view")),
-      menuItem("K-value", tabName = "k_values", icon = icon("chevron-down"),
+      menuItem("K-value", tabName = "k_values", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "k_des"), 
                menuSubItem("Estimation", tabName = "k_est")),
-      menuItem("Sap Flow", tabName = "sap_flow", icon = icon("chevron-down"),
+      menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "sf_des"), 
                menuSubItem("Sap Flow Index", tabName = "sf_ind"),
                menuSubItem("Sap Flow Density", tabName = "sf_dens"),
-               menuSubItem("Sap Flow", tabName = "sf_flow"),
-               menuSubItem("Tree Water Use", tabName = "sf_twu")),
+               menuSubItem("Sap Flow", tabName = "sf_flow")),
       menuItem("Diagnostics", tabName = "diagnostics", icon = icon("th"),
                menuSubItem("VPD", tabName = "vpd"))
       # br(), tags$hr(), br(),
@@ -473,24 +472,27 @@ dataViewOutput = function(){
 
 kDescriptionOutput <- function(){
    return(list(
-      box(title = "K-value estimation",
-          collapsible = T,
-          status = "info",
-          includeMarkdown("./man/des_k_value.md")),
-      box(title = "K-diagrams",
-          collapsible = T,
-          status = "info",
-          includeMarkdown("./man/des_k_diagrams.md"),
-          img(src='Nadezhdina_2018_fig1.png', width = "80%"),
-          p(HTML('&nbsp;'),
-            a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank")),
-          includeMarkdown("./man/des_k_diagrams2.md")
+      fluidRow(
+         box(title = "K-value estimation",
+             collapsible = T,
+             status = "info",
+             includeMarkdown("./man/des_k_value.md")),
+         box(title = "K-diagrams",
+             collapsible = T,
+             status = "info",
+             includeMarkdown("./man/des_k_diagrams.md"),
+             img(src='Nadezhdina_2018_fig1.png', width = "80%"),
+             p(HTML('&nbsp;'),
+               a("Nadezhdina (2018)", href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank")),
+             includeMarkdown("./man/des_k_diagrams2.md")
+         )  
       )
    ))
 }
 
 kValueOutput <- function(){
    return(list(
+      fluidRow(
       box(title = "K-value estimation",
           collapsible = T, #width = 8,
           status = "warning",
@@ -590,7 +592,7 @@ kValueOutput <- function(){
           
           actButton("save.kPlots", "Save figures", "saveFigure")
           )
-   ))
+   )))
 }
 
 ################
@@ -653,6 +655,7 @@ sdDescriptionOutput <- function(){
 
 sfIndexOutput <- function(){
    return(list(
+      fluidRow(
       box(title = "Settings",
           collapsible = T, width = 4,
           status = "warning",
@@ -698,12 +701,13 @@ sfIndexOutput <- function(){
                       output.figure("sapFlowIndex.Day"),
                       actButton("save.sfIndex.day", "Save figure", "saveFigure"))
           ))
-   ))   
+   )))
 }
 
 
 sfDensityOutput <- function(){
    return(list(
+      fluidRow(
       box(title = "Figure settings",
           collapsible = T, width = 4,
           status = "warning",
@@ -736,35 +740,47 @@ sfDensityOutput <- function(){
        actButton("save.sapFlowDensityPlot", "Save figure", "saveFigure"),
        actButton("save.sapFlowDensity", "Save csv", "saveCsv")
    )
-   ))
+   )))
 }
 
 sfRateOutput <- function(){
    return(
       list(
          fluidRow(
-            box(title = "Settings",
-                collapsible = T, width = 4,
-                status = "warning",
-                
-                p(strong("<Note>"), "The estimation of sap flow is based
-                                     on sensor positions (see 'Data | Upload') and wood
-                                     properties (see 'Project settings')."),
-                
-                checkboxInput("treeScaleSimple1", "Method 1: SFD * Asd", T),
-                checkboxInput("treeScaleSimple2", "Method 2: SFS / swd", T),
-                checkboxInput("treeScaleSimple3", "Method 3: SFS * Csd", T)
-                
-            ),
-            box(title = "Figures",
-                collapsible = T, width = 8,
-                status = "info",
-                
-                output.figure("SapFlowPlot"),
-                actButton("save.SapFlow", "Save figures", "saveFigure"),
-                actButton("save.SapFlowCsv", "Save csv", "saveCsv")
-                
-            )
+            column(width = 4,
+               box(title = "Settings",
+                   collapsible = T, width = NULL,
+                   status = "warning",
+                   
+                   p(strong("<Note>"), "The estimation of sap flow is based
+                                        on sensor positions (see 'Data | Upload') and wood
+                                        properties (see 'Project settings')."),
+                   
+                   checkboxInput("treeScaleSimple1", "Method 1: SFD * Asd", T),
+                   checkboxInput("treeScaleSimple2", "Method 2: SFS / swd", T),
+                   checkboxInput("treeScaleSimple3", "Method 3: SFS * Csd", T)
+               )),
+            column(width = 8,
+               box(title = "Figures",
+                   collapsible = T, width = NULL,
+                   status = "info",
+                   
+                   output.figure("SapFlowPlot"),
+                   actButton("save.SapFlow", "Save figures", "saveFigure"),
+                   actButton("save.SapFlowCsv", "Save csv", "saveCsv")
+                   
+               )),
+            column(
+               width = 8, offset = 4,
+               box(title = "Tree water use",
+                   p("Daily tree water use (in liter per day) estimated as the area under
+                     the curve (AUC) of the figure above."),
+                   collapsible = T,
+                   width = NULL,
+                   status = "info",
+                   output.table("twu.table"),
+                   actButton("save.TreeWaterUseCsv", "Save csv", "saveCsv")
+               ))
          )
       )
    )
