@@ -71,4 +71,34 @@ get.sapFlowByMethod <- function(data, method,
    }
 }
 
+get.treeWaterUseByMethod = function(data, input){
+   groups = c()
+   if (input$treeScaleSimple1){
+      groups = rbind(groups, "sfM1")
+   }
+   if (input$treeScaleSimple2){
+      groups = rbind(groups, "sfM2")
+   }
+   if (input$treeScaleSimple3){
+      groups = rbind(groups, "sfM3")
+   }
+   
+   groups = groups[,1]
+   print(paste('groups  ', groups))
+   return(data %>% 
+      gather(., key, value, groups) %>% 
+      group_by(doy, key) %>% 
+      mutate(key = ifelse(key == "sfM1", "method 1",
+                          ifelse(key == "sfM2", "method 2",
+                                 "method 3"))) %>% 
+      arrange(dTime) %>% 
+      mutate(delta_time = dTime - lag(dTime),
+             delta_sp = abs(value - lag(value))) %>% 
+      mutate(m = delta_time * delta_sp) %>% 
+      distinct(s_kg_h = sum(m, na.rm = T),
+               s_kg_d = round(s_kg_h*24, 2)) %>%
+      arrange(doy) %>% 
+      select(-s_kg_h) %>% 
+      spread(., key, s_kg_d))
+}
 
