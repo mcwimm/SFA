@@ -159,6 +159,7 @@ shinyServer(function(input, output, session) {
 
       d$doy <- as.numeric(d$doy)
       
+      # filter by day/ doy and day time
       minDoy = as.numeric(strftime(input$daterange[1], format = "%j"))
       maxDoy = as.numeric(strftime(input$daterange[2], format = "%j"))
       
@@ -173,16 +174,37 @@ shinyServer(function(input, output, session) {
         filter(dTime >= start) %>% 
         filter(dTime <= end)
       
-      
+      # remove outlier
       if (input$removeOutlier){
         d = remove.outlier(d, input$filterPlot_X)
       }
       
+      # remove na-values
       if (input$removeNA){
         d = d[complete.cases(d), ]
       }
       
+      # filter temperature filters by range
+      dTSymMin = ifelse(is.na(input$dTSymMin), -Inf, input$dTSymMin)
+      dTSymMax = ifelse(is.na(input$dTSymMax), Inf, input$dTSymMax)
+      dTasMin = ifelse(is.na(input$dTasMin), -Inf, input$dTasMin)
+      dTasMax = ifelse(is.na(input$dTasMax), Inf, input$dTasMax)
+      dTsym.dTasMin = ifelse(is.na(input$dTsym.dTasMin), -Inf, input$dTsym.dTasMin)
+      dTsym.dTasMax = ifelse(is.na(input$dTsym.dTasMax), Inf, input$dTsym.dTasMax)
       
+      d = d %>%
+        filter(dTSym >= dTSymMin) %>% 
+        filter(dTSym <= dTSymMax)
+      
+      d = d %>%
+        filter(dTas >= dTasMin) %>% 
+        filter(dTas <= dTasMax)
+      
+      d = d %>%
+        filter(dTsym.dTas >= dTsym.dTasMin) %>% 
+        filter(dTsym.dTas <= dTsym.dTasMax)
+
+      # print remaining size of data set
       print(nrow(d))
       return(d)
     }
@@ -240,13 +262,56 @@ shinyServer(function(input, output, session) {
         req(input$LoadFilter)
         
         tagList(
-          dateRangeInput("daterange", "Date range:"),
-          # actButton("updateDate", "Update data", "update"),
-          fluidRow(
-            column(6, numericInput("timerangeStart", "Start", value = 0)),
-            column(6, numericInput("timerangeEnd", "End", value = 24)),
+          # Date and time range
+          h4(strong("Time filters")),
+          
+          fluidRow(# Date
+            column(2,
+                   p(strong('Date'))),
+            column(10,
+                   dateRangeInput("daterange", "Range")
+            )),
+          
+          fluidRow(# Time of day
+            column(2,
+                   p(strong('Time'))),
+            column(5, 
+                   numericInput("timerangeStart", "Start", value = 0)),
+            column(5, numericInput("timerangeEnd", "End", value = 24)),
           ),
-          checkboxInput("removeOutlier", "Remove outlier", F),
+          
+          br(), 
+          
+          # Temperature ranges
+          h4(strong("Temperature ranges")),
+          fluidRow(# dTSym
+            column(4,
+                   p(strong('dTSym'))),
+            column(4, 
+                   numericInput("dTSymMin", "Min", value = Inf)),
+            column(4, numericInput("dTSymMax", "Max", value = Inf)),
+          ),
+          
+          fluidRow(# dTas
+            column(4,
+                   p(strong('dTas'))),
+            column(4, 
+                   numericInput("dTasMin", "Min", value = Inf)),
+            column(4, numericInput("dTasMax", "Max", value = Inf)),
+          ),
+          
+          fluidRow(# dTsym.dTas
+            column(4,
+                   p(strong('dTsym.dTas'))),
+            column(4, 
+                   numericInput("dTsym.dTasMin", "Min", value = Inf)),
+            column(4, numericInput("dTsym.dTasMax", "Max", value = Inf)),
+          ),
+          
+          
+          br(), 
+          # General
+          checkboxInput("removeOutlier", "Remove outlier of plot variable", F),
           
           checkboxInput("removeNA", "Remove NA-rows", F),
 
