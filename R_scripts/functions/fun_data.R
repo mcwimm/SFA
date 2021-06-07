@@ -312,8 +312,8 @@ remove.outlier <- function(data, data.vector){
    up <-  Q[2] + 1.5 * iqr # Upper Range  
    low <- Q[1] - 1.5 * iqr # Lower Range
 
-   data <- subset(data, data[, data.vector] > (Q[1] - 1.5*iqr) & 
-                     data[, data.vector] < (Q[2] + 1.5*iqr))
+   data <- subset(data, data[, data.vector] > low & 
+                     data[, data.vector] < up)
    return(data)
 }
 
