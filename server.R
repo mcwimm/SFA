@@ -310,11 +310,13 @@ shinyServer(function(input, output, session) {
           
           
           br(), 
-          # General
-          checkboxInput("removeOutlier", "Remove outlier of plot variable", F),
           
+          # General filters
+          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
+  
           checkboxInput("removeNA", "Remove NA-rows", F),
-
+          
+          # Buttons
           fluidRow(
             column(5, (actButton("FilterApply", "Apply filter", "update"))),
             column(5, (actButton("FilterDelete", "Delete filter", "update"))),
