@@ -1,4 +1,3 @@
-theme_set(theme_bw())
 shinyServer(function(input, output, session) {
   
     ###############
@@ -29,6 +28,52 @@ shinyServer(function(input, output, session) {
         }
     })
     
+    #' Define default ggplot theme
+    plot_theme <- reactive({
+      themes[[input$figTheme]]
+      })
+    
+    output$theme_output <- renderUI({ 
+      req(input$figTheme)
+      theme_set(plot_theme())
+      NULL
+      })
+    
+
+    #' Define fill colors to be used in all plots with discrete data
+    fillcolors_react = reactive({
+      print("in fill colors react")
+      print(input$fillColors)
+      if (input$fillColors == ""){
+        col = c("#d8b365", "#260C7D", "#5ab4ac",
+                "#7D410C", "#007D06",
+                '#999999','#E69F00', '#56B4E9')
+        print("Use default colors:  ")
+        
+      } else {
+        cols = input$fillColors
+        cols_split = strsplit(cols, ",")[[1]]
+        col = c()
+        for (i in 1:length(cols_split)){
+          # remove white spaces
+          c = gsub(" ", "", cols_split[i], fixed = TRUE)
+          col = append(col, c)
+        }
+        print("Use customized colors:  ")
+      }
+      print(col)
+      return(col)
+    })
+
+    
+    
+    fillcolors <<- function(N){
+      col = fillcolors_react()
+      return(col[1:N])
+    }
+    
+    
+    #theme_set(plot_theme())
     #### Text output ####
     
     output$prjDir <- renderPrint({

@@ -1,8 +1,14 @@
-
+themes <- list("Bw" = theme_bw(),
+               "Classic" = theme_classic(),
+               "Grey" = theme_gray(),
+               "Dark" = theme_dark(),
+               "Light" = theme_light(),
+               "Minimal" = theme_minimal(),
+               "Void" = theme_void()
+)
 ################
 ### SETTINGS ###
 ################
-
 settingsOutput = function(){
    return(
       fluidRow(
@@ -85,16 +91,14 @@ settingsOutput = function(){
                           textInput("figTitle", "Figure title", 
                                     placeholder = "Tree species")
                        ),
+                       
                        p(strong("Visualization")),
-                       p("NOT WORKING!!!", style = "color:red"),
-                       
-                       textInput("gradientColorLow", 
-                                 "Gradient color low", 
-                                 placeholder = "#d8b365"),
-                       textInput("gradientColorHigh", 
-                                 "Gradient color high", 
-                                 placeholder = "#5ab4ac")
-                       
+                       selectInput("figTheme", "Figure theme (ggplot)",
+                                   choices = names(themes)),
+                       uiOutput('theme_output'),
+                       textInput("fillColors", "Fill colors for discrete data*",
+                                 placeholder = 'Hex color codes as vector (comma delimited): #CD5C5C, #FFBF00, #6495ED'),
+                       p("*Number of colors required = max(number of sensors, doy)")
           )))
       )
    )
