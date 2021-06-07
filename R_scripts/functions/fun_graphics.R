@@ -75,6 +75,16 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
 #                "SFDsw" = expression(Sapwood-related~Sap~Flow~Density~(g~cm^-1~s^-1)))
 
 
+
+# Function to produce summary statistics (mean and +/- sd)
+# Source: http://www.sthda.com/english/wiki/ggplot2-violin-plot-quick-start-guide-r-software-and-data-visualization
+data_summary <- function(x) {
+   m <- mean(x)
+   ymin <- m-sd(x)
+   ymax <- m+sd(x)
+   return(c(y=m,ymin=ymin,ymax=ymax))
+}
+
 ######## FILTER ########
 
 plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
@@ -109,15 +119,30 @@ plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
    } 
    if (type == "freq"){
       p = p +
-         # geom_freqpoly(mapping=aes(x = x, col = fill), binwidth = binwidth)  +
          geom_freqpoly(mapping=aes(x = x), binwidth = binwidth)  +
          
          labs(x = labels[x.col][[1]])
    }
-   
+
    if (type == "boxp"){
       p = p +
-         geom_boxplot(mapping=aes(y = x), alpha = 0.1)  + #, group = fill, col = fill, fill = fill
+         geom_boxplot(mapping=aes(y = x), alpha = 0.1)  + 
+         labs(y = labels[x.col][[1]]) +
+         theme(axis.title.x=element_blank(),
+               axis.text.x=element_blank(),
+               axis.ticks.x=element_blank())
+   }
+   
+   if (type == "violin"){
+      if (fill.col == "none"){
+         y = 0
+      } else {
+         y = data[, fill.col]
+      }
+      p = p +
+         geom_violin(mapping=aes(y = x, x = y), alpha = 0.1)  + 
+         stat_summary(mapping=aes(y = x, x = y),
+                      fun.data=data_summary) +
          labs(y = labels[x.col][[1]]) +
          theme(axis.title.x=element_blank(),
                axis.text.x=element_blank(),
