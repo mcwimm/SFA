@@ -2,6 +2,7 @@
 ### SAP FLOW ###
 ################
 
+#### Description ####
 sdDescriptionOutput <- function(){
    return(
       fluidRow(
@@ -56,6 +57,8 @@ sdDescriptionOutput <- function(){
    )
 }
 
+#### Sap flow index ####
+
 sfIndexOutput <- function(){
    return(list(
       fluidRow(
@@ -107,6 +110,7 @@ sfIndexOutput <- function(){
       )))
 }
 
+#### Sap flow density ####
 
 sfDensityOutput <- function(){
    return(list(
@@ -145,6 +149,8 @@ sfDensityOutput <- function(){
          )
       )))
 }
+
+#### Sap flow rate ####
 
 sfRateOutput <- function(){
    return(
