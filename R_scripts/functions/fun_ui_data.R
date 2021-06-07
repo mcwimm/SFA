@@ -235,7 +235,7 @@ dataViewOutput = function(){
           ),
           
           tags$hr(),
-          p(strong("Optional settings only available for figure 'Variable'")),
+          p(strong("Optional settings only available for figure 'Customized'")),
           
           
           selectInput("rawPlot.xcol", "X-axis",
@@ -263,7 +263,7 @@ dataViewOutput = function(){
              tabPanel("Temperature difference", br(),
                       output.figure("deltaTfacetWrap"),
                       actButton("save.deltaTfacetWrap", "Save figure", "saveFigure")),
-             tabPanel("Variable", br(),
+             tabPanel("Customized", br(),
                       output.figure("deltaTSingle"),
                       actButton("save.deltaTSingle", "Save figure", "saveFigure"))
           ))
