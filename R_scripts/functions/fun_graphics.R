@@ -1,23 +1,8 @@
-fillcolors = function(N){
-   col = c("#d8b365", "#260C7D", "#5ab4ac", 
-           "#7D410C", "#007D06",
-           '#999999','#E69F00', '#56B4E9')
-   return(col[1:N])
-}
-
-
 gradientcolors <- function(){
-   # return(c("#AED4E6", "#03354D"))
-   print("COLORRRRRRR")
-   # if (is.null(input$gradientColorLow)){
    col = c("#d8b365", "#5ab4ac")
-   # } else {
-   #    col = c(input$gradientColorLow, input$gradientColorHigh)
-   #
-   # }
-   print(col)
    return(col)
 }
+
 
 get.labelledFacets = function(data, facet.col){
    facet = as.integer(data[, facet.col]) 
@@ -98,14 +83,12 @@ plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
       p = data %>% 
          ggplot(., aes(fill = fill, col = fill)) +
          labs(fill = labels[fill.col][[1]],
-              col = labels[fill.col][[1]]) +
-         theme_bw()
+              col = labels[fill.col][[1]])
    } else {
       p = data %>% 
          ggplot(.) +
          labs(fill = labels[fill.col][[1]],
-              col = labels[fill.col][[1]]) +
-         theme_bw()
+              col = labels[fill.col][[1]])
    }
    
    
@@ -176,8 +159,7 @@ plot.deltaTfacetWrap <- function(data, xRange, yRange,
       scale_color_manual(values = fillcolors(3)) +
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]],
-           col = labels["T"][[1]]) +
-      theme_bw()
+           col = labels["T"][[1]])
 
    
    if (facetWrap){
@@ -208,8 +190,7 @@ plot.singleTemperature <- function(data, x.col, y.col, col.col, shape.col, facet
       labs(x = labels[x.col][[1]],
            y = labels[y.col][[1]],
            col = labels[col.col][[1]],
-           shape = labels[shape.col][[1]]) +
-      theme_bw()
+           shape = labels[shape.col][[1]]) 
    
    if (col.col == "dTime"){
       p = p +
@@ -261,8 +242,8 @@ plot.nighttime <- function(data.complete){
       # ylim(0, max(data.complete$dTsym.dTas)) +
       geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
       geom_line() +
-      labs(x = "Time (h)", y = labels["dTsym.dTas"][[1]]) +
-      theme_bw())
+      labs(x = "Time (h)", y = labels["dTsym.dTas"][[1]]) 
+      )
 }
 
 plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScales = T){
@@ -298,8 +279,7 @@ plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScal
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
            col = labels["T"][[1]],
-           caption = "* Black cross (x): data point used for regression") +
-      theme_bw()
+           caption = "* Black cross (x): data point used for regression") 
    
    if (fixedScales){
       p = p +
@@ -353,7 +333,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                                         label =  ..adj.rr.label..),
                             label.y.npc = c("top", "bottom")) + 
       geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
-                     label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
+                     label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) +
       scale_color_manual(values=fillcolors(4)) +
       xlim(xmin, max(d$dTsym.dTas)) +
       ylim(min(d$value), max(d$value)) +
@@ -362,8 +342,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
            col = labels["T"][[1]],
-           caption = "* Black cross (x): data point used for regression") +
-      theme_bw()
+           caption = "* Black cross (x): data point used for regression")
    
    if (fixedScales){
       p = p +
@@ -447,8 +426,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
             col = "x-axis", 
             shape = labels["T"][[1]],
             caption = "* Black cross (x): data point used for regression.
-            Gray-shaded values indicate the point of intersection of the two lines.") +
-      theme_bw()
+            Gray-shaded values indicate the point of intersection of the two lines.")
    
    if (fixedScales){
       p = p +
@@ -467,8 +445,7 @@ plot.sapFlowIndex = function(data, yRange, scales, facetWrap, facet.col){
       geom_line(aes(x = datetime, y = dTSym, col = factor(position))) +
       labs(x = "", 
            y = labels["SFI"][[1]],
-           col = labels["position"][[1]]) +
-      theme_bw()
+           col = labels["position"][[1]])
    
    # if (facetWrap){
    #    # timelist.minor = seq(from = min(data[data$dTime == 6, ]$datetime),
@@ -512,8 +489,7 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap, facet.
       geom_line(aes(x = dTime, y = dTSym, group = factor(doy), col = factor(doy))) +
       labs(x = labels["dTime"][[1]], 
            col = labels["doy"][[1]],
-           y = labels["SFI"][[1]]) +
-      theme_bw() 
+           y = labels["SFI"][[1]]) 
    
    if (facetWrap){
       facet = get.labelledFacets(data, facet.col)
@@ -546,8 +522,7 @@ plot.sapFlowDensity <- function(data,
       geom_line(aes(x = dTime, y = y.col, col = col.col)) +
       labs(x = labels["dTime"][[1]], 
            col = labels[col][[1]],
-           y = labels[y][[1]]) +
-      theme_bw() 
+           y = labels[y][[1]])
    
 
    if (facetWrap){
