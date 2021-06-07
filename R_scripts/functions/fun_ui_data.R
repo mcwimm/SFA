@@ -137,49 +137,64 @@ dataFilterOutput = function(){
       fluidRow(
          box(title = "Subset data",
              collapsible = T, width = 4,
+             status = "warning",
              actButton("LoadFilter", "Load filter options", "update"),
-             
              uiOutput("filterOptions")
-             
          ),
          
          box(title = "Figures",
              collapsible = T, width = 8,
+             status = "info",
+             box.filter.figures()
              
-             fluidRow(
-                column(4, checkboxInput("filterPlot_facetGrid", "Facet wrap", F)),
-                column(4, 
-                       conditionalPanel(condition = "input.filterPlot_facetGrid == true",
-                                        
-                                        radioButtons("filterPlot_scales", "Scales", 
-                                                     inline = T,
-                                                     choices = c("fixed" = "fixed", 
-                                                                 "free" = "free")))
-                )
-             ),
-             
-             radioButtons("filterPlot_type", "Diagram type", inline = T,
-                          choices = c("Boxplot" = "boxp",
-                                      "Histogram" = "hist", 
-                                      "Frequency polygons" = "freq")),
-             
-             fluidRow(
-                column(4, selectInput("filterPlot_X", "Variable",
-                                      choices = c("dTsym.dTas" = "dTsym.dTas",
-                                                  "dTas" = "dTas",
-                                                  "dTsa" = "dTsa",
-                                                  "dTSym" = "dTSym"))),
-                column(4, selectInput("filterPlot_col", "Color",
-                                      choices = c("none" = "none",
-                                                  "doy" = "doy",
-                                                  "position" = "position"))),
-                column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
-             ),
-             
-             output.figure("filterPlot"),
-             
+         ),
+         column(
+            width = 8, offset = 4,
+            box(title = "Info",
+                collapsible = T,
+                width = NULL,
+                status = "info",
+                includeMarkdown("./man/des_data_filter.md")
+            )
          )
       )
+   ))
+}
+
+box.filter.figures = function(){
+   return(list(
+      fluidRow(
+         column(4, checkboxInput("filterPlot_facetGrid", "Facet wrap", F)),
+         column(4, 
+                conditionalPanel(condition = "input.filterPlot_facetGrid == true",
+                                 
+                                 radioButtons("filterPlot_scales", "Scales", 
+                                              inline = T,
+                                              choices = c("fixed" = "fixed", 
+                                                          "free" = "free")))
+         )
+      ),
+      
+      radioButtons("filterPlot_type", "Diagram type", inline = T,
+                   choices = c("Violin plot" = "violin",
+                               "Boxplot" = "boxp",
+                               "Histogram" = "hist", 
+                               "Frequency polygons" = "freq")),
+      
+      fluidRow(
+         column(4, selectInput("filterPlot_X", "Variable",
+                               choices = c("dTsym.dTas" = "dTsym.dTas",
+                                           "dTas" = "dTas",
+                                           "dTsa" = "dTsa",
+                                           "dTSym" = "dTSym"))),
+         column(4, selectInput("filterPlot_col", "Color",
+                               choices = c("doy" = "doy",
+                                           "none" = "none",
+                                           "position" = "position"))),
+         column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
+      ),
+      
+      output.figure("filterPlot")
    ))
 }
 
