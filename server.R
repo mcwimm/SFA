@@ -555,9 +555,11 @@ shinyServer(function(input, output, session) {
     output$kPositionSelect <- renderUI({
       # load current data set
       d = values$deltaTempLong
+      pos = positions()
+      sel = pos[1]
       radioButtons("kPositionSelect", "Sensor position",
-                   choices = positions(),
-                   selected = 1, inline = T)
+                   choices = pos,
+                   selected = sel, inline = T)
     })
     
     
