@@ -545,6 +545,28 @@ shinyServer(function(input, output, session) {
         save.figure(name, obj, figTitle(), input$figFor)
     })
 
+    # button to save filtered data, long format
+    observeEvent(input$save_dat_filter, {
+      csvObject = values$deltaTempLong
+      path = paste(projectPath(), 
+                   "/csv-files/",
+                   "deltaT_longFormat_filtered", sep = "")
+      save.csv(path, csvObject)
+    })
+    
+    
+    # button to save figure shown in filter window
+    observeEvent(input$save_dat_filter_fig, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "deltaT_filtered_",
+                   as.character(input$filterPlot_type), "_",
+                   input$rawPlot.facet, sep = "")
+      print(name)
+      obj = filterPlot()
+      save.figure(name, obj, figTitle(), input$figFor)
+    })
+    
     
     ####################
     ### K-ESTIMATION ###

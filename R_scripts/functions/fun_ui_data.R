@@ -145,8 +145,9 @@ dataFilterOutput = function(){
          box(title = "Figures",
              collapsible = T, width = 8,
              status = "info",
-             box.filter.figures()
-             
+             box.filter.figures(),
+             actButton("save_dat_filter", "Save csv", "saveCsv"),
+             actButton("save_dat_filter_fig", "Save figure", "saveFigure"),
          ),
          column(
             width = 8, offset = 4,
