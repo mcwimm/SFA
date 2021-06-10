@@ -199,19 +199,18 @@ convertTimeToDeci <- function(time){
 #' Sensor positions are either extracted from raw data file or
 #' entered manually
 #' 
-get.positions = function(positionManual = F, inputType,
-                      dataSource, positionInput){
+get.positionsFromRawData = function(dataSource, input){
 
-   if (inputType == "ICT_raw"){
+   if (input$inputType == "ICT_raw"){
       reg = "Asym"
    }
    
-   if (inputType == "ICT_delta"){
+   if (input$inputType == "ICT_delta"){
       reg = "dTSym"
    }
    
-   if (positionManual){
-      positions = as.numeric(unlist(strsplit(positionInput,",")))
+   if (input$positionManual){
+      positions = as.numeric(unlist(strsplit(input$positionInput,",")))
    } else {
       positions = c(1:ncol(dataSource[, grepl(reg, 
                                           colnames(dataSource))]))
