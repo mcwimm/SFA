@@ -559,9 +559,10 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save_dat_filter_fig, {
       name = paste(projectPath(),
                    "/graphics/",
-                   "deltaT_filtered_",
                    as.character(input$filterPlot_type), "_",
-                   input$rawPlot.facet, sep = "")
+                   "filtered_",
+                   as.character(input$filterPlot_X), "_",
+                   as.character(input$filterPlot_col), sep = "")
       print(name)
       obj = filterPlot()
       save.figure(name, obj, figTitle(), input$figFor)
