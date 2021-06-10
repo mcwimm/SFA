@@ -929,12 +929,6 @@ shinyServer(function(input, output, session) {
                             facet.col = input$sfIndexPlot.facet)
     })
     
-    #' Check if any k-values have been set
-    click <- reactive(({
-      click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
-        input$setKfromClosest[1]
-    }))
-    
     sapFlowDensityPlot = reactive({
       print(paste('click ', click()))
       if (click() == 0 && is.null(input$file2)){
@@ -944,12 +938,32 @@ shinyServer(function(input, output, session) {
                    color="red", size = 8) +
           theme_void()
       } else {
-        plot.sapFlowDensity(data = sapFlowDens(), 
-                            y = input$sapFlowDensityPlot.y,
-                            col = input$sapFlowDensityPlot.color, 
-                            scales = input$sapFlowDensityPlot_scales, 
-                            facetWrap = input$sapFlowDensityPlot_facetWrap, 
-                            facet.col = input$sapFlowDensityPlot.facet)
+        d = sapFlowDens()
+
+        # check if sap flow density is Inf
+        # helper variable; if 1 no sap flow density data are avail.
+        SFDensity = data.frame(x = 0)
+        if (input$sapFlowDensityPlot.y == "SFDsw"){
+          SFDensity = d %>% mutate(all = n()) %>% 
+            filter(abs(SFDsw) == Inf) %>% 
+            distinct(x = n()/all)
+        }
+        
+        # show error message if sap flow density haven't been calculated (i.e. is Inf)
+        if (SFDensity$x == 1){
+          ggplot() +
+            annotate(geom="text", x=5, y=5, 
+                     label="Wood properties are missing.",
+                     color="red", size = 8) +
+            theme_void()
+        } else{
+          plot.sapFlowDensity(data = d, 
+                              y = input$sapFlowDensityPlot.y,
+                              col = input$sapFlowDensityPlot.color, 
+                              scales = input$sapFlowDensityPlot_scales, 
+                              facetWrap = input$sapFlowDensityPlot_facetWrap, 
+                              facet.col = input$sapFlowDensityPlot.facet)
+        }
       }
       
     })
