@@ -230,7 +230,7 @@ dataViewOutput = function(){
              
              selectInput("rawPlot.facet", "Facet",
                          choices = c("position" = "position",
-                                     "day time" = "dTime",
+                                     #"day time" = "dTime",
                                      "doy" = "doy"))
           ),
           
