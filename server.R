@@ -518,7 +518,7 @@ shinyServer(function(input, output, session) {
         csvObject = deltaTempLong()
         path = paste(projectPath(), 
                      "/csv-files/",
-                     "temperatureDifferences_longFormat", sep = "")
+                     "deltaT_longFormat", sep = "")
         save.csv(path, csvObject)
         
     })
@@ -526,7 +526,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save.deltaTfacetWrap, {
         name = paste(projectPath(),
                      "/graphics/",
-                     "temperatureDifferences_", input$rawPlot.facet, sep = "")
+                     "deltaT_", input$rawPlot.facet, sep = "")
         obj = deltaTfacetWrap()
         save.figure(name, obj, figTitle(), input$figFor)
     })
