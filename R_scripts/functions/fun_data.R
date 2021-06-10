@@ -31,16 +31,19 @@ get.temperatures.ICT = function(file, sep, skip){
    return(rawData)
 }
 
-#' Reads temperature differences from ICT-data file.
+#' Reads temperature differences from processed ICT-data file.
 #' 
 get.temp.differences.ICT = function(file, sep, skip){
    rawData <- read.csv(file,
                        header = TRUE, sep = sep, 
                        fileEncoding="latin1",
                        skip = skip)
-   datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
-   rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
-                                  format=datetimeformat)
+
+   if (all(c("Date", "Time") %in% colnames(rawData))){
+      datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
+      rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
+                                     format=datetimeformat)
+   }
    return(rawData)
 }
 
