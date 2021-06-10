@@ -82,8 +82,8 @@ settingsOutput = function(){
                        p("These inputs are optional."),
                        selectInput("figFor", "Figure format",
                                    c(#"svg" = "svg",
-                                      "pdf" = "pdf",
-                                      "jpg" = "jpg")),
+                                      "jpg" = "jpg",
+                                      "pdf" = "pdf")),
                        checkboxInput("prjNameAsTitle",
                                      "Use project name as title", value = T),
                        conditionalPanel(
