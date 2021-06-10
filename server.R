@@ -652,6 +652,12 @@ shinyServer(function(input, output, session) {
         
     })
     
+    #' Check if any k-values have been set
+    click <- reactive(({
+      click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
+        input$setKfromClosest[1]
+    }))
+    
     #### Store and display selected k-values ####
     
     # create reactive value to store selected k-values
@@ -659,7 +665,7 @@ shinyServer(function(input, output, session) {
     
     #' Button to store single selected k-value in data.frame
     observeEvent(input$setK, {  
-      if (input$setK[1] == 1 && is.null(input$file2)){
+      if (click() == 0 && is.null(input$file2)){
         values$df_data <-  data.frame(position = positions(),  
                                       method = rep(NA),
                                       k = rep(NA))
