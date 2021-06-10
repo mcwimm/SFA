@@ -125,9 +125,7 @@ shinyServer(function(input, output, session) {
                                     sep = ",",
                                     skip = 10))
       } else {
-        return(get.rawData(input$file1, input$inputType,
-                           sep = input$sep,
-                           skip = input$skip))
+        return(get.rawData(input))
       }
         
     })

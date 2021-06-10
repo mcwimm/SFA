@@ -1,15 +1,15 @@
-get.rawData = function(file, inputType, sep, skip){
-   if (inputType == "ICT_raw"){
+get.rawData = function(input){
+   if (input$inputType == "ICT_raw"){
       # print("ICT_raw")
-      return(get.temperatures.ICT(file$datapath,
-                                  sep = sep,
-                                  skip = skip))
+      return(get.temperatures.ICT(input$file1$datapath,
+                                  sep = input$sep,
+                                  skip = input$skip))
    }
-   if (inputType == "ICT_delta"){
+   if (input$inputType == "ICT_delta"){
       # print("ICT_delta")
-      return(get.temp.differences.ICT(file$datapath,
-                                      sep = sep,
-                                      skip = skip))
+      return(get.temp.differences.ICT(input$file1$datapath,
+                                      sep = input$sep,
+                                      skip = input$skip))
    }
 }
 
