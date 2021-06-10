@@ -15,7 +15,7 @@ dataUplOutput = function(){
              collapsible = T,
              status = "warning",
              box.dat_upl.upload())),
-      fluidRow(box(title = "Data",
+      fluidRow(box(title = "Preview data",
                    collapsible = T,
                    status = "info",
                    
@@ -67,7 +67,7 @@ box.dat_upl.upload = function(){
                     "ICT_delta" = "ICT_delta")),
       numericInput("skip", "Skip:", min = 0, max = 100, 10),
       # Input: Checkbox if file has header ----
-      checkboxInput("header", "Header", TRUE),
+      # checkboxInput("header", "Header", TRUE),
       # Input: Select separator ----
       
       actButton("setData", "Use data", "create")
