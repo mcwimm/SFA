@@ -162,11 +162,34 @@ shinyServer(function(input, output, session) {
         req(input$setData)
       } 
       
-      positions = get.positions(positionManual = input$positionManual,
-                          inputType = input$inputType,
-                          dataSource = rawData(),
-                          positionInput = input$positionInput)
+      positions = get.positionsFromRawData(dataSource = rawData(),
+                                           input = input)
 
+      # update sensor positions if a filter was applied to the data set
+      if (input$LoadFilter != 0){
+        # case if FilterApply button was activated the first time: use filtered data
+        if (!is.null(input$FilterApply)){
+          d = values$deltaTempLong
+          positions = unique(d$position)
+        }
+        # case if FilterDelete button was activated the first time: use raw data
+        if (!is.null(input$FilterDelete)){
+          positions = get.positionsFromRawData(dataSource = rawData(), 
+                                               input = input)
+        }
+        # case if filters have been applied and deleted button was activated
+        # the first time
+        if ((!is.null(input$FilterApply)) & (!is.null(input$FilterDelete))){
+          if (input$FilterApply > input$FilterDelete){
+            d = values$deltaTempLong
+            positions = unique(d$position)
+          } else{
+            positions = get.positionsFromRawData(dataSource = rawData(), 
+                                                 input = input)
+          }
+        }
+      } 
+      
       return(positions)
     })
     
@@ -249,11 +272,7 @@ shinyServer(function(input, output, session) {
       
       # filter by sensor positions
       if (!is.null(input$sensorFilter)){
-        print('Sensor filter')
-        print(unique(d$position))
-        
         sensorFilter = as.numeric(unlist(strsplit(input$sensorFilter,",")))
-        print(sensorFilter)
         d = d %>% 
           filter(position %in% sensorFilter)
       }
@@ -534,6 +553,8 @@ shinyServer(function(input, output, session) {
     #### UI #####
     
     output$kPositionSelect <- renderUI({
+      # load current data set
+      d = values$deltaTempLong
       radioButtons("kPositionSelect", "Sensor position",
                    choices = positions(),
                    selected = 1, inline = T)
