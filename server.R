@@ -122,11 +122,11 @@ shinyServer(function(input, output, session) {
         defaultData = "./tests/ICT_rawdata.csv"
         print("Default data")
         return(get.temperatures.ICT(defaultData,
-                                    header = T, sep = ",",
+                                    sep = ",",
                                     skip = 10))
       } else {
         return(get.rawData(input$file1, input$inputType,
-                           header = input$header, sep = input$sep,
+                           sep = input$sep,
                            skip = input$skip))
       }
         
@@ -248,6 +248,18 @@ shinyServer(function(input, output, session) {
       d = d %>%
         filter(dTsym.dTas >= dTsym.dTasMin) %>% 
         filter(dTsym.dTas <= dTsym.dTasMax)
+      
+      # filter by sensor positions
+      if (!is.null(input$sensorFilter)){
+        print('Sensor filter')
+        print(unique(d$position))
+        
+        sensorFilter = as.numeric(unlist(strsplit(input$sensorFilter,",")))
+        print(sensorFilter)
+        d = d %>% 
+          filter(position %in% sensorFilter)
+      }
+      
 
       # print remaining size of data set
       print(nrow(d))
@@ -352,6 +364,14 @@ shinyServer(function(input, output, session) {
                    numericInput("dTsym.dTasMin", "Min", value = Inf)),
             column(4, numericInput("dTsym.dTasMax", "Max", value = Inf)),
           ),
+          
+          # Sensor filters
+          h4(strong("Sensor positions")),
+          fluidRow(# sensor positions
+            column(12,
+                   textInput("sensorFilter", "",
+                 placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3"))
+            ),
           
           
           br(), 

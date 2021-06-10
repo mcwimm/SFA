@@ -1,33 +1,23 @@
-get.rawData = function(file, inputType, header, sep, skip){
-   # if (is.null(file)){
-   #    defaultData = "./tests/ICT_rawdata.csv"
-   #    print("Default data")
-   #    
-   #    return(get.temperatures.ICT(defaultData,
-   #                                header = T, sep = ",",
-   #                                skip = 10))
-   # }
-   # req(input$file1)
-   # print(file)
+get.rawData = function(file, inputType, sep, skip){
    if (inputType == "ICT_raw"){
       # print("ICT_raw")
       return(get.temperatures.ICT(file$datapath,
-                                  header = header, sep = sep,
+                                  sep = sep,
                                   skip = skip))
    }
    if (inputType == "ICT_delta"){
       # print("ICT_delta")
       return(get.temp.differences.ICT(file$datapath,
-                                      header = header, sep = sep,
+                                      sep = sep,
                                       skip = skip))
    }
 }
 
 #' Reads raw temperatures from ICT-data file.
 #' 
-get.temperatures.ICT = function(file, header, sep, skip){
+get.temperatures.ICT = function(file, sep, skip){
    rawData <- read.csv(file,
-                       header = header, sep = sep, 
+                       header = TRUE, sep = sep, 
                        fileEncoding="latin1",
                        skip = skip)
 
@@ -43,9 +33,9 @@ get.temperatures.ICT = function(file, header, sep, skip){
 
 #' Reads temperature differences from ICT-data file.
 #' 
-get.temp.differences.ICT = function(file, header, sep, skip){
+get.temp.differences.ICT = function(file, sep, skip){
    rawData <- read.csv(file,
-                       header = header, sep = sep, 
+                       header = TRUE, sep = sep, 
                        fileEncoding="latin1",
                        skip = skip)
    datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
