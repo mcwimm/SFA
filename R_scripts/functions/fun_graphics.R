@@ -108,28 +108,30 @@ plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
    }
 
    if (type == "boxp"){
+      if (fill.col == "none"){
+         y = 0
+      } else {
+         y = factor(data[, fill.col])
+      }
+      
       p = p +
-         geom_boxplot(mapping=aes(y = x), alpha = 0.1)  + 
+         geom_boxplot(mapping=aes(y = x, x = y), alpha = 0.1)  + 
          labs(y = labels[x.col][[1]]) +
-         theme(axis.title.x=element_blank(),
-               axis.text.x=element_blank(),
-               axis.ticks.x=element_blank())
+         theme(axis.title.x=element_blank())
    }
    
    if (type == "violin"){
       if (fill.col == "none"){
          y = 0
       } else {
-         y = data[, fill.col]
+         y = factor(data[, fill.col])
       }
       p = p +
          geom_violin(mapping=aes(y = x, x = y), alpha = 0.1)  + 
          stat_summary(mapping=aes(y = x, x = y),
                       fun.data=data_summary) +
          labs(y = labels[x.col][[1]]) +
-         theme(axis.title.x=element_blank(),
-               axis.text.x=element_blank(),
-               axis.ticks.x=element_blank())
+         theme(axis.title.x=element_blank())
    }
    
    
