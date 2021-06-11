@@ -21,13 +21,16 @@ get.temperatures.ICT = function(file, sep, skip){
                        fileEncoding="latin1",
                        skip = skip)
 
-   col = grep("Exter", colnames(rawData) )[1]
-   rawData = rawData[, c(1:col)]
+   if (length(colnames(rawData)) > 1){
+      col = grep("Exter", colnames(rawData) )[1]
+      rawData = rawData[, c(1:col)]
+      
+      datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
+      
+      rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
+                                     format=datetimeformat)
+   }
    
-   datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
-   
-   rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
-                                  format=datetimeformat)
    return(rawData)
 }
 
