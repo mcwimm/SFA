@@ -8,8 +8,9 @@ The Sap Flow analyser is an R Shiny app to process sap flow data recorded with H
 
 requires `shiny` package
 
-``runGitHub("SFA", "mcwimm")``
+``runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)``
 
+``'destdir`` ... destination directory. If ``NULL`` this is the temporary directory (Caution: files will be deleted)
 
 ### ... in R: Option 2
 
