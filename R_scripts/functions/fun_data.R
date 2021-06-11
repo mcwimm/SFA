@@ -1,12 +1,12 @@
 get.rawData = function(input){
-   if (input$inputType == "ICT_raw"){
-      # print("ICT_raw")
+   if (input$inputType == "HFD_raw"){
+      # print("HFD_raw")
       return(get.temperatures.ICT(input$file1$datapath,
                                   sep = input$sep,
                                   skip = input$skip))
    }
-   if (input$inputType == "ICT_delta"){
-      # print("ICT_delta")
+   if (input$inputType == "HFD_delta"){
+      # print("HFD_delta")
       return(get.temp.differences.ICT(input$file1$datapath,
                                       sep = input$sep,
                                       skip = input$skip))
@@ -201,11 +201,11 @@ convertTimeToDeci <- function(time){
 #' 
 get.positionsFromRawData = function(dataSource, input){
 
-   if (input$inputType == "ICT_raw"){
+   if (input$inputType == "HFD_raw"){
       reg = "Asym"
    }
    
-   if (input$inputType == "ICT_delta"){
+   if (input$inputType == "HFD_delta"){
       reg = "dTSym"
    }
    

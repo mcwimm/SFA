@@ -11,7 +11,7 @@ If nothing is selected, a default file is used. This file contains data of a....
 
 ## Current input types
 
-- [x] **ICT_raw**: original sensor output
-- [x] **ICT_delta**: data sets with calculated temperature differences, e.g. Sap Flow Analyzer output
+- [x] **Raw**: original sensor output/ raw temperature measurments
+- [x] **Delta**: data sets with calculated temperature differences, e.g. Sap Flow Analyzer output
 
 

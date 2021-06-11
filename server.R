@@ -131,10 +131,10 @@ shinyServer(function(input, output, session) {
     })
     
     deltaTempLongNoFilter <- reactive({
-      if (input$inputType == "ICT_raw"){
+      if (input$inputType == "HFD_raw"){
         d = get.delta.from.temp(rawData(), positions())
       }
-      if (input$inputType == "ICT_delta"){
+      if (input$inputType == "HFD_delta"){
         d = get.delta.temp(rawData(), positions())
       }
       return(d)
