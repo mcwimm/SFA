@@ -667,16 +667,16 @@ shinyServer(function(input, output, session) {
     
     #' Button to store single selected k-value in data.frame
     observeEvent(input$setK, {  
-      if (click() == 0 && is.null(input$file2)){
+      click = click()
+      if (click == 1 && is.null(input$file2)){
         values$df_data <-  data.frame(position = positions(),  
                                       method = rep(NA),
                                       k = rep(NA))
       }
       
-      values$df_data[values$df_data$position == input$kPositionSelect, 
-                     2:3] <- cbind(method = as.character(input$kMethod),
-                                   k = round(kValue(), 3))
-      
+      values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(
+        method = as.character(input$kMethod),
+        k = round(kValue(), 3))
     })
     
     #' Button to use uploaded k-Values
