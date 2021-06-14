@@ -462,7 +462,7 @@ shinyServer(function(input, output, session) {
     })
     
     output$dataPoints <- renderText({
-      paste(nrow(deltaTempLong()), " data points remaing.")
+      paste(nrow(deltaTempLong()), " data points remaining.")
     })
     
     #### Graphics ####
