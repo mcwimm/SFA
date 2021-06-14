@@ -257,23 +257,23 @@ shinyServer(function(input, output, session) {
       dTasMax = ifelse(is.na(input$dTasMax), Inf, input$dTasMax)
       dTsym.dTasMin = ifelse(is.na(input$dTsym.dTasMin), -Inf, input$dTsym.dTasMin)
       dTsym.dTasMax = ifelse(is.na(input$dTsym.dTasMax), Inf, input$dTsym.dTasMax)
-      
+
       d = d %>%
-        filter(dTSym >= dTSymMin) %>% 
+        filter(dTSym >= dTSymMin) %>%
         filter(dTSym <= dTSymMax)
-      
+
       d = d %>%
-        filter(dTas >= dTasMin) %>% 
+        filter(dTas >= dTasMin) %>%
         filter(dTas <= dTasMax)
-      
+
       d = d %>%
-        filter(dTsym.dTas >= dTsym.dTasMin) %>% 
+        filter(dTsym.dTas >= dTsym.dTasMin) %>%
         filter(dTsym.dTas <= dTsym.dTasMax)
-      
+
       # filter by sensor positions
-      if (!is.null(input$sensorFilter)){
+      if (input$sensorFilter != ""){
         sensorFilter = as.numeric(unlist(strsplit(input$sensorFilter,",")))
-        d = d %>% 
+        d = d %>%
           filter(position %in% sensorFilter)
       }
       
