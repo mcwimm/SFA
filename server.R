@@ -945,18 +945,18 @@ shinyServer(function(input, output, session) {
           theme_void()
       } else {
         d = sapFlowDens()
-
-        # check if sap flow density is Inf
-        # helper variable; if 1 no sap flow density data are avail.
-        SFDensity = data.frame(x = 0)
-        if (input$sapFlowDensityPlot.y == "SFDsw"){
-          SFDensity = d %>% mutate(all = n()) %>% 
-            filter(abs(SFDsw) == Inf) %>% 
-            distinct(x = n()/all)
-        }
         
+        # check if sap flow density is Inf
+        # helper variable; if 0 no sap flow density data is avail.
+        SFDensity = nrow(d)
+        if (input$sapFlowDensityPlot.y == "SFDsw"){
+          SFDensity = nrow(d %>% mutate(all = n()) %>% 
+            filter(abs(SFDsw) != Inf))
+          
+        }
+
         # show error message if sap flow density haven't been calculated (i.e. is Inf)
-        if (SFDensity$x == 1){
+        if (SFDensity == 0){
           ggplot() +
             annotate(geom="text", x=5, y=5, 
                      label="Wood properties are missing.",
