@@ -258,7 +258,7 @@ get.depths <- function(depthManual = F, inputType,
 
 #' Get area and circumference of circular ring to dataframe with positions and depths
 #'
-add.Props2DepthsHelper = function(depths, swd){
+add.Props2DepthsHelper = function(depths, rxy, swd){
 
    #depths = depths %>% arrange(desc(depth))
    
@@ -266,20 +266,22 @@ add.Props2DepthsHelper = function(depths, swd){
       mutate(Aring = pi*(depth^2 - lead(depth)^2),
              R = (depth + lead(depth)) / 2,
              Cring = 2*pi * R)
-   depths[nrow(depths), "Aring"] = pi*(depths[nrow(depths), "depth"]^2 - swd^2)
-   depths[nrow(depths), "R"] =(depths[nrow(depths), "depth"] + swd) / 2
-   
-   depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"] 
+   depths[nrow(depths), "Aring"] = pi*(depths[nrow(depths), "depth"]^2 - (rxy - swd)^2)
+   depths[nrow(depths), "R"] =(depths[nrow(depths), "depth"] + (rxy - swd)) / 2
+
+   depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"]
    return(depths)
 }
 
 
-add.Props2Depths = function(depths, swd){
+add.Props2Depths = function(depths, rxy, swd){
    if (all(depths$depth > 0)){
-      depths = add.Props2DepthsHelper(depths = depths, swd = swd)
+      depths = add.Props2DepthsHelper(depths = depths, 
+                                      rxy = rxy,
+                                      swd = swd)
    } else {
       depths = bind_rows(
-         depths[depths[, "depth"] > 0,] %>% add.Props2DepthsHelper(., 0),
+         depths[depths[, "depth"] > 0,] %>% add.Props2DepthsHelper(., rxy, 0),
          depths[depths[, "depth"] == 0,] %>% 
             mutate(Aring = 0,
                    R = 0,
@@ -289,7 +291,7 @@ add.Props2Depths = function(depths, swd){
             mutate(depth_helper = depth,
                   depth = abs(depth)) %>% 
             arrange(desc(depth)) %>% 
-            add.Props2DepthsHelper(., 0) %>% 
+            add.Props2DepthsHelper(., rxy, 0) %>% 
             mutate(depth = depth_helper) %>% 
             select(-depth_helper) %>% 
             arrange(position)

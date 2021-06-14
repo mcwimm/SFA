@@ -212,9 +212,11 @@ shinyServer(function(input, output, session) {
                           depth = input$depthInput,
                           sensor_distance = sensor.dist())
       # Àdd area and circumference of circular ring
+      swd = sapWoodDepth()
       depths = add.Props2Depths(depths = depths, 
-                                swd = sapWoodDepth())
-      print(paste('Estimated sap wood depth in cm: ', sapWoodDepth()))
+                                rxy = rxy,
+                                swd = swd)
+      print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy))
       return(depths)
     })
     
