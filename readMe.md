@@ -15,5 +15,5 @@ requires `shiny` package
 ### ... in R: Option 2
 
 1. fork/ clone the complete project (repo)
-2. open ui.R with R and click Run App
+2. open _ui.R_ with R and click `Run App`
 
