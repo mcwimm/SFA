@@ -1,4 +1,4 @@
-# Sap Flow Analyser
+# Sap Flow Analyzer
 
 The Sap Flow analyser is an R Shiny app to process sap flow data recorded with HFD (Heat Field Defomation) sensors. The app allows to clean the data, determine the k-value, calculate sap flow index and sap flow density and to estimate sap flow rates and tree water use if tree properties are given.
 
