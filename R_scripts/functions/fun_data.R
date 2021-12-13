@@ -53,14 +53,14 @@ get.temp.differences.ICT = function(file, sep, skip){
 get.datetime.format = function(datetime){
    # datetime = rawData[1, c("Date", "Time")]
    if (!is.na(as.POSIXct(x = paste(datetime$Date, datetime$Time), 
-                     format="%d.%m.%Y %H:%M"))){
+                     format="%d.%m.%Y %H:%M:%S"))){
       # print("%d.%m.%Y %H:%M")
-      return("%d.%m.%Y %H:%M")
+      return("%d.%m.%Y %H:%M:%S")
    }
    if (!is.na(as.POSIXct(x = paste(datetime$Date, datetime$Time), 
-                         format="%d/%m/%Y %H:%M"))){
+                         format="%d/%m/%Y %H:%M:%S"))){
       # print("%d/%m/%Y %H:%M")
-      return("%d/%m/%Y %H:%M")
+      return("%d/%m/%Y %H:%M:%S")
    }
 }
 
