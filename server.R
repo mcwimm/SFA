@@ -887,6 +887,8 @@ shinyServer(function(input, output, session) {
       }        
 
       print(paste("SAP WOOD DEPTH  ", sapWoodDepth()))
+      print(paste("SAP WOOD AREA", mean(data$SWDarea)))
+      
       return(data)
     })
     

@@ -165,9 +165,12 @@ sfRateOutput <- function(){
                                         on sensor positions (see 'Data | Upload') and wood
                                         properties (see 'Project settings')."),
                        
-                       checkboxInput("treeScaleSimple1", "Method 1: SFD * Asd", T),
-                       checkboxInput("treeScaleSimple2", "Method 2: SFS / swd", T),
-                       checkboxInput("treeScaleSimple3", "Method 3: SFS * Csd", T)
+                       checkboxInput("treeScaleSimple1", 
+                                     "Method 1: sum(SFD * Aring)", T),
+                       checkboxInput("treeScaleSimple2", 
+                                     "Method 2: mean(SFD) * Asw", T),
+                       checkboxInput("treeScaleSimple3", 
+                                     "Method 3: mean(SFS * Csd)", T)
                    )),
             column(width = 8,
                    box(title = "Figures",

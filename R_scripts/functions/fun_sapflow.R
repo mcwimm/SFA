@@ -37,8 +37,9 @@ treeScaleSimple2 <- function(data, swd) {
    
    # Calculate sap wood area, which is the difference in total stem area (A_rxy) and
    # heart wood area
-   A_rxy = pi * max(depths)^2
-   A_hw = pi * (max(depths) - swd)^2
+   A_rxy = pi * max(abs(depths))^2
+   A_hw = pi * (max(abs(depths)) - swd)^2
+
    data$SWDarea = A_rxy - A_hw
 
    # Calculate sap flow rate per time step over alls depths in kg/h
