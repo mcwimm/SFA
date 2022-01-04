@@ -261,15 +261,21 @@ get.depths <- function(depthManual = F, inputType,
 add.Props2DepthsHelper = function(depths, rxy, swd){
 
    #depths = depths %>% arrange(desc(depth))
-   
    depths = depths %>% 
       mutate(Aring = pi*(depth^2 - lead(depth)^2),
              R = (depth + lead(depth)) / 2,
              Cring = 2*pi * R)
-   depths[nrow(depths), "Aring"] = pi*(depths[nrow(depths), "depth"]^2 - (rxy - swd)^2)
-   depths[nrow(depths), "R"] =(depths[nrow(depths), "depth"] + (rxy - swd)) / 2
+   
+   sensor_distance = abs(depths[1, "R"] - depths[2, "R"])
+   last_ring_outer = pi * depths[nrow(depths), "depth"]^2
+   last_ring_inner = pi * (depths[nrow(depths), "depth"]-sensor_distance)^2 
+   
+   depths[nrow(depths), "Aring"] = last_ring_outer - last_ring_inner
+   depths[nrow(depths), "R"] = depths[nrow(depths), "depth"] - sensor_distance / 2
 
    depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"]
+   print(depths)
+   
    return(depths)
 }
 
