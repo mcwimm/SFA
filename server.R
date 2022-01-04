@@ -281,6 +281,7 @@ shinyServer(function(input, output, session) {
       
 
       # print remaining size of data set
+      # print(paste("Remaining size of data set: ", nrow(d)))
       print(nrow(d))
       return(d)
     }
@@ -978,6 +979,49 @@ shinyServer(function(input, output, session) {
       
     })
     
+    sapFlowDensityPlot.Boxplot = reactive({
+      print(paste('click ', click()))
+      if (click() == 0 && is.null(input$file2)){
+        ggplot() +
+          annotate(geom="text", x=5, y=5, 
+                   label="No k-values have been set yet.",
+                   color="red", size = 8) +
+          theme_void()
+      } else {
+        d = sapFlowDens()
+        
+        # check if sap flow density is Inf
+        # helper variable; if 0 no sap flow density data is avail.
+        SFDensity = nrow(d)
+        if (input$sapFlowDensityPlot.y == "SFDsw"){
+          SFDensity = nrow(d %>% mutate(all = n()) %>% 
+                             filter(abs(SFDsw) != Inf))
+          
+        }
+        
+        # show error message if sap flow density haven't been 
+        # calculated (i.e. is Inf)
+        if (SFDensity == 0){
+          ggplot() +
+            annotate(geom="text", x=5, y=5, 
+                     label="Wood properties are missing.",
+                     color="red", size = 8) +
+            theme_void()
+        } else{
+          names(d)
+          d %>% 
+            ggplot(., aes(x = factor(position), y = SFS, 
+                          col = factor(position)))+
+            geom_boxplot() +
+            # scale_y_log10() +
+            facet_wrap(~ doy)
+          
+        }
+      }
+      
+    })
+    
+    
     sapFlowTreePlot <- reactive({
       print(paste('click ', click()))
       if (click() == 0 && is.null(input$file2)){
@@ -1011,6 +1055,10 @@ shinyServer(function(input, output, session) {
     
     output$sapFlowDensity <- renderPlot({
       sapFlowDensityPlot()
+    })
+    
+    output$sapFlowDensity.Boxplot <- renderPlot({
+      sapFlowDensityPlot.Boxplot()
     })
     
     output$SapFlowPlot <- renderPlot({

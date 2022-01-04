@@ -143,11 +143,18 @@ sfDensityOutput <- function(){
          box(title = "Figure",
              collapsible = T, width = 8,
              status = "info",
-             output.figure("sapFlowDensity"),
-             actButton("save.sapFlowDensityPlot", "Save figure", "saveFigure"),
-             actButton("save.sapFlowDensity", "Save csv", "saveCsv")
-         )
-      )))
+             tabsetPanel(
+                tabPanel("Chart", br(),
+                         output.figure("sapFlowDensity"),
+                         actButton("save.sapFlowDensityPlot",
+                                   "Save figure", 
+                                   "saveFigure"),
+                         actButton("save.sapFlowDensity", 
+                                   "Save csv", "saveCsv")),
+                tabPanel("Boxplot", br(),
+                         output.figure("sapFlowDensity.Boxplot"))
+             ))
+         )))
 }
 
 #### Sap flow rate ####
