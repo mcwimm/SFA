@@ -47,7 +47,7 @@ kValueOutput <- function(){
                 numericInput("kManual", "Enter k manually", value = 1.11)
              ),
              
-             checkboxInput("dTimeFilter", "Set custom night time", F),
+             checkboxInput("dTimeFilter", "Custom zero-flow time", F),
              conditionalPanel(
                 condition = "input.dTimeFilter == true",
                 fluidRow(
