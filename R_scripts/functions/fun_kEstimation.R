@@ -35,17 +35,23 @@ get.kByMethodAll <- function(data, nightTimeStart, nightTimeEnd){
 get.regressionK.depth <- function(data, position, nightTimeStart,
                                   nightTimeEnd){
    sensorDepth = position
+   # Filter repective sensor depth
    data = data %>% 
       filter(position == sensorDepth) 
-   t = nrow(data)
+   datapoints_sensordepth = nrow(data)
+   
+   # Filter 0-trend data points by time
    data = data %>% 
       filter(dTime >= nightTimeStart | dTime <= nightTimeEnd) 
-   print(paste(round(nrow(data)/t*100, 2),
-               " % of data points are used (",
-               t, ")", sep = ""))
    
    data.adj = clean.data.iteration(data, 0)
    
+   datapoints_used = nrow(data.adj[[1]])
+   print(paste(round(datapoints_used/datapoints_sensordepth*100, 1),
+               " % (", datapoints_used, "/ ", datapoints_sensordepth,
+               " ) of data points are used to estimate k.",
+               sep = "")
+         )
    df = data.frame(kAs = data.adj[[2]][[1]],
                    R.kAs = data.adj[[2]][[2]],
                    kSa = data.adj[[3]][[1]],
@@ -108,9 +114,8 @@ get.K.dTsa <- function(clean.data){
    return(c(dTsa.K, dTsa.lm$adj.r.squared))
 }
 
-clean.data.iteration = function(data, initial.cutoff){
-   data <- data[data$timestep > initial.cutoff, ]
-   
+clean.data.iteration = function(data_ini, initial.cutoff){
+   data <- data_ini[data_ini$timestep > initial.cutoff, ]
    step = 0
    r.adj.n1 = 0
    r.adj.diff = 1
@@ -122,7 +127,7 @@ clean.data.iteration = function(data, initial.cutoff){
       # print(paste("nrow(data)  ", nrow(data)))
       
       if (nrow(data) < 50){
-         print(paste("[Warning] Only ", nrow(data), " data points were used for the regression."))
+         print(paste("[Warning] Iteration stopped as number of data points < 50."))
          data = data.n1
          break
       }
@@ -145,10 +150,10 @@ clean.data.iteration = function(data, initial.cutoff){
       step = step + 1
       
    }
-   
+
    K.dTas <- get.K.dTas(clean.data = data)
    K.dTsa <- get.K.dTsa(clean.data = data)
-   
+
    return(list(data, K.dTas, K.dTsa))
 }
 
