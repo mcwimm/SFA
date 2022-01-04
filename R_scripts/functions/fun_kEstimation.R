@@ -1,12 +1,15 @@
 
-get.kByMethod <- function(method, data, position, nightTimeStart, nightTimeEnd, kManual = 1.11){
+get.kByMethod <- function(method, data, position, 
+                          nightTimeStart, nightTimeEnd, 
+                          kManual = 1.11){
    sensorDepth = position
    if (method == "manual"){
       k = kManual
    }
    
    if (method == "regression"){
-      k = get.regressionK.depth(data, sensorDepth, nightTimeStart, nightTimeEnd)[, "k"]
+      k = get.regressionK.depth(data, sensorDepth, 
+                                nightTimeStart, nightTimeEnd)[, "k"]
    }
    
    if (method == "closest"){
@@ -29,11 +32,18 @@ get.kByMethodAll <- function(data, nightTimeStart, nightTimeEnd){
 ### regression ###
 ##################
 
-get.regressionK.depth <- function(data, position, nightTimeStart, nightTimeEnd){
+get.regressionK.depth <- function(data, position, nightTimeStart,
+                                  nightTimeEnd){
    sensorDepth = position
    data = data %>% 
-      filter(position == sensorDepth) %>% 
+      filter(position == sensorDepth) 
+   t = nrow(data)
+   data = data %>% 
       filter(dTime >= nightTimeStart | dTime <= nightTimeEnd) 
+   print(paste(round(nrow(data)/t*100, 2),
+               " % of data points are used (",
+               t, ")", sep = ""))
+   
    data.adj = clean.data.iteration(data, 0)
    
    df = data.frame(kAs = data.adj[[2]][[1]],
