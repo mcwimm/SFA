@@ -41,8 +41,13 @@ get.regressionK.depth <- function(data, position, nightTimeStart,
    datapoints_sensordepth = nrow(data)
    
    # Filter 0-trend data points by time
-   data = data %>% 
-      filter(dTime >= nightTimeStart | dTime <= nightTimeEnd) 
+   if (nightTimeStart < nightTimeEnd){
+      data = data %>% 
+         filter(dTime >= nightTimeStart & dTime <= nightTimeEnd)
+   } else {
+      data = data %>% 
+         filter(dTime >= nightTimeStart | dTime <= nightTimeEnd)
+   }
    
    data.adj = clean.data.iteration(data, 0)
    
