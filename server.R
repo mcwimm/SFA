@@ -621,12 +621,17 @@ shinyServer(function(input, output, session) {
         
         if (input$dTimeFilter){
           print(nrow(d))
-          d = d %>% 
-            filter(dTime >= input$kRegressionTime.start | dTime <= input$kRegressionTime.end) 
+          if (nightTimeStart < nightTimeEnd){
+            d = d %>% 
+              filter(dTime >= input$kRegressionTime.start & dTime <= input$kRegressionTime.end) 
+          } else {
+            d = d %>% 
+              filter(dTime >= input$kRegressionTime.start | dTime <= input$kRegressionTime.end) 
+          }
           print(nrow(d))
           
         }
-        return(clean.data.iteration(d, 0))
+        return(clean.data.iteration(d))
     })
     
     
