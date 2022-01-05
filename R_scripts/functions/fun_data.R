@@ -85,15 +85,16 @@ get.delta.from.temp.depth <- function(rawData, position){
    reg.L <- paste(position, "L", sep=".")
    reg.S <- paste(position, "S", sep=".")
    
-   t_up <- matrix(raw_temperatures[, grepl(reg.U,
-                                               colnames(raw_temperatures))])
+   t_up <- matrix(as.numeric(raw_temperatures[, grepl(reg.U,
+                                               colnames(raw_temperatures))]))
    
-   t_low <- matrix(raw_temperatures[, grepl(reg.L,
-                                                colnames(raw_temperatures))])
+   t_low <- matrix(as.numeric(raw_temperatures[, grepl(reg.L,
+                                                colnames(raw_temperatures))]))
    
-   t_side <- matrix(raw_temperatures[, grepl(reg.S,
-                                                 colnames(raw_temperatures))])
+   t_side <- matrix(as.numeric(raw_temperatures[, grepl(reg.S,
+                                                 colnames(raw_temperatures))]))
    
+
    if ((ncol(t_up) != 1) | (ncol(t_low) != 1) | (ncol(t_side) != 1)){
       print(paste("There is more than one temperature dataset for position ", position,
             ". Please check your raw data file.", sep = ""))

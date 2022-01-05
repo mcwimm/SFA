@@ -66,11 +66,13 @@ box.dat_upl.upload = function(){
                   c("Raw" = "HFD_raw", 
                     "Delta" = "HFD_delta")),
       numericInput("skip", "Skip:", min = 0, max = 100, 10),
+
       # Input: Checkbox if file has header ----
       # checkboxInput("header", "Header", TRUE),
       # Input: Select separator ----
       
-      actButton("setData", "Use data", "create")
+      actButton("setData", "Use data", "create"),
+      p(em("<Note> If your data set contains non-numeric rows, e.g. logger warnings, they are converted to NA. Remove them in the 'Data > Filter' section."))
    ))
 }
 
