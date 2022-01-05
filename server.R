@@ -28,6 +28,14 @@ shinyServer(function(input, output, session) {
         }
     })
     
+    fileAppendix <- reactive({
+      if (input$fileAppendix){
+        return(input$fileAppend) 
+      } else {
+        return("")
+      }
+    })
+    
     #' Define default ggplot theme
     plot_theme <- reactive({
       themes[[input$figTheme]]
@@ -522,7 +530,7 @@ shinyServer(function(input, output, session) {
         path = paste(projectPath(), 
                      "/csv-files/",
                      "deltaT_longFormat", sep = "")
-        save.csv(path, csvObject)
+        save.csv(path, csvObject, fileAppendix())
         
     })
     
@@ -531,7 +539,7 @@ shinyServer(function(input, output, session) {
                      "/graphics/",
                      "deltaT_", input$rawPlot.facet, sep = "")
         obj = deltaTfacetWrap()
-        save.figure(name, obj, figTitle(), input$figFor)
+        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     observeEvent(input$save.deltaTSingle, {
@@ -545,7 +553,7 @@ shinyServer(function(input, output, session) {
                      "/graphics/",
                      "tempDiff_", v, sep = "")
         obj = deltaTSingle()
-        save.figure(name, obj, figTitle(), input$figFor)
+        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
 
     # button to save filtered data, long format
@@ -554,7 +562,7 @@ shinyServer(function(input, output, session) {
       path = paste(projectPath(), 
                    "/csv-files/",
                    "deltaT_longFormat_filtered", sep = "")
-      save.csv(path, csvObject)
+      save.csv(path, csvObject, fileAppendix())
     })
     
     
@@ -568,7 +576,7 @@ shinyServer(function(input, output, session) {
                    as.character(input$filterPlot_col), sep = "")
       print(name)
       obj = filterPlot()
-      save.figure(name, obj, figTitle(), input$figFor)
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     
@@ -802,7 +810,7 @@ shinyServer(function(input, output, session) {
         path = paste(projectPath(), 
                      "/csv-files", sep = "")
         csvObject = values$df_data
-        save.csv(paste(path, "/k-values", sep = ""), csvObject)
+        save.csv(paste(path, "/k-values", sep = ""), csvObject, fileAppendix())
     })
     
     # save figures
@@ -811,11 +819,11 @@ shinyServer(function(input, output, session) {
                      "/graphics/",
                      sep = "")
         save.figure(paste(name, "k_fig1_position_", input$kPositionSelect, sep = ""), 
-                    kplot1(), figTitle(), input$figFor)
+                    kplot1(), figTitle(), fileAppendix(), input$figFor)
         save.figure(paste(name, "k_fig2_position_", input$kPositionSelect, sep = ""), 
-                    kplot2(), figTitle(), input$figFor)
+                    kplot2(), figTitle(), fileAppendix(), input$figFor)
         save.figure(paste(name, "k_fig3_position_", input$kPositionSelect, sep = ""), 
-                    kplot3(), figTitle(), input$figFor)
+                    kplot3(), figTitle(), fileAppendix(), input$figFor)
     })
 
     ####################
@@ -910,7 +918,7 @@ shinyServer(function(input, output, session) {
                      "/graphics/",
                      "sapFlowIndexComplete", sep = "")
         obj = sapFlowIndex()
-        save.figure(name, obj, figTitle(), input$figFor)
+        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     observeEvent(input$save.sfIndex.day, {
@@ -918,7 +926,7 @@ shinyServer(function(input, output, session) {
                      "/graphics/",
                      "sapFlowIndexDaily", sep = "")
         obj = sapFlowIndex.Day()
-        save.figure(name, obj, figTitle(), input$figFor)
+        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     
@@ -1072,7 +1080,7 @@ shinyServer(function(input, output, session) {
                    "/graphics/",
                    "sf_", input$sapFlowDensityPlot.y, sep = "")
       obj = sapFlowDensityPlot()
-      save.figure(name, obj, figTitle(), input$figFor)
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     observeEvent(input$save.sapFlowDensity, {
@@ -1080,7 +1088,7 @@ shinyServer(function(input, output, session) {
                    "/csv-files/",
                    "sapFlowDensity", sep = "")
       obj = sapFlowDens()
-      save.csv(name, obj)
+      save.csv(name, obj, fileAppendix())
     })
     
     observeEvent(input$save.SapFlow, {
@@ -1088,7 +1096,7 @@ shinyServer(function(input, output, session) {
                    "/graphics/",
                    "sapFlow_scaled", sep = "")
       obj = sapFlowTreePlot()
-      save.figure(name, obj, figTitle(), input$figFor)
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     observeEvent(input$save.SapFlowCsv, {
@@ -1096,7 +1104,7 @@ shinyServer(function(input, output, session) {
                    "/csv-files/",
                    "sapFlow_scaled", sep = "")
       obj = sapFlow()
-      save.csv(name, obj)
+      save.csv(name, obj, fileAppendix())
     })
     
     
@@ -1105,7 +1113,7 @@ shinyServer(function(input, output, session) {
                    "/csv-files/",
                    "treeWaterUsePerDay", sep = "")
       obj = treeWaterUse()
-      save.csv(name, obj)
+      save.csv(name, obj, fileAppendix())
     })
     
     

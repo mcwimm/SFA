@@ -323,7 +323,10 @@ remove.outlier <- function(data, data.vector){
 
 ########### SAVE #############
 
-save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
+save.figure = function(name, plotObject, prjName = "PrjName", 
+                       fileAppendix = "", format = "svg"){
+   name = paste(name, fileAppendix, sep = "_")
+   
    plotObject = plotObject +
       ggtitle(prjName) +
       theme_bw(base_size = 14)
@@ -363,8 +366,10 @@ save.figure = function(name, plotObject, prjName = "PrjName", format = "svg"){
 
 }
 
-save.csv = function(name, csvObject){
-   res = try(write.csv(csvObject, file = paste(name, ".csv", sep = ""),
+save.csv = function(name, csvObject, fileAppendix = ""){
+   file_name = paste(name, "_", fileAppendix, ".csv", sep = "")
+   res = try(write.csv(csvObject, 
+                       file = file_name,
                        row.names = FALSE))
    if (is.null(res)){
       showNotification("File saved successfully!",

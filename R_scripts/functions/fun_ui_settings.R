@@ -89,7 +89,15 @@ settingsOutput = function(){
                        conditionalPanel(
                           condition = "input.prjNameAsTitle != true",
                           textInput("figTitle", "Figure title", 
-                                    placeholder = "Tree species")
+                                    placeholder = "e.g. tree species")
+                       ),
+                       
+                       checkboxInput("fileAppendix",
+                                     "Customize file names", value = F),
+                       conditionalPanel(
+                          condition = "input.fileAppendix == true",
+                          textInput("fileAppend", "File Appendix", 
+                                    placeholder = "e.g. summer")
                        ),
                        
                        p(strong("Visualization")),
