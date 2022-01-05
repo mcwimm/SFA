@@ -73,8 +73,6 @@ shinyServer(function(input, output, session) {
       return(col)
     })
 
-    
-    
     fillcolors <<- function(N){
       col = fillcolors_react()
       return(col[1:N])
@@ -152,9 +150,7 @@ shinyServer(function(input, output, session) {
     deltaTempLong <- reactive({
       if (is.null(values$deltaTempLong)){
         values$deltaTempLong <- deltaTempLongNoFilter()
-        
       }
-      
       return(values$deltaTempLong)
     })
   
@@ -439,8 +435,8 @@ shinyServer(function(input, output, session) {
     }, options = list(scrollX = TRUE))
     
     output$raw.long <- DT::renderDataTable({ # raw data
-        return(deltaTempLong() %>% 
-                 mutate_if(is.numeric, round, 3))
+      return(deltaTempLong() %>% 
+               mutate_if(is.numeric, round, 3))
     }, options = list(scrollX = TRUE))
     
     output$depth.table <- DT::renderDataTable({ # sensor positions etc
@@ -471,7 +467,9 @@ shinyServer(function(input, output, session) {
     })
     
     output$dataPoints <- renderText({
-      paste(nrow(deltaTempLong()), " data points remaining.")
+      n_diff = nrow(deltaTempLongNoFilter()) - nrow(deltaTempLong())
+      # paste(nrow(deltaTempLong()), " data points remaining.")
+      paste(n_diff, " data points removed.")
     })
     
     #### Graphics ####
@@ -574,7 +572,7 @@ shinyServer(function(input, output, session) {
                    "filtered_",
                    as.character(input$filterPlot_X), "_",
                    as.character(input$filterPlot_col), sep = "")
-      print(name)
+
       obj = filterPlot()
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
@@ -620,7 +618,6 @@ shinyServer(function(input, output, session) {
             filter(position == input$kPositionSelect)
         
         if (input$dTimeFilter){
-          print(nrow(d))
           if (nightTimeStart < nightTimeEnd){
             d = d %>% 
               filter(dTime >= input$kRegressionTime.start & dTime <= input$kRegressionTime.end) 
@@ -628,8 +625,7 @@ shinyServer(function(input, output, session) {
             d = d %>% 
               filter(dTime >= input$kRegressionTime.start | dTime <= input$kRegressionTime.end) 
           }
-          print(nrow(d))
-          
+
         }
         return(clean.data.iteration(d))
     })

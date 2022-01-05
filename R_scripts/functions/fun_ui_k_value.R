@@ -51,9 +51,11 @@ kValueOutput <- function(){
              conditionalPanel(
                 condition = "input.dTimeFilter == true",
                 fluidRow(
-                   column(6, numericInput("kRegressionTime.start", label = "Start (0-24 h)",
+                   column(6, numericInput("kRegressionTime.start",
+                                          label = "Start (0-24 h)",
                                           value = 22)),
-                   column(6, numericInput("kRegressionTime.end", label = "End (0-24 h)",
+                   column(6, numericInput("kRegressionTime.end", 
+                                          label = "End (0-24 h)",
                                           value = 6))
                 )
              ),

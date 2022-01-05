@@ -248,7 +248,8 @@ plot.nighttime <- function(data.complete){
       )
 }
 
-plot.kEst1 <- function(data.complete, data.adj, xRange, fullrange = F, fixedScales = T){
+plot.kEst1 <- function(data.complete, data.adj, xRange, 
+                       fullrange = F, fixedScales = T){
    d = data.complete %>% 
       gather(., temp, value, dTsa, dTas, dTSym)
    ad = data.adj %>% 
