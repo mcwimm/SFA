@@ -79,28 +79,19 @@ settingsOutput = function(){
                    box(title = "Output",
                        status = "info", solidHeader = F, 
                        collapsible = T, width = 12,
-                       p("These inputs are optional."),
+                       p(em("(Optional inputs)")),
                        selectInput("figFor", "Figure format",
                                    c(#"svg" = "svg",
                                       "jpg" = "jpg",
                                       "pdf" = "pdf")),
-                       checkboxInput("prjNameAsTitle",
-                                     "Use project name as title", value = T),
-                       conditionalPanel(
-                          condition = "input.prjNameAsTitle != true",
-                          textInput("figTitle", "Figure title", 
-                                    placeholder = "e.g. tree species")
-                       ),
                        
-                       checkboxInput("fileAppendix",
-                                     "Customize file names", value = F),
-                       conditionalPanel(
-                          condition = "input.fileAppendix == true",
-                          textInput("fileAppend", "File Appendix", 
-                                    placeholder = "e.g. summer")
-                       ),
+                       textInput("figTitle", "Figure title", 
+                                 placeholder = "e.g. tree species"),
+                       textInput("fileAppend", "File Appendix", 
+                                 placeholder = "e.g. summer"),
                        
-                       p(strong("Visualization")),
+                       br(),
+                       h4("Visualization"),
                        selectInput("figTheme", "Figure theme (ggplot)",
                                    choices = names(themes)),
                        uiOutput('theme_output'),

@@ -21,19 +21,11 @@ shinyServer(function(input, output, session) {
     })
     
     figTitle <- reactive({
-        if (input$prjNameAsTitle){
-            return(projectName())
-        } else {
-            return(input$figTitle)
-        }
+        return(input$figTitle)
     })
     
     fileAppendix <- reactive({
-      if (input$fileAppendix){
-        return(input$fileAppend) 
-      } else {
-        return("")
-      }
+      return(input$fileAppend) 
     })
     
     #' Define default ggplot theme
