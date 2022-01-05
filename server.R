@@ -707,9 +707,16 @@ shinyServer(function(input, output, session) {
       
       regK = kComplete()$regression %>% round(., 3)
       
+      method_name = "auto. regression"
+      if (input$dTimeFilter){
+        method_name = paste(method_name, " (",
+                            input$kRegressionTime.start, " - ",
+                            input$kRegressionTime.end, ")",
+                            sep = "")
+      }
       for (pos in unique(regK[, "position"])){
         values$df_data[values$df_data$position == pos, 2:3] <- cbind(
-          method = "auto. regression",
+          method = method_name,
           k = regK[regK$position == pos, "k"])
       }
     })
