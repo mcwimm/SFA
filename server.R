@@ -639,18 +639,14 @@ shinyServer(function(input, output, session) {
             kManual = d[d$position == input$kPositionSelect, "k"]
         }
         
-        get.kByMethod(method = input$kMethod, 
-                      data = deltaTempLong(),
-                      position = input$kPositionSelect,
-                      nightTimeStart = input$kRegressionTime.start, 
-                      nightTimeEnd = input$kRegressionTime.end,
+        get.kByMethod(data = deltaTempLong(),
+                      input = input,
                       kManual = kManual)
     })
 
     kComplete <- reactive({  # get k-values for all positions for closest, regression
         get.kByMethodAll(deltaTempLong(),
-                         nightTimeStart = input$kRegressionTime.start, 
-                         nightTimeEnd = input$kRegressionTime.end)
+                         input = input)
     })
     
     kFromCsv <- reactive({

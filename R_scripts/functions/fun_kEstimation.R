@@ -1,15 +1,17 @@
 
-get.kByMethod <- function(method, data, position, 
-                          nightTimeStart, nightTimeEnd, 
-                          kManual = 1.11){
-   sensorDepth = position
+get.kByMethod <- function(data, input, kManual = 1.11){
+   # Extract ui-input values
+   method = input$kMethod
+   sensorDepth = input$kPositionSelect
+   nightTimeStart = input$kRegressionTime.start
+   nightTimeEnd = input$kRegressionTime.end
+   
    if (method == "manual"){
       k = kManual
    }
    
    if (method == "regression"){
-      k = get.regressionK.depth(data, sensorDepth, 
-                                nightTimeStart, nightTimeEnd)[, "k"]
+      k = get.regressionK.depth(data, sensorDepth, input)[, "k"]
    }
    
    if (method == "closest"){
@@ -23,8 +25,10 @@ get.kByMethod <- function(method, data, position,
    return(k)
 }
 
-get.kByMethodAll <- function(data, nightTimeStart, nightTimeEnd){
-   return(list( "regression" = get.regressionKvalues(data, nightTimeStart, nightTimeEnd),
+get.kByMethodAll <- function(data, input){
+   nightTimeStart = input$kRegressionTime.start
+   nightTimeEnd = input$kRegressionTime.end
+   return(list( "regression" = get.regressionKvalues(data, input),
                 "closest" = get.closestKvalues(data)))
 }
 
@@ -32,31 +36,37 @@ get.kByMethodAll <- function(data, nightTimeStart, nightTimeEnd){
 ### regression ###
 ##################
 
-get.regressionK.depth <- function(data, position, nightTimeStart,
-                                  nightTimeEnd){
-   sensorDepth = position
+get.regressionK.depth <- function(data, sensorDepth, input){
+   # Extract ui-input values
+   nightTimeStart = input$kRegressionTime.start
+   nightTimeEnd = input$kRegressionTime.end
+   
    # Filter repective sensor depth
    data = data %>% 
       filter(position == sensorDepth) 
    datapoints_sensordepth = nrow(data)
-   
-   # Filter 0-trend data points by time
-   if (nightTimeStart < nightTimeEnd){
-      data = data %>% 
-         filter(dTime >= nightTimeStart & dTime <= nightTimeEnd)
-   } else {
-      data = data %>% 
-         filter(dTime >= nightTimeStart | dTime <= nightTimeEnd)
+
+   # Filter 0-trend data points by time, if filter is enables
+   if (input$dTimeFilter){
+      if (nightTimeStart < nightTimeEnd){
+         data = data %>% 
+            filter(dTime >= nightTimeStart & dTime <= nightTimeEnd)
+      } else {
+         data = data %>% 
+            filter(dTime >= nightTimeStart | dTime <= nightTimeEnd)
+      }
    }
-   
-   data.adj = clean.data.iteration(data, 0)
+
+   # Iterate through data
+   data.adj = clean.data.iteration(data)
    
    datapoints_used = nrow(data.adj[[1]])
    print(paste(round(datapoints_used/datapoints_sensordepth*100, 1),
                " % (", datapoints_used, "/ ", datapoints_sensordepth,
                " ) of data points are used to estimate k.",
-               sep = "")
-         )
+               sep = ""))
+   
+   # Combine results into a table
    df = data.frame(kAs = data.adj[[2]][[1]],
                    R.kAs = data.adj[[2]][[2]],
                    kSa = data.adj[[3]][[1]],
@@ -65,12 +75,11 @@ get.regressionK.depth <- function(data, position, nightTimeStart,
    return(df)
 }
 
-get.regressionKvalues <- function(data, nightTimeStart, nightTimeEnd){
+get.regressionKvalues <- function(data, input){
    positions = unique(data$position)
    h = do.call(rbind, lapply(positions, 
                                 function(x) 
-                                   get.regressionK.depth(data, x,
-                                                         nightTimeStart, nightTimeEnd)))
+                                   get.regressionK.depth(data, x, input)))
    h = cbind(position = positions, h)
    return(h)
 }
@@ -119,7 +128,7 @@ get.K.dTsa <- function(clean.data){
    return(c(dTsa.K, dTsa.lm$adj.r.squared))
 }
 
-clean.data.iteration = function(data_ini, initial.cutoff){
+clean.data.iteration = function(data_ini, initial.cutoff = 0){
    data <- data_ini[data_ini$timestep > initial.cutoff, ]
    step = 0
    r.adj.n1 = 0
