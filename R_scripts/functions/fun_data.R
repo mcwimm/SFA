@@ -326,6 +326,7 @@ remove.outlier <- function(data, data.vector){
 
 save.figure = function(name, plotObject, prjName = "PrjName", 
                        fileAppendix = "", format = "svg"){
+   fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
    name = paste(name, fileAppendix, sep = "_")
    
    plotObject = plotObject +
@@ -368,6 +369,7 @@ save.figure = function(name, plotObject, prjName = "PrjName",
 }
 
 save.csv = function(name, csvObject, fileAppendix = ""){
+   fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
    file_name = paste(name, "_", fileAppendix, ".csv", sep = "")
    res = try(write.csv(csvObject, 
                        file = file_name,
