@@ -134,11 +134,14 @@ shinyServer(function(input, output, session) {
     #' input type: raw temperature (HFD sensor data), 
     #' temperature differences
     deltaTempLongNoFilter <- reactive({
+      data = rawData()
+      positions = get.positionsFromRawData(dataSource = data,
+                                           input = input)
       if (input$inputType == "HFD_raw"){
-        d = get.delta.from.temp(rawData(), positions())
+        d = get.delta.from.temp(data, positions)
       }
       if (input$inputType == "HFD_delta"){
-        d = get.delta.temp(rawData(), positions())
+        d = get.delta.temp(data, positions)
       }
       return(d)
     })
