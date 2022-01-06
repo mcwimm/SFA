@@ -655,11 +655,13 @@ shinyServer(function(input, output, session) {
     ####################
     #### Variables ####
     
+    #' Reactive variable holding sap wood depth
     sapWoodDepth <- reactive({
       return(get.sapWoodDepth(ui.input = input))
     })
     
-    
+    #' Reactive variable holding sap flow density
+    #' based on k-values
     sapFlowDens <- reactive({
       data = add.k2data(data = deltaTempLong(),
                         values = values)
@@ -669,10 +671,14 @@ shinyServer(function(input, output, session) {
                                 ui.input = input))
     })
     
+    #' Reactive variable holding distances between
+    #' sensors
     sensor.dist <- reactive({
       return(get.sensorDistance(ui.input = input))
     })
     
+    #' Reactive variable holding sap flow rates
+    #' for all methods
     sapFlow <- reactive({
       return(get.sapFlow(data = sapFlowDens(),
                          depths = depths(), 
@@ -680,7 +686,9 @@ shinyServer(function(input, output, session) {
                          ui.input = input))
     })
     
-    #' Calculate daily tree water use in kg per h and kg per day
+    #' Reactive variable holding daily tree water 
+    #' use in kg per h and kg per day
+    #' for selected method
     treeWaterUse <- reactive({
       if (click() > 0){
         get.treeWaterUseByMethod(data = sapFlow(),
@@ -690,44 +698,62 @@ shinyServer(function(input, output, session) {
       }
     })
     
-    #### Buttons ####
-    
-    observeEvent(input$save.sfIndex, {
-        name = paste(projectPath(),
-                     "/graphics/",
-                     "sapFlowIndexComplete", sep = "")
-        obj = sapFlowIndex()
-        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
-    })
-    
-    observeEvent(input$save.sfIndex.day, {
-        name = paste(projectPath(),
-                     "/graphics/",
-                     "sapFlowIndexDaily", sep = "")
-        obj = sapFlowIndex.Day()
-        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
-    })
-    
-    
     #### Graphics ####
+    
+    ##### Sap Flow Index #####
+    
+    #' Reactive variable holding figure of sap flow index
+    #' Complete
     sapFlowIndex <- reactive({
       plot.sapFlowIndex(data = deltaTempLong(), 
                         ui.input = input)
     })
     
+    #' Eventlistener to show figure of sap flow index
+    #' Complete
+    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Complete)
+    output$sapFlowIndex <- renderPlot({
+      sapFlowIndex()
+    })
+    
+    #' Eventlistener to save sap flow index plot
+    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Complete)
+    observeEvent(input$save.sfIndex, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "sapFlowIndexComplete", sep = "")
+      obj = sapFlowIndex()
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+    })
+    
+    #' Reactive variable holding figure of sap flow index
+    #' Daily
     sapFlowIndex.Day <- reactive({
       plot.sapFlowIndex.Day(data = deltaTempLong(), 
                             ui.input = input)
     })
     
-      
+    #' Eventlistener to show figure of sap flow index
+    #' Daily
+    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Daily)
+    output$sapFlowIndex.Day <- renderPlot({
+      sapFlowIndex.Day()
     })
     
+    #' Eventlistener to save sap flow index plot
+    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Daily)
+    observeEvent(input$save.sfIndex.day, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "sapFlowIndexDaily", sep = "")
+      obj = sapFlowIndex.Day()
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     
-    sapFlowTreePlot <- reactive({
-      print(paste('click ', click()))
+    ##### Sap Flow Density #####
+    
+    #' Reactive variable holding figure of sap flow density
     sapFlowDensityPlot = reactive({
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
@@ -738,29 +764,14 @@ shinyServer(function(input, output, session) {
       }
     })
     
-    
-    output$sapFlowIndex <- renderPlot({
-      sapFlowIndex()
-    })
-    
-    output$sapFlowIndex.Day <- renderPlot({
-      sapFlowIndex.Day()
-    })
-    
+    #' Eventlistener to show figure of sap flow density
+    #' (Sap Flow > Sap Flow Density > Figure > Chart)
     output$sapFlowDensity <- renderPlot({
       sapFlowDensityPlot()
     })
     
-    output$sapFlowDensity.Boxplot <- renderPlot({
-      sapFlowDensityPlot.Boxplot()
-    })
-    
-    output$SapFlowPlot <- renderPlot({
-      sapFlowTreePlot()
-    })
-    
-    #### Buttons ####
-    
+    #' Eventlistener to save sap flow density plot
+    #' (Sap Flow > Sap Flow Density > Figure > Chart)
     observeEvent(input$save.sapFlowDensityPlot, {
       name = paste(projectPath(),
                    "/graphics/",
@@ -769,6 +780,8 @@ shinyServer(function(input, output, session) {
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
+    #' Reactive variable holding figure of sap flow density
+    #' vertical profile, represented as boxplot
     sapFlowDensityPlot.Boxplot = reactive({
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
@@ -778,9 +791,17 @@ shinyServer(function(input, output, session) {
                                    boxplot = T)
       }
     })
+    
+    #' Eventlistener to show figure of sap flow density
+    #' vertical profile
+    #' (Sap Flow > Sap Flow Density > Figure > Boxplot)
     output$sapFlowDensity.Boxplot <- renderPlot({
       sapFlowDensityPlot.Boxplot()
     })
+    
+    #' Eventlistener to save sap flow density plot
+    #' vertical profile
+    #' (Sap Flow > Sap Flow Density > Figure > Boxplot)
     observeEvent(input$save.sapFlowDensity, {
       name = paste(projectPath(),
                    "/csv-files/",
@@ -789,6 +810,10 @@ shinyServer(function(input, output, session) {
       save.csv(name, obj, fileAppendix())
     })
     
+    ##### Sap Flow Rate #####
+    
+    #' Reactive variable holding figure of sap flow rate
+    #' for selected methods
     sapFlowTreePlot <- reactive({
       print(paste('click ', click()))
       if (click() == 0 && is.null(input$file2)){
@@ -801,6 +826,15 @@ shinyServer(function(input, output, session) {
                            ui.input = input)
         }}
     })
+    
+    #' Eventlistener to show figure of sap flow rate
+    #' (Sap Flow > Sap Flow > Figures)
+    output$SapFlowPlot <- renderPlot({
+      sapFlowTreePlot()
+    })
+    
+    #' Eventlistener to save sap flow rate figure
+    #' (Sap Flow > Sap Flow > Figures)
     observeEvent(input$save.SapFlow, {
       name = paste(projectPath(),
                    "/graphics/",
@@ -809,6 +843,8 @@ shinyServer(function(input, output, session) {
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
+    #' Eventlistener to save sap flow rate data as csv
+    #' (Sap Flow > Sap Flow > Figures)
     observeEvent(input$save.SapFlowCsv, {
       name = paste(projectPath(),
                    "/csv-files/",
@@ -817,7 +853,8 @@ shinyServer(function(input, output, session) {
       save.csv(name, obj, fileAppendix())
     })
     
-    
+    #' Eventlistener to save daily tree water use as csv
+    #' (Sap Flow > Sap Flow > Tree water use)
     observeEvent(input$save.TreeWaterUseCsv, {
       name = paste(projectPath(),
                    "/csv-files/",
@@ -829,7 +866,7 @@ shinyServer(function(input, output, session) {
     
     #### Table ####
     
-    # Table with daily tree water use
+    #' UI-Table with daily tree water use
     output$twu.table <- DT::renderDataTable({ 
       treeWaterUse()
     }, options = list(scrollX = TRUE))
