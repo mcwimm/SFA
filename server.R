@@ -408,6 +408,9 @@ shinyServer(function(input, output, session) {
     
     #### UI #####
     
+    #' UI radiobuttons to select sensor position
+    #' Derives positions from filtered data set
+    #' (K-value > Estimation > K-value estimation)
     output$kPositionSelect <- renderUI({
       positions = positions()
       pre_selected = positions[1]
@@ -416,7 +419,9 @@ shinyServer(function(input, output, session) {
                    selected = pre_selected, inline = T)
     })
     
-    
+    #' UI numeric inputs to define range in k-plots
+    #' Only visible if 'fixed' range is enabled
+    #' (K-value > Estimation > Control plots)
     output$xRangeSlider <- renderUI({
       data = deltaTempLong.depth()
       tagList(
@@ -433,6 +438,9 @@ shinyServer(function(input, output, session) {
     
     #### Variables ####
     
+    #' Reactive variable holding a list with cleaned data,
+    #' positive and negative k-value (K.dTas, K.dTsa) for a
+    #' selected sensor position
     cleanedDataAndKvalues <- reactive({
       data = deltaTempLong() %>%
           filter(position == input$kPositionSelect)
@@ -441,19 +449,31 @@ shinyServer(function(input, output, session) {
       return(clean.data.iteration(data))
     })
     
+    #' Reactive variable holding k-values derived
+    #' based on selected method for selected sensor
+    #' position
     kValue <- reactive({
       return(get.kByMethod(data = deltaTempLong(),
                            ui.input = input))
     })
 
+    #' Reactive variable holding k-values derived
+    #' based on selected method (closest and regression)
+    #' for all sensor positions, shown in tables
+    kComplete <- reactive({
+      return(get.kByMethodAll(deltaTempLong(),
+                              ui.input = input))
     })
     
+    #' Reactive variable holding k-values derived
+    #' from csv-input for all sensor positions
     kFromCsv <- reactive({
       req(input$file2)
       return(get.csvKvalues(ui.input = input))
     })
     
-    #' Check if any k-values have been set
+    #' Reactive variable holding a helper to check 
+    #' if any k-values have been set
     click <- reactive(({
       click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
         input$setKfromClosest[1]
@@ -461,10 +481,20 @@ shinyServer(function(input, output, session) {
     
     #### Store and display selected k-values ####
     
-    # create reactive value to store selected k-values
-    values <- reactiveValues(df_data = NULL)  
+    #' Reactive value: assign empty placeholder to 
+    #' store selected k-values
+    values <- reactiveValues(kvalues = NULL)  
     
-    #' Button to store single selected k-value in data.frame
+    #' Reactive helper function to clear reactive kvalues
+    emptyKvalues = reactive({
+      values$kvalues <-  data.frame(position = positions(),  
+                                    method = rep(NA),
+                                    k = rep(NA))
+    })
+    
+    #' Eventlistener to set/ store k-value as reactive value
+    #' K-value is stored in reactive value
+    #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setK, {  
       click = click()
       if (click == 1 && is.null(input$file2)){
@@ -475,9 +505,20 @@ shinyServer(function(input, output, session) {
         k = round(kValue(), 3))
     })
 
+    #' Eventlistener to store k-values from csv upload
+    #' as reactive values
+    #' (K-value > Estimation > K-value estimation)
+    observeEvent(input$setKfromCsv, {
+      emptyKvalues()
+      values = fill.k.table(method = "csv",
+                            k.data = kFromCsv(), 
+                            ui.input = input, 
+                            reactive.value = values)
     })
-   
-    #' Button to use all k-Values from automatic regression
+    
+    #' Eventlistener to store k-values from automatic 
+    #' regression as reactive values
+    #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setKfromRegression, {
       emptyKvalues()
       values = fill.k.table(method = "regression",
@@ -486,7 +527,9 @@ shinyServer(function(input, output, session) {
                             reactive.value = values)
     })
     
-    #' Button to use all k-Values from closest estimate
+    #' Eventlistener to store k-values from closest 
+    #' no-flow estimate as reactive values
+    #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setKfromClosest, {
       emptyKvalues()
       values = fill.k.table(method = "closest",
@@ -497,7 +540,9 @@ shinyServer(function(input, output, session) {
 
     #### Text outputs ####
 
-    # output current k-value (depends on selected position and method)
+    #' UI text output of current k-value,
+    #' depending on selected position and method
+    #' (K-value > Estimation > K-value estimation)
     output$kCurrent <- renderPrint({ 
         paste("K-value", round(kValue(), 3))
     })
@@ -505,41 +550,54 @@ shinyServer(function(input, output, session) {
     
     #### Table outputs ####
     
+    #' UI table output of selected k-values
+    #' (K-value > Estimation > K-value estimation > Selected)
     output$kSelected <- DT::renderDataTable({  
-      # display selected k-values
-        return(values$df_data)
+      return(values$kvalues)
     }, options = list(scrollX = TRUE))
     
-    
+    #' UI table output of auto. regression k-values
+    #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable({  
-      # display estimated k-values - by regression
-        return(kComplete()$regression  %>% round(., 2))
+      return(kComplete()$regression  %>% round(., 2))
     }, options = list(scrollX = TRUE))
     
-    
-    output$kClosest <- DT::renderDataTable({  # output closest k-estimates
-        return(kComplete()$closest %>% round(., 2))
+    #' UI table output of closest zero-flow k-values
+    #' (K-value > Estimation > K-value estimation > Closest)
+    output$kClosest <- DT::renderDataTable({
+      return(kComplete()$closest %>% round(., 2))
     }, options = list(scrollX = TRUE))
 
-
-    output$uploadedKvalues <- DT::renderDataTable({  # output closest k-estimates
-        return(kFromCsv())
+    #' UI table output of uploaded k-values
+    #' (K-value > Estimation > K-value estimation > Read csv)
+    output$uploadedKvalues <- DT::renderDataTable({ 
+      return(kFromCsv())
     }, options = list(scrollX = TRUE))
-    
-    
+  
     
     #### Graphics ####
+    
+    #' Reactive variable holding the nighttime plot
     kNightTime <- reactive({
       plot.nighttime(data.complete = deltaTempLong.depth())
-
     })
     
+    #' UI output of nighttime plot
+    #' (K-value > Estimation > Control plots > Night time)
+    output$kNightTimePlot <- renderPlot({ kNightTime() })
+    
+    #' Reactive variable holding the k-diagram
     kplot1 <- reactive({
       plot.kEst1(data.complete = deltaTempLong.depth(),
                  data.adj = cleanedDataAndKvalues()[[1]],
                  ui.input = input)
     })
     
+    #' UI output of K-diagram
+    #' (K-value > Estimation > Control plots > K-diagram)
+    output$kvaluePlot1 <- renderPlot({ kplot1() })
+    
+    #' Reactive variable holding the control-diagram 1
     kplot2 <- reactive({
       plot.kEst2(data.complete = deltaTempLong.depth(),
                  data.adj =cleanedDataAndKvalues()[[1]],
@@ -547,6 +605,11 @@ shinyServer(function(input, output, session) {
                  ui.input = input)
     })
     
+    #' UI output of Control-diagram 1
+    #' (K-value > Estimation > Control plots > Control-diagram 1)
+    output$kvaluePlot2 <- renderPlot({ kplot2() })
+    
+    #' Reactive variable holding the control-diagram 2
     kplot3 <- reactive({
         plot.kEst3(data.complete = deltaTempLong.depth(), 
                    data.adj = cleanedDataAndKvalues()[[1]],
@@ -554,35 +617,37 @@ shinyServer(function(input, output, session) {
                    ui.input = input)
     })
     
-    output$kNightTimePlot <- renderPlot({ kNightTime() })
-    output$kvaluePlot1 <- renderPlot({ kplot1() })
-    output$kvaluePlot2 <- renderPlot({ kplot2() })
+    #' UI output of Control-diagram 2
+    #' (K-value > Estimation > Control plots > Control-diagram 2)
     output$kvaluePlot3 <- renderPlot({ kplot3() })
     
     #### Buttons ####
-    # save data
     
-    observeEvent(input$save.kValues, { # save selected k-values as csv
-        path = paste(projectPath(), 
-                     "/csv-files", sep = "")
-        csvObject = values$df_data
-        save.csv(paste(path, "/k-values", sep = ""), csvObject, fileAppendix())
+    #' Eventlistener to save selected k-values as csv 
+    #' (K-value > Estimation > K-value estimation > Selected)
+    observeEvent(input$save.kValues, {
+      path = paste(projectPath(), 
+                   "/csv-files", sep = "")
+      csvObject = values$kvalues
+      save.csv(paste(path, "/k-values", sep = ""), 
+               csvObject, fileAppendix())
     })
     
-    # save figures
+    #' Eventlistener to save k-diagrams
+    #' (K-value > Estimation > Control plots)
     observeEvent(input$save.kPlots, {
-        name = paste(projectPath(),
-                     "/graphics/",
-                     sep = "")
-        figTitle = figTitle()
-        fileAppendix = fileAppendix()
-        
-        save.figure(paste(name, "k_fig1_position_", input$kPositionSelect, sep = ""), 
-                    kplot1(), figTitle, fileAppendix, input$figFor)
-        save.figure(paste(name, "k_fig2_position_", input$kPositionSelect, sep = ""), 
-                    kplot2(), figTitle, fileAppendix, input$figFor)
-        save.figure(paste(name, "k_fig3_position_", input$kPositionSelect, sep = ""), 
-                    kplot3(), figTitle, fileAppendix, input$figFor)
+      name = paste(projectPath(),
+                   "/graphics/",
+                   sep = "")
+      figTitle = figTitle()
+      fileAppendix = fileAppendix()
+      
+      save.figure(paste(name, "k_fig1_position_", input$kPositionSelect, sep = ""), 
+                  kplot1(), figTitle, fileAppendix, input$figFor)
+      save.figure(paste(name, "k_fig2_position_", input$kPositionSelect, sep = ""), 
+                  kplot2(), figTitle, fileAppendix, input$figFor)
+      save.figure(paste(name, "k_fig3_position_", input$kPositionSelect, sep = ""), 
+                  kplot3(), figTitle, fileAppendix, input$figFor)
     })
 
     ####################
@@ -606,7 +671,7 @@ shinyServer(function(input, output, session) {
     
     sapFlowDens <- reactive({
       #req(input$setK, input$setKfromRegression)
-      kValues = values$df_data
+      kValues = values$kvalues
       kValues[, "k"] = as.numeric(kValues[, "k"])
       positions = unique(kValues[!is.na(kValues$k), ]$position)
       data = deltaTempLong()
