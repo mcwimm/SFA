@@ -26,8 +26,6 @@ get.kByMethod <- function(data, ui.input, kManual = 1.11){
 }
 
 get.kByMethodAll <- function(data, ui.input){
-   nightTimeStart = ui.input$kRegressionTime.start
-   nightTimeEnd = ui.input$kRegressionTime.end
    return(list( "regression" = get.regressionKvalues(data, ui.input),
                 "closest" = get.closestKvalues(data)))
 }
