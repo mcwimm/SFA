@@ -41,27 +41,7 @@ shinyServer(function(input, output, session) {
 
     #' Define fill colors to be used in all plots with discrete data
     fillcolors_react = reactive({
-      print("in fill colors react")
-      print(input$fillColors)
-      if (input$fillColors == ""){
-        col = c("#d8b365", "#260C7D", "#5ab4ac",
-                "#7D410C", "#007D06",
-                '#999999','#E69F00', '#56B4E9')
-        print("Use default colors:  ")
-        
-      } else {
-        cols = input$fillColors
-        cols_split = strsplit(cols, ",")[[1]]
-        col = c()
-        for (i in 1:length(cols_split)){
-          # remove white spaces
-          c = gsub(" ", "", cols_split[i], fixed = TRUE)
-          col = append(col, c)
-        }
-        print("Use customized colors:  ")
-      }
-      print(col)
-      return(col)
+      return(get.fillcolors(ui.input = input))
     })
 
     fillcolors <<- function(N){

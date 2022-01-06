@@ -11,6 +11,26 @@ get.labelledFacets = function(data, facet.col){
    return(factor(facet, labels = labs))
 }
 
+get.fillcolors = function(ui.input){
+   # If no colors are defined use default set
+   if (ui.input$fillColors == ""){
+      print("Discrete color scheme: default")
+      col = c("#d8b365", "#260C7D", "#5ab4ac", "#7D410C", 
+              "#007D06", '#999999','#E69F00', '#56B4E9')
+   } else {
+      print("Discrete color scheme: customized")
+      cols = ui.input$fillColors
+      cols_split = strsplit(cols, ",")[[1]]
+      col = c()
+      for (i in 1:length(cols_split)){
+         # remove white spaces
+         c = gsub(" ", "", cols_split[i], fixed = TRUE)
+         col = append(col, c)
+      }
+   }
+   return(col)
+}
+
 ######### labels working in shiny ggplot
 # mit den Labels funktioniert die Anzeige, aber nicht das speichern an svg und beim pdf fehlen delta fehlt
 labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
