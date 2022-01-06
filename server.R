@@ -1,88 +1,110 @@
 shinyServer(function(input, output, session) {
   
-    ###############
-    ### PROJECT ###
-    ###############
+    ########################
+    ### PROJECT SETTINGS ###
+    ########################
     
     #### Variables ####
+  
+    #' Shiny function that returns 'available volumes on the system'
     volumes = getVolumes()
 
+    #' Shiny function to 'to navigate the filesystem'
     folderInput1 <- shinyDirChoose(input, 'folder',
-                   roots=c(wd='.'), filetypes=c('', 'txt'))
+                                   roots=c(wd='.'), 
+                                   filetypes=c('', 'txt'))
     
+    #' Reactive variable holding the current project path
     projectPath <- reactive({
       parseDirPath(c(wd=getwd()), input$folder)
-      
     })
 
+    #' Reactive variable holding the current project name
     projectName <- reactive({
       return(tail(unlist(strsplit(as.character(projectPath()), "/")), 1))
     })
     
+    #' Reactive variable holding the name of plot titles 
+    #' (for saved plots)
+    #' If not defined in the UI it returns "", i.e. no title appears
     figTitle <- reactive({
         return(input$figTitle)
     })
     
+    #' Reactive variable holding the name appended to files
+    #' If not defined in the UI it returns "", i.e. nothing 
+    #' is appended
     fileAppendix <- reactive({
       return(input$fileAppend) 
     })
     
-    #' Define default ggplot theme
+    #' Reactive variable holding ggplot theme
+    #' Can be defined in UI
     plot_theme <- reactive({
       themes[[input$figTheme]]
       })
-    
-    output$theme_output <- renderUI({ 
-      req(input$figTheme)
-      theme_set(plot_theme())
-      NULL
-      })
-    
 
-    #' Define fill colors to be used in all plots with discrete data
+    #' Reactive variable holding fill colors to be used in 
+    #' all plots with discrete data
+    #' Can be defined in UI
     fillcolors_react = reactive({
       return(get.fillcolors(ui.input = input))
     })
 
+    #' Global function (accessible from other scripts) 
+    #' that returns a set of N fillcolors
     fillcolors <<- function(N){
       col = fillcolors_react()
       return(col[1:N])
     }
     
+
+    #### UI output ####
     
-    #theme_set(plot_theme())
-    #### Text output ####
+    #' Function to render all ggplots with defined theme
+    output$theme_output <- renderUI({ 
+      req(input$figTheme)
+      theme_set(plot_theme())
+      NULL
+    })
     
+    #' Show project path in Project Settings > Project
+    #' if a project folder is selected
     output$prjDir <- renderPrint({
         print(projectPath())
     })
     
+    
     #### Buttons ####
     
+    #' Button to create a project (Project Settings > Project)
+    #' Requires a folder to be selected (Folder select)
+    #' If directory does not exist create two folders:
+    #' 'csv-files', 'graphics'
+    #' Sets project name = project folder name
     observeEvent(input$crtPrj, {
-        if (!isTruthy(input$folder)){
-            showNotification("Please choose a directory first!",
-                             type = "error")
-        } else{
-            req(input$folder)
-            csvPath = paste(projectPath(),
-                            "/csv-files/", sep = "")
-            figPath = paste(projectPath(),
-                            "/graphics/", sep = "")
-            if (!dir.exists(csvPath)){
-                dir.create(csvPath)
-            }
-            if (!dir.exists(figPath)){
-                dir.create(figPath)
-            }
-            showNotification("Project set successfully!",
-                             type = "message")
-        }
-        
-        output$prjName <- renderPrint({
-            print(projectName())
-        })
-        
+      # If no folder have been selected show error
+      if (!isTruthy(input$folder)){
+          showNotification("Please choose a directory first!",
+                           type = "error")
+      } else{
+          req(input$folder)
+          csvPath = paste(projectPath(),
+                          "/csv-files/", sep = "")
+          figPath = paste(projectPath(),
+                          "/graphics/", sep = "")
+          if (!dir.exists(csvPath)){
+              dir.create(csvPath)
+          }
+          if (!dir.exists(figPath)){
+              dir.create(figPath)
+          }
+          showNotification("Project set successfully!",
+                           type = "message")
+      }
+      output$prjName <- renderPrint({
+          print(projectName())
+      })
     })
     
     
@@ -91,9 +113,9 @@ shinyServer(function(input, output, session) {
     ############
     
     #### Variables ####
-    
-    values <- reactiveValues(deltaTempLong = NULL)
-    
+
+    #' Reactive variable holding raw sap flow data
+    #' If no data set is defined, use default data set
     rawData <- reactive({
       if (is.null(input$file1)){
         defaultData = "./tests/ICT_rawdata.csv"
@@ -104,9 +126,13 @@ shinyServer(function(input, output, session) {
       } else {
         return(get.rawData(input))
       }
-        
     })
     
+    #' Reactive variable holding sap flow data in long format
+    #' Unfiltered
+    #' Transformation of data set from wide to long depends on
+    #' input type: raw temperature (HFD sensor data), 
+    #' temperature differences
     deltaTempLongNoFilter <- reactive({
       if (input$inputType == "HFD_raw"){
         d = get.delta.from.temp(rawData(), positions())
@@ -115,9 +141,14 @@ shinyServer(function(input, output, session) {
         d = get.delta.temp(rawData(), positions())
       }
       return(d)
-      
     })
   
+    #' Create empty reactive value with a placeholder for the
+    #' data set in long format
+    values <- reactiveValues(deltaTempLong = NULL)
+    
+    #' Reactive variable holding long-format data
+    #' Assigned to reactive value if empty
     deltaTempLong <- reactive({
       if (is.null(values$deltaTempLong)){
         values$deltaTempLong <- deltaTempLongNoFilter()
@@ -125,18 +156,21 @@ shinyServer(function(input, output, session) {
       return(values$deltaTempLong)
     })
   
+    #' Reactive variable holding long-format data for
+    #' specific UI-selected sensor position
     deltaTempLong.depth <- reactive({
       deltaTempLong() %>% 
         filter(position == input$kPositionSelect)
     })
     
-    # Get sensor positions (a vector numbering the sensors) from input file
+    #' Reactive variable holding sensor positions
+    #' (a vector numbering the sensors) derived from input file
     positions <- reactive({
-      # req(input$setData)
+      # If an input file is given wait until 'set data' button
+      # is pressed
       if (!is.null(input$file1)){  
         req(input$setData)
       } 
-      
       h = update.positions(data = rawData(), 
                            ui.input = input, 
                            reactive.value = values)
