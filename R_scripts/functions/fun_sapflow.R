@@ -1,3 +1,14 @@
+get.sapWoodDepth = function(ui.input){
+   if (ui.input$sapWoodDepth == 0){
+      if (ui.input$stemCircumference == 0){
+         swd = ui.input$stemDiameter/2 - ui.input$barkThickness - ui.input$heartWoodDepth
+      } else {
+         swd = ui.input$stemCircumference / (2*pi) - ui.input$barkThickness -
+            ui.input$heartWoodDepth
+      }} else {
+         swd = ui.input$sapWoodDepth
+      }
+   return(swd)
 get.sapFlowDensity <- function(method = "HFD", data, 
                                sapWoodDepth, ui.input){
    Dst = ui.input$ThermalDiffusivity

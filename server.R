@@ -656,16 +656,7 @@ shinyServer(function(input, output, session) {
     #### Variables ####
     
     sapWoodDepth <- reactive({
-      if (input$sapWoodDepth == 0){
-        if (input$stemCircumference == 0){
-          swd = input$stemDiameter/2 - input$barkThickness - input$heartWoodDepth
-        } else {
-          swd = input$stemCircumference / (2*pi) - input$barkThickness -
-            input$heartWoodDepth
-        }} else {
-        swd = input$sapWoodDepth
-      }
-      return(swd)
+      return(get.sapWoodDepth(ui.input = input))
     })
     
     
