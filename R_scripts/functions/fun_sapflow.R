@@ -1,5 +1,9 @@
-get.sapFlowDensity <- function(method = "HFD", data, Dst, Zax, Ztg,
-                               sapWoodDepth) {
+get.sapFlowDensity <- function(method = "HFD", data, 
+                               sapWoodDepth, ui.input){
+   Dst = ui.input$ThermalDiffusivity
+   Zax = ui.input$Zax
+   Ztg = ui.input$Ztg
+   
    if (method == "HFD") {
       data$SFS = 3600 * Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
          Zax / Ztg

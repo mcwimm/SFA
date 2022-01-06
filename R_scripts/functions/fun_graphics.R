@@ -72,8 +72,13 @@ data_summary <- function(x) {
 
 ######## FILTER ########
 
-plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
-                           type, facetGrid = T, scales){
+plot.histogram <- function(data, ui.input){
+   x.col = ui.input$filterPlot_X
+   fill.col = ui.input$filterPlot_col
+   binwidth = ui.input$filterPlot_binwidth
+   type = ui.input$filterPlot_type
+   facetGrid = ui.input$filterPlot_facetGrid
+   scales = ui.input$filterPlot_scales
    
    x = data[, x.col]
 
@@ -149,8 +154,12 @@ plot.histogram <- function(data, x.col, fill.col, binwidth = 0.1,
 
 
 
-plot.deltaTfacetWrap <- function(data, xRange, yRange, 
-                                 scales, facetWrap = T, facet.col){
+plot.deltaTfacetWrap <- function(data, ui.input){
+   xRange = ui.input$rawPlot.x
+   yRange = ui.input$rawPlot.y
+   scales = ui.input$rawPlot_scales
+   facetWrap = ui.input$rawPlot_facetWrap
+   facet = ui.input$rawPlot.facet
 
    p = data %>% 
       gather(., key, value, "dTas", "dTsa", "dTSym") %>% 
@@ -179,8 +188,17 @@ plot.deltaTfacetWrap <- function(data, xRange, yRange,
    return(p)
 }
 
-plot.singleTemperature <- function(data, x.col, y.col, col.col, shape.col, facetWrap,
-                                   xRange, yRange, scales, facet.col){
+plot.singleTemperature <- function(data, ui.input){
+   
+   x.col = ui.input$rawPlot.xcol
+   y.col = ui.input$rawPlot.ycol
+   col.col = ui.input$rawPlot.col
+   shape.col = ui.input$rawPlot.shape
+   facetWrap = ui.input$rawPlot_facetWrap
+   xRange = ui.input$rawPlot.x
+   yRange = ui.input$rawPlot.y
+   scales = ui.input$rawPlot_scales
+   facet = ui.input$rawPlot.facet
 
    x = data[, x.col]
    y = data[, y.col]
@@ -248,8 +266,11 @@ plot.nighttime <- function(data.complete){
       )
 }
 
-plot.kEst1 <- function(data.complete, data.adj, xRange, 
-                       fullrange = F, fixedScales = T){
+plot.kEst1 <- function(data.complete, data.adj, ui.input){
+   xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
+   fullrange = ui.input$k1Plot.fullrange
+   fixedScales = ui.input$k1Plot_scales
+   
    d = data.complete %>% 
       gather(., temp, value, dTsa, dTas, dTSym)
    ad = data.adj %>% 
@@ -299,7 +320,12 @@ plot.kEst1 <- function(data.complete, data.adj, xRange,
 }
 
 plot.kEst2 <- function(data.complete, data.adj, k, 
-                       xRange, fullrange = F, fixedScales = T, force = T){
+                       ui.input){
+   xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
+   fullrange = ui.input$k1Plot.fullrange
+   fixedScales = ui.input$k1Plot_scales
+   force = ui.input$k1Plot.forceOrigin
+   
    
    if (min(data.complete$dTsym.dTas < 0)){
       xmin = min(data.complete$dTsym.dTas < 0)
@@ -362,7 +388,10 @@ plot.kEst2 <- function(data.complete, data.adj, k,
 }
 
 plot.kEst3 <- function(data.complete, data.adj, k,
-                       xRange, fixedScales = T){
+                       ui.input){
+   xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
+   fixedScales = ui.input$k1Plot_scales
+   
    d = data.complete %>%
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
@@ -441,8 +470,12 @@ plot.kEst3 <- function(data.complete, data.adj, k,
 
 ######## SAP FLOW INDEX ########
 
-plot.sapFlowIndex = function(data, yRange, scales, facetWrap, facet.col){
-
+plot.sapFlowIndex = function(data, ui.input){
+   yRange = ui.input$sfIndexPlot.y
+   scales = ui.input$sfIndexPlot_scales
+   facetWrap = ui.input$sfIndexPlot_wrap
+   facet.col = ui.input$sfIndexPlot.facet
+   
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = datetime, y = dTSym, col = factor(position))) +
@@ -486,7 +519,13 @@ plot.sapFlowIndex = function(data, yRange, scales, facetWrap, facet.col){
 
 
 
-plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap, facet.col){
+plot.sapFlowIndex.Day = function(data, ui.input){
+   xRange = ui.input$sfIndexPlot.x
+   yRange = ui.input$sfIndexPlot.y
+   scales = ui.input$sfIndexPlot_scales
+   facetWrap = ui.input$sfIndexPlot_wrap
+   facet.col = ui.input$sfIndexPlot.facet
+   
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = dTime, y = dTSym, group = factor(doy), col = factor(doy))) +
@@ -512,11 +551,13 @@ plot.sapFlowIndex.Day = function(data, xRange, yRange, scales, facetWrap, facet.
 
 ######## SAP FLOW DENSITY ########
 
-plot.sapFlowDensity <- function(data, 
-                                y,
-                                col, 
-                                scales, 
-                                facetWrap = T, facet.col){
+plot.sapFlowDensity <- function(data, ui.input){
+   y = ui.input$sapFlowDensityPlot.y
+   col = ui.input$sapFlowDensityPlot.color
+   scales = ui.input$sapFlowDensityPlot_scales
+   facetWrap = ui.input$sapFlowDensityPlot_facetWrap
+   facet.col = ui.input$sapFlowDensityPlot.facet
+   
    y.col = data[, y]
    col.col = factor(data[, col])
    
@@ -540,22 +581,22 @@ plot.sapFlowDensity <- function(data,
 
 ######## SAP FLOW RATE ########
 
-plot.sapFLowRate = function(data, input){
+plot.sapFLowRate = function(data, ui.input){
    
    p = data %>% 
       ggplot(.) +
       labs(x = "",
            y = "Sap flow rate (kg/h)",
            color = "Scaling method")
-   if (input$treeScaleSimple1){
+   if (ui.input$treeScaleSimple1){
       p = p +
          geom_line(aes(x = datetime, y = sfM1, color = "method 1"))
    }
-   if (input$treeScaleSimple2){
+   if (ui.input$treeScaleSimple2){
       p = p +
          geom_line(aes(x = datetime, y = sfM2, color = "method 2"))
    }
-   if (input$treeScaleSimple3){
+   if (ui.input$treeScaleSimple3){
       p = p +
          geom_line(aes(x = datetime, y = sfM3, color = "method 3"))
    }

@@ -11,7 +11,6 @@ shinyServer(function(input, output, session) {
                    roots=c(wd='.'), filetypes=c('', 'txt'))
     
     projectPath <- reactive({
-      # parseDirPath(c(wd='.'), input$folder)
       parseDirPath(c(wd=getwd()), input$folder)
       
     })
@@ -468,36 +467,18 @@ shinyServer(function(input, output, session) {
 
     filterPlot <- reactive({
       plot.histogram(data = deltaTempLong(), 
-                     x.col = input$filterPlot_X, 
-                     fill.col = input$filterPlot_col, 
-                     binwidth = input$filterPlot_binwidth,
-                     type = input$filterPlot_type,
-                     facetGrid = input$filterPlot_facetGrid,
-                     scales = input$filterPlot_scales)
-      
+                     ui.input = input)
     })
     
     
     deltaTfacetWrap <- reactive({
         plot.deltaTfacetWrap(data = deltaTempLong(), 
-                             xRange = input$rawPlot.x, 
-                             yRange = input$rawPlot.y, 
-                             scales = input$rawPlot_scales, 
-                             facetWrap = input$rawPlot_facetWrap,
-                             facet = input$rawPlot.facet)
+                             ui.input = input)
     })
     
     deltaTSingle <- reactive({
         plot.singleTemperature(data = deltaTempLong(),
-                               x.col = input$rawPlot.xcol, 
-                               y.col = input$rawPlot.ycol, 
-                               col.col = input$rawPlot.col,  
-                               shape.col = input$rawPlot.shape, 
-                               facetWrap = input$rawPlot_facetWrap,
-                               xRange = input$rawPlot.x,
-                               yRange = input$rawPlot.y, 
-                               scales = input$rawPlot_scales,
-                               facet = input$rawPlot.facet)
+                               ui.input = input)
     })
     
     output$filterPlot <- renderPlot({
@@ -633,21 +614,18 @@ shinyServer(function(input, output, session) {
         }
         
         get.kByMethod(data = deltaTempLong(),
-                      input = input,
+                      ui.input = input,
                       kManual = kManual)
     })
 
     kComplete <- reactive({  # get k-values for all positions for closest, regression
         get.kByMethodAll(deltaTempLong(),
-                         input = input)
+                         ui.input = input)
     })
     
     kFromCsv <- reactive({
       req(input$file2)
-      kcsv = get.csvKvalues(input$file2, 
-                            header = input$header2, 
-                            sep = input$sep2,
-                            skip = input$skip2)
+      kcsv = get.csvKvalues(ui.input = input)
       return(kcsv)
         
     })
@@ -771,27 +749,21 @@ shinyServer(function(input, output, session) {
     kplot1 <- reactive({
       plot.kEst1(data.complete = deltaTempLong.depth(),
                  data.adj = cleanedDataAndKvalues()[[1]],
-                 xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
-                 fullrange = input$k1Plot.fullrange,
-                 fixedScales = input$k1Plot_scales)
+                 ui.input = input)
     })
     
     kplot2 <- reactive({
       plot.kEst2(data.complete = deltaTempLong.depth(),
                  data.adj =cleanedDataAndKvalues()[[1]],
                  k = kValue(),
-                 xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
-                 fullrange = input$k1Plot.fullrange,
-                 fixedScales = input$k1Plot_scales,
-                 force = input$k1Plot.forceOrigin)
+                 ui.input = input)
     })
     
     kplot3 <- reactive({
         plot.kEst3(data.complete = deltaTempLong.depth(), 
                    data.adj = cleanedDataAndKvalues()[[1]],
                    k = kValue(),
-                   xRange = c(input$k1Plot.x.min, input$k1Plot.x.max),
-                   fixedScales = input$k1Plot_scales)
+                   ui.input = input)
     })
     
     output$kNightTimePlot <- renderPlot({ kNightTime() })
@@ -814,12 +786,15 @@ shinyServer(function(input, output, session) {
         name = paste(projectPath(),
                      "/graphics/",
                      sep = "")
+        figTitle = figTitle()
+        fileAppendix = fileAppendix()
+        
         save.figure(paste(name, "k_fig1_position_", input$kPositionSelect, sep = ""), 
-                    kplot1(), figTitle(), fileAppendix(), input$figFor)
+                    kplot1(), figTitle, fileAppendix, input$figFor)
         save.figure(paste(name, "k_fig2_position_", input$kPositionSelect, sep = ""), 
-                    kplot2(), figTitle(), fileAppendix(), input$figFor)
+                    kplot2(), figTitle, fileAppendix, input$figFor)
         save.figure(paste(name, "k_fig3_position_", input$kPositionSelect, sep = ""), 
-                    kplot3(), figTitle(), fileAppendix(), input$figFor)
+                    kplot3(), figTitle, fileAppendix, input$figFor)
     })
 
     ####################
@@ -854,9 +829,7 @@ shinyServer(function(input, output, session) {
       data = get.sapFlowDensity(method = "HFD",
                                 data = data,
                                 sapWoodDepth = sapWoodDepth(),
-                                Dst = input$ThermalDiffusivity,
-                                Zax = input$Zax, 
-                                Ztg = input$Ztg)
+                                ui.input = input)
       return(data)
       
     })
@@ -929,19 +902,12 @@ shinyServer(function(input, output, session) {
     #### Graphics ####
     sapFlowIndex <- reactive({
       plot.sapFlowIndex(data = deltaTempLong(), 
-                        yRange = input$sfIndexPlot.y, 
-                        scales = input$sfIndexPlot_scales,
-                        facetWrap = input$sfIndexPlot_wrap,
-                        facet.col = input$sfIndexPlot.facet)
+                        ui.input = input)
     })
     
     sapFlowIndex.Day <- reactive({
       plot.sapFlowIndex.Day(data = deltaTempLong(), 
-                            xRange = input$sfIndexPlot.x, 
-                            yRange = input$sfIndexPlot.y, 
-                            scales = input$sfIndexPlot_scales,
-                            facetWrap = input$sfIndexPlot_wrap,
-                            facet.col = input$sfIndexPlot.facet)
+                            ui.input = input)
     })
     
     sapFlowDensityPlot = reactive({
@@ -973,11 +939,7 @@ shinyServer(function(input, output, session) {
             theme_void()
         } else{
           plot.sapFlowDensity(data = d, 
-                              y = input$sapFlowDensityPlot.y,
-                              col = input$sapFlowDensityPlot.color, 
-                              scales = input$sapFlowDensityPlot_scales, 
-                              facetWrap = input$sapFlowDensityPlot_facetWrap, 
-                              facet.col = input$sapFlowDensityPlot.facet)
+                              ui.input = input)
         }
       }
       
@@ -1042,7 +1004,7 @@ shinyServer(function(input, output, session) {
                      color="red", size = 8) +
             theme_void()
         } else {
-          plot.sapFLowRate(data = sapFlow(), input = input)
+          plot.sapFLowRate(data = sapFlow(), ui.input = input)
         }
       
       }

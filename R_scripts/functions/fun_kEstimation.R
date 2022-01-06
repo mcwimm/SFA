@@ -1,17 +1,17 @@
 
-get.kByMethod <- function(data, input, kManual = 1.11){
+get.kByMethod <- function(data, ui.input, kManual = 1.11){
    # Extract ui-input values
-   method = input$kMethod
-   sensorDepth = input$kPositionSelect
-   nightTimeStart = input$kRegressionTime.start
-   nightTimeEnd = input$kRegressionTime.end
+   method = ui.input$kMethod
+   sensorDepth = ui.input$kPositionSelect
+   nightTimeStart = ui.input$kRegressionTime.start
+   nightTimeEnd = ui.input$kRegressionTime.end
    
    if (method == "manual"){
       k = kManual
    }
    
    if (method == "regression"){
-      k = get.regressionK.depth(data, sensorDepth, input)[, "k"]
+      k = get.regressionK.depth(data, sensorDepth, ui.input)[, "k"]
    }
    
    if (method == "closest"){
@@ -25,10 +25,10 @@ get.kByMethod <- function(data, input, kManual = 1.11){
    return(k)
 }
 
-get.kByMethodAll <- function(data, input){
-   nightTimeStart = input$kRegressionTime.start
-   nightTimeEnd = input$kRegressionTime.end
-   return(list( "regression" = get.regressionKvalues(data, input),
+get.kByMethodAll <- function(data, ui.input){
+   nightTimeStart = ui.input$kRegressionTime.start
+   nightTimeEnd = ui.input$kRegressionTime.end
+   return(list( "regression" = get.regressionKvalues(data, ui.input),
                 "closest" = get.closestKvalues(data)))
 }
 
@@ -36,10 +36,10 @@ get.kByMethodAll <- function(data, input){
 ### regression ###
 ##################
 
-get.regressionK.depth <- function(data, sensorDepth, input){
+get.regressionK.depth <- function(data, sensorDepth, ui.input){
    # Extract ui-input values
-   nightTimeStart = input$kRegressionTime.start
-   nightTimeEnd = input$kRegressionTime.end
+   nightTimeStart = ui.input$kRegressionTime.start
+   nightTimeEnd = ui.input$kRegressionTime.end
    
    # Filter repective sensor depth
    data = data %>% 
@@ -47,7 +47,7 @@ get.regressionK.depth <- function(data, sensorDepth, input){
    datapoints_sensordepth = nrow(data)
 
    # Filter 0-trend data points by time, if filter is enables
-   if (input$dTimeFilter){
+   if (ui.input$dTimeFilter){
       if (nightTimeStart < nightTimeEnd){
          data = data %>% 
             filter(dTime >= nightTimeStart & dTime <= nightTimeEnd)
@@ -75,11 +75,11 @@ get.regressionK.depth <- function(data, sensorDepth, input){
    return(df)
 }
 
-get.regressionKvalues <- function(data, input){
+get.regressionKvalues <- function(data, ui.input){
    positions = unique(data$position)
    h = do.call(rbind, lapply(positions, 
                                 function(x) 
-                                   get.regressionK.depth(data, x, input)))
+                                   get.regressionK.depth(data, x, ui.input)))
    h = cbind(position = positions, h)
    return(h)
 }
@@ -197,12 +197,14 @@ get.closestKvalues <- function(data){
 ### from file ###
 #################
 
-get.csvKvalues <- function(file, header, sep, skip){
-
+get.csvKvalues <- function(ui.input){
+   file = ui.input$file2
+   
    kValues <- read.csv(file$datapath,
-                       header = header, sep = sep, 
+                       header = ui.input$header2, 
+                       sep = ui.input$sep2, 
                        fileEncoding="latin1",
-                       skip = skip)
+                       skip = ui.input$skip2)
    return(kValues)
 }
 
