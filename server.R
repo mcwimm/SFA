@@ -409,28 +409,24 @@ shinyServer(function(input, output, session) {
     #### UI #####
     
     output$kPositionSelect <- renderUI({
-      # load current data set
-      d = values$deltaTempLong
-      pos = positions()
-      sel = pos[1]
+      positions = positions()
+      pre_selected = positions[1]
       radioButtons("kPositionSelect", "Sensor position",
-                   choices = pos,
-                   selected = sel, inline = T)
+                   choices = positions,
+                   selected = pre_selected, inline = T)
     })
     
     
     output$xRangeSlider <- renderUI({
-
-      min = round(min(deltaTempLong.depth()$dTsym.dTas), 2)
-      max = round(max(deltaTempLong.depth()$dTsym.dTas), 2)
-      
+      data = deltaTempLong.depth()
       tagList(
         conditionalPanel(
           condition = "input.k1Plot_scales == 'TRUE'",
           fluidRow(
-            column(6, numericInput("k1Plot.x.min", "Min x-value", min)),
-            column(6, numericInput("k1Plot.x.max", "Max x-value", max))
-          )
+            column(6, numericInput("k1Plot.x.min", "Min. x-value", 
+                                   round(min(data$dTsym.dTas), 2))),
+            column(6, numericInput("k1Plot.x.max", "Max. x-value", 
+                                   round(max(data$dTsym.dTas), 2))))
         ))
     })
     
@@ -476,9 +472,7 @@ shinyServer(function(input, output, session) {
     
     kFromCsv <- reactive({
       req(input$file2)
-      kcsv = get.csvKvalues(ui.input = input)
-      return(kcsv)
-        
+      return(get.csvKvalues(ui.input = input))
     })
     
     #' Check if any k-values have been set
