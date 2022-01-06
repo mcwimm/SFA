@@ -9,6 +9,8 @@ get.sapWoodDepth = function(ui.input){
          swd = ui.input$sapWoodDepth
       }
    return(swd)
+}
+
 add.k2data = function(data, values){
    # Get sensor positions for which a k-value exist
    kValues = values$kvalues
@@ -101,8 +103,7 @@ treeScaleSimple3 <- function(data, swd) {
    return(data)
 }
 
-get.sapFlowByMethod <- function(data, method,
-                                swd) {
+get.sapFlowByMethod <- function(data, method, swd) {
    if (method == "treeScaleSimple1") {
       return(treeScaleSimple1(data, swd))
    }

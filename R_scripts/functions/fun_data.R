@@ -500,7 +500,6 @@ update.filter.ui = function(ui.output, ui.input){
          textOutput("dataPoints")
       )
    })
-   
    return(ui.output)
 }
 ########### SAVE #############
