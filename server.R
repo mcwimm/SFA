@@ -720,103 +720,21 @@ shinyServer(function(input, output, session) {
                             ui.input = input)
     })
     
-    sapFlowDensityPlot = reactive({
-      print(paste('click ', click()))
-      if (click() == 0 && is.null(input$file2)){
-        ggplot() +
-          annotate(geom="text", x=5, y=5, 
-                   label="No k-values have been set yet.",
-                   color="red", size = 8) +
-          theme_void()
-      } else {
-        d = sapFlowDens()
-        
-        # check if sap flow density is Inf
-        # helper variable; if 0 no sap flow density data is avail.
-        SFDensity = nrow(d)
-        if (input$sapFlowDensityPlot.y == "SFDsw"){
-          SFDensity = nrow(d %>% mutate(all = n()) %>% 
-            filter(abs(SFDsw) != Inf))
-          
-        }
-
-        # show error message if sap flow density haven't been calculated (i.e. is Inf)
-        if (SFDensity == 0){
-          ggplot() +
-            annotate(geom="text", x=5, y=5, 
-                     label="Wood properties are missing.",
-                     color="red", size = 8) +
-            theme_void()
-        } else{
-          plot.sapFlowDensity(data = d, 
-                              ui.input = input)
-        }
-      }
       
     })
     
-    sapFlowDensityPlot.Boxplot = reactive({
-      print(paste('click ', click()))
-      if (click() == 0 && is.null(input$file2)){
-        ggplot() +
-          annotate(geom="text", x=5, y=5, 
-                   label="No k-values have been set yet.",
-                   color="red", size = 8) +
-          theme_void()
-      } else {
-        d = sapFlowDens()
-        
-        # check if sap flow density is Inf
-        # helper variable; if 0 no sap flow density data is avail.
-        SFDensity = nrow(d)
-        if (input$sapFlowDensityPlot.y == "SFDsw"){
-          SFDensity = nrow(d %>% mutate(all = n()) %>% 
-                             filter(abs(SFDsw) != Inf))
-          
-        }
-        
-        # show error message if sap flow density haven't been 
-        # calculated (i.e. is Inf)
-        if (SFDensity == 0){
-          ggplot() +
-            annotate(geom="text", x=5, y=5, 
-                     label="Wood properties are missing.",
-                     color="red", size = 8) +
-            theme_void()
-        } else{
-          names(d)
-          d %>% 
-            ggplot(., aes(x = factor(position), y = SFS, 
-                          col = factor(position)))+
-            geom_boxplot() +
-            # scale_y_log10() +
-            facet_wrap(~ doy)
-          
-        }
-      }
-      
     })
     
     
     sapFlowTreePlot <- reactive({
       print(paste('click ', click()))
+    sapFlowDensityPlot = reactive({
       if (click() == 0 && is.null(input$file2)){
-        ggplot() +
-          annotate(geom="text", x=5, y=5, 
-                   label="No k-values have been set yet.",
-                   color="red", size = 8) +
-          theme_void()
+        plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
-        if (sapWoodDepth() == 0){
-          ggplot() +
-            annotate(geom="text", x=5, y=5, 
-                     label="Wood properties are missing (see 'Project settings').",
-                     color="red", size = 8) +
-            theme_void()
-        } else {
-          plot.sapFLowRate(data = sapFlow(), ui.input = input)
-        }
-      
+        plot.sapFlowDensity.Helper(data = sapFlowDens(),
+                                   ui.input = input,
+                                   boxplot = F)
       }
     })
     
@@ -851,6 +769,18 @@ shinyServer(function(input, output, session) {
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
+    sapFlowDensityPlot.Boxplot = reactive({
+      if (click() == 0 && is.null(input$file2)){
+        plot.emptyMessage(message = "No k-values have been set yet.")
+      } else {
+        plot.sapFlowDensity.Helper(data = sapFlowDens(),
+                                   ui.input = input,
+                                   boxplot = T)
+      }
+    })
+    output$sapFlowDensity.Boxplot <- renderPlot({
+      sapFlowDensityPlot.Boxplot()
+    })
     observeEvent(input$save.sapFlowDensity, {
       name = paste(projectPath(),
                    "/csv-files/",
@@ -859,6 +789,18 @@ shinyServer(function(input, output, session) {
       save.csv(name, obj, fileAppendix())
     })
     
+    sapFlowTreePlot <- reactive({
+      print(paste('click ', click()))
+      if (click() == 0 && is.null(input$file2)){
+        plot.emptyMessage(message = "No k-values have been set yet.")
+      } else {
+        if (sapWoodDepth() == 0){
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        } else {
+          plot.sapFLowRate(data = sapFlow(), 
+                           ui.input = input)
+        }}
+    })
     observeEvent(input$save.SapFlow, {
       name = paste(projectPath(),
                    "/graphics/",

@@ -571,6 +571,42 @@ plot.sapFlowIndex.Day = function(data, ui.input){
 
 ######## SAP FLOW DENSITY ########
 
+plot.emptyMessage = function(message){
+   return(p = ggplot() +
+             annotate(geom = "text", x = 5, y = 5, 
+                      label = message,
+                      color = "red", size = 8) +
+             theme_void())
+}
+
+plot.sapFlowDensity.Helper = function(data, ui.input, boxplot = F){
+   # check if sap flow density is Inf
+   # helper variable; if 0 no sap flow density data is avail.
+   SFDensity = nrow(data)
+   if (ui.input$sapFlowDensityPlot.y == "SFDsw"){
+      SFDensity = nrow(data %>% 
+                          mutate(all = n()) %>% 
+                          filter(abs(SFDsw) != Inf))
+   }
+
+   # show error message if sap flow density haven't been calculated (i.e. is Inf)
+   if (SFDensity == 0){
+      p = plot.emptyMessage(message = "Wood properties are missing.")
+   } else{
+      if (boxplot){
+         p = data %>% 
+            ggplot(., aes(x = factor(position), y = SFS, 
+                          col = factor(position)))+
+            geom_boxplot() +
+            facet_wrap(~ doy)
+      } else {
+         p = plot.sapFlowDensity(data = data, 
+                                 ui.input = ui.input) 
+      }
+   }
+   return(p)
+}
+
 plot.sapFlowDensity <- function(data, ui.input){
    y = ui.input$sapFlowDensityPlot.y
    col = ui.input$sapFlowDensityPlot.color
