@@ -225,19 +225,31 @@ shinyServer(function(input, output, session) {
       return(c(minDate, maxDate))
     })
     
-    observeEvent(input$LoadFilter, {
+    #' Helper function to built Filter-UI (load or delete)
+    filter_helper = function(input, output){
       if (!is.null(input$file1)){
         req(input$setData)
-      } 
+      }
       output = update.filter.ui(ui.output = output, ui.input = input)
+      minMaxDatetime = minMaxDatetime()
       updateDateRangeInput(session, "daterange",
-                           start = minMaxDatetime()[1],
-                           end = minMaxDatetime()[2],
-                           min = minMaxDatetime()[1],
-                           max = minMaxDatetime()[2])
+                           start = minMaxDatetime[1],
+                           end = minMaxDatetime[2],
+                           min = minMaxDatetime[1],
+                           max = minMaxDatetime[2])
+    }
+    
+    #' Eventlistener to built Filter-UI
+    #' Calling helper function, same as delete filter
+    observeEvent(input$LoadFilter, {
+      filter_helper(input, output)
     })
     
-    
+    #' Eventlistener to built Filter-UI
+    #' Calling helper function, same as load filter
+    observeEvent(input$FilterDelete, {
+      filter_helper(input, output)
+    })
     
 
     
