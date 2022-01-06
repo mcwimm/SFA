@@ -338,6 +338,27 @@ update.positions = function(data, ui.input, reactive.value){
    return(list(reactive.value, positions))
 }
 
+update.depths = function(ui.input, positions, sensor_distance, swd){
+   # Calculate the distance Rxy from the stem center to the inner bark
+   # Prioritize information on sap wood depth over dbh
+   if (ui.input$sapWoodDepth != 0){
+      rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
+   } else {
+      rxy = ui.input$stemDiameter / 2 - ui.input$barkThickness
+   }
+   depths = get.depths(depthManual = ui.input$depthManual,
+                       inputType = ui.input$sensorType,
+                       positions = positions,
+                       rxy = rxy,
+                       depth = ui.input$depthInput,
+                       sensor_distance = sensor_distance)
+   # Àdd area and circumference of circular ring
+   depths = add.Props2Depths(depths = depths, 
+                             rxy = rxy,
+                             swd = swd)
+   print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy))
+   return(depths)
+}
 
 ########### CLEAN #############
 

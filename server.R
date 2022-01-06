@@ -149,27 +149,10 @@ shinyServer(function(input, output, session) {
       if (!is.null(input$file1)){
         req(input$setData)
       }
-      
-      # Calculate the distance Rxy from the stem center to the inner bark
-      # Prioritize information on sap wood depth over dbh
-      if (input$sapWoodDepth != 0){
-        rxy = input$sapWoodDepth + input$heartWoodDepth
-      } else {
-        rxy = input$stemDiameter / 2 - input$barkThickness
-      }
-      depths = get.depths(depthManual = input$depthManual,
-                          inputType = input$sensorType,
-                          positions = positions(),
-                          rxy = rxy,
-                          depth = input$depthInput,
-                          sensor_distance = sensor.dist())
-      # Àdd area and circumference of circular ring
-      swd = sapWoodDepth()
-      depths = add.Props2Depths(depths = depths, 
-                                rxy = rxy,
-                                swd = swd)
-      print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy))
-      return(depths)
+      return(update.depths(ui.input = input,
+                           positions = positions(),
+                           sensor_distance = sensor.dist(),
+                           swd = sapWoodDepth()))
     })
     
 
