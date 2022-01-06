@@ -35,10 +35,6 @@ get.kByMethodAll <- function(data, ui.input){
 ##################
 
 get.regressionK.depth <- function(data, sensorDepth, ui.input){
-   # Extract ui-input values
-   nightTimeStart = ui.input$kRegressionTime.start
-   nightTimeEnd = ui.input$kRegressionTime.end
-   
    # Filter repective sensor depth
    data = data %>% 
       filter(position == sensorDepth) 
