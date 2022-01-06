@@ -181,6 +181,8 @@ shinyServer(function(input, output, session) {
       return(positions)
     })
     
+    #' Reactive variable holding depth of each sensor positions
+    #' in cm
     depths <- reactive({
       if (!is.null(input$file1)){
         req(input$setData)
@@ -194,21 +196,31 @@ shinyServer(function(input, output, session) {
 
     #### FILTER ####
     
+    #' Button to load filter options
+    #' Assigns unfiltered, long-format data as reactive 
+    #' value 'deltaTempLong'
     observeEvent(input$LoadFilter, {
       values$deltaTempLong <- deltaTempLongNoFilter()
     })
     
+    #' Button to apply filter
+    #' Assigns filterd, long-format data as reactive 
+    #' value 'deltaTempLong'
     observeEvent(input$FilterApply, {
       values$deltaTempLong <- get.filteredData(data = values$deltaTempLong,
                                                ui.input = input)
     })
     
+    #' Button to delete filter
+    #' Assigns unfiltered, long-format data as reactive 
+    #' value 'deltaTempLong'
     observeEvent(input$FilterDelete, {
       values$deltaTempLong <- deltaTempLongNoFilter()
     })
     
     #### UI ####
 
+    #' Reactive variable to get start and end data of data set
     minMaxDatetime <- reactive({
       if (!is.null(input$file1)){
         req(input$setData)
@@ -247,31 +259,38 @@ shinyServer(function(input, output, session) {
       filter_helper(input, output)
     })
     
-
     
     #### Table outputs #####
 
-    output$raw.wide <- DT::renderDataTable({ # raw data
-      #print(str(rawData()))
-        return(rawData())
+    #' UI Table with raw data, wide-format
+    #' (Data > Upload > Preview data)
+    output$raw.wide <- DT::renderDataTable({
+      return(rawData())
     }, options = list(scrollX = TRUE))
     
+    #' UI Table with raw data, long-format 
+    #' (Data > Upload > Preview data)
     output$raw.long <- DT::renderDataTable({
       return(deltaTempLongNoFilter() %>% 
                mutate_if(is.numeric, round, 3))
     }, options = list(scrollX = TRUE))
     
-    output$depth.table <- DT::renderDataTable({ # sensor positions etc
-      d = depths() %>%
-        mutate_at(vars(3, 4, 5), round, 1) %>%
-        select(-R) %>%
-        `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                        "Circ. (cm)"))
-      return(d)
+    #' UI Table with sensor data, i.e.
+    #' sensor position, depth, area and circumference of ring
+    #' (Data > Upload > Sensor settings)
+    output$depth.table <- DT::renderDataTable({
+      return(depths() %>%
+               mutate_at(vars(3, 4, 5), round, 1) %>%
+               select(-R) %>%
+               `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                        "Circ. (cm)")))
     }, options = list(scrollX = TRUE))
     
     
     #### Text output ####
+
+    #' UI Test output of remaining data points after filtering
+    #' (Data > Filter > Subset data)    
     output$dataPoints <- renderText({
       n_diff = nrow(deltaTempLongNoFilter()) - nrow(deltaTempLong())
       paste(n_diff, " data points removed.")
@@ -279,30 +298,41 @@ shinyServer(function(input, output, session) {
     
     #### Graphics ####
 
+    #' Reactive variable holding the histogram-like 
+    #' plot with (filtered) data
     filterPlot <- reactive({
       plot.histogram(data = deltaTempLong(), 
                      ui.input = input)
     })
     
+    #' UI plot of filtered data
+    #' (Data > Filter > Figures)
+    output$filterPlot <- renderPlot({
+      filterPlot()
+    })
     
+    #' Reactive variable holding the plot showing temperature
+    #' differences
     deltaTfacetWrap <- reactive({
         plot.deltaTfacetWrap(data = deltaTempLong(), 
                              ui.input = input)
     })
     
+    #' UI plot of temperature differences
+    #' (Data > View > Figures)
+    output$deltaTfacetWrap <- renderPlot({
+      deltaTfacetWrap()
+    })
+    
+    #' Reactive variable holding the plot showing customized
+    #' temperature visualizations
     deltaTSingle <- reactive({
         plot.singleTemperature(data = deltaTempLong(),
                                ui.input = input)
     })
     
-    output$filterPlot <- renderPlot({
-      filterPlot()
-    })
-    
-    output$deltaTfacetWrap <- renderPlot({
-      deltaTfacetWrap()
-    })
-    
+    #' UI of customized plot
+    #' (Data > View > Figures)
     output$deltaTSingle <- renderPlot({
       deltaTSingle()
     })
@@ -310,6 +340,8 @@ shinyServer(function(input, output, session) {
     
     #### Buttons ####
     
+    #' Eventlistener to save unfiltered, long-format data
+    #' (Data > Upload > Preview data)
     observeEvent(input$save_dat_upl, {
         csvObject = deltaTempLongNoFilter()
         path = paste(projectPath(), 
@@ -319,6 +351,8 @@ shinyServer(function(input, output, session) {
         
     })
     
+    #' Eventlistener to save plot with temperature differences
+    #' (Data > View > Figures)
     observeEvent(input$save.deltaTfacetWrap, {
         name = paste(projectPath(),
                      "/graphics/",
@@ -327,6 +361,8 @@ shinyServer(function(input, output, session) {
         save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
+    #' Eventlistener to save plot with customized temperatures
+    #' (Data > View > Figures)
     observeEvent(input$save.deltaTSingle, {
         v = paste(input$rawPlot.xcol, 
                   input$rawPlot.ycol, 
@@ -341,7 +377,8 @@ shinyServer(function(input, output, session) {
         save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
 
-    # button to save filtered data, long format
+    #' Eventlistener to save filtered, long-format data
+    #' (Data > Filter > Figures)
     observeEvent(input$save_dat_filter, {
       csvObject = values$deltaTempLong
       path = paste(projectPath(), 
@@ -350,8 +387,8 @@ shinyServer(function(input, output, session) {
       save.csv(path, csvObject, fileAppendix())
     })
     
-    
-    # button to save figure shown in filter window
+    #' Eventlistener to save plot with filtered data
+    #' (Data > Filter > Figures)
     observeEvent(input$save_dat_filter_fig, {
       name = paste(projectPath(),
                    "/graphics/",
