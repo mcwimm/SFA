@@ -441,23 +441,11 @@ shinyServer(function(input, output, session) {
       return(clean.data.iteration(data))
     })
     
-    kValue <- reactive({     # get k value by selected method for selected position
-        if (input$kMethod == "manual"){
-            kManual = input$kManual
-        }
-        if (input$kMethod == "csv"){
-            d = kFromCsv()
-            kManual = d[d$position == input$kPositionSelect, "k"]
-        }
-        
-        get.kByMethod(data = deltaTempLong(),
-                      ui.input = input,
-                      kManual = kManual)
+    kValue <- reactive({
+      return(get.kByMethod(data = deltaTempLong(),
+                           ui.input = input))
     })
 
-    kComplete <- reactive({  # get k-values for all positions for closest, regression
-        get.kByMethodAll(deltaTempLong(),
-                         ui.input = input)
     })
     
     kFromCsv <- reactive({

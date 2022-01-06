@@ -1,5 +1,5 @@
 
-get.kByMethod <- function(data, ui.input, kManual = 1.11){
+get.kByMethod <- function(data, ui.input){
    # Extract ui-input values
    method = ui.input$kMethod
    sensorDepth = ui.input$kPositionSelect
@@ -7,7 +7,7 @@ get.kByMethod <- function(data, ui.input, kManual = 1.11){
    nightTimeEnd = ui.input$kRegressionTime.end
    
    if (method == "manual"){
-      k = kManual
+      k = ui.input$kManual
    }
    
    if (method == "regression"){
@@ -20,7 +20,9 @@ get.kByMethod <- function(data, ui.input, kManual = 1.11){
    }
    
    if (method == "csv"){
-      k = kManual
+      req(ui.input$file2)
+      kcsv = get.csvKvalues(ui.input = ui.input)
+      k = kvalues[kvalues$position == ui.input$kPositionSelect, "k"]
    }
    return(k)
 }
