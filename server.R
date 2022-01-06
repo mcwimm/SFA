@@ -192,94 +192,17 @@ shinyServer(function(input, output, session) {
 
     #### FILTER ####
     
-    filterData <- function(d){
-
-      d$doy <- as.numeric(d$doy)
-      
-      # filter by day/ doy and day time
-      minDoy = as.numeric(strftime(input$daterange[1], format = "%j"))
-      maxDoy = as.numeric(strftime(input$daterange[2], format = "%j"))
-      
-      start = input$timerangeStart
-      end = input$timerangeEnd
-      
-      d = d %>%
-        filter(doy >= minDoy) %>%
-        filter(doy <= maxDoy)
-      
-      d = d %>%
-        filter(dTime >= start) %>% 
-        filter(dTime <= end)
-      
-      # remove outlier
-      if (input$removeOutlier){
-        d = remove.outlier(d, input$filterPlot_X)
-      }
-      
-      # remove na-values
-      if (input$removeNA){
-        d = d[complete.cases(d), ]
-      }
-      
-      # filter temperature filters by range
-      dTSymMin = ifelse(is.na(input$dTSymMin), -Inf, input$dTSymMin)
-      dTSymMax = ifelse(is.na(input$dTSymMax), Inf, input$dTSymMax)
-      dTasMin = ifelse(is.na(input$dTasMin), -Inf, input$dTasMin)
-      dTasMax = ifelse(is.na(input$dTasMax), Inf, input$dTasMax)
-      dTsym.dTasMin = ifelse(is.na(input$dTsym.dTasMin), -Inf, input$dTsym.dTasMin)
-      dTsym.dTasMax = ifelse(is.na(input$dTsym.dTasMax), Inf, input$dTsym.dTasMax)
-
-      d = d %>%
-        filter(dTSym >= dTSymMin) %>%
-        filter(dTSym <= dTSymMax)
-
-      d = d %>%
-        filter(dTas >= dTasMin) %>%
-        filter(dTas <= dTasMax)
-
-      d = d %>%
-        filter(dTsym.dTas >= dTsym.dTasMin) %>%
-        filter(dTsym.dTas <= dTsym.dTasMax)
-
-      # filter by sensor positions
-      if (input$sensorFilter != ""){
-        sensorFilter = as.numeric(unlist(strsplit(input$sensorFilter,",")))
-        d = d %>%
-          filter(position %in% sensorFilter)
-      }
-      
-
-      # print remaining size of data set
-      # print(paste("Remaining size of data set: ", nrow(d)))
-      print(nrow(d))
-      return(d)
-    }
-
     observeEvent(input$LoadFilter, {
       values$deltaTempLong <- deltaTempLongNoFilter()
     })
     
     observeEvent(input$FilterApply, {
-      print("Within filter apply")
-      print(paste("nrow(data) before  ", nrow(data)))
-      
-      temp <- filterData(values$deltaTempLong)
-      
-      print(paste("nrow(data) after  ", nrow(temp)))
-      values$deltaTempLong <- temp
-      
+      values$deltaTempLong <- get.filteredData(data = values$deltaTempLong,
+                                               ui.input = input)
     })
     
     observeEvent(input$FilterDelete, {
-      print("Within filter delete")
-      
-      temp <- deltaTempLongNoFilter()
-      
-      values$deltaTempLong <- temp
-      
-      print(paste("nrow(data) after filter delete ", nrow(temp)))
-      
-      
+      values$deltaTempLong <- deltaTempLongNoFilter()
     })
     
     #### UI ####

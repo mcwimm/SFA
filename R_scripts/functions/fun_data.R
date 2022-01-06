@@ -375,6 +375,64 @@ remove.outlier <- function(data, data.vector){
 }
 
 
+get.filteredData <- function(data, ui.input){
+   
+   data$doy <- as.numeric(data$doy)
+   
+   # filter by day/ doy and day time
+   minDoy = as.numeric(strftime(ui.input$daterange[1], format = "%j"))
+   maxDoy = as.numeric(strftime(ui.input$daterange[2], format = "%j"))
+   
+   start = ui.input$timerangeStart
+   end = ui.input$timerangeEnd
+   
+   data = data %>%
+      filter(doy >= minDoy) %>%
+      filter(doy <= maxDoy)
+   
+   data = data %>%
+      filter(dTime >= start) %>% 
+      filter(dTime <= end)
+   
+   # remove outlier
+   if (ui.input$removeOutlier){
+      data = remove.outlier(data, ui.input$filterPlot_X)
+   }
+   
+   # remove na-values
+   if (ui.input$removeNA){
+      data = data[complete.cases(data), ]
+   }
+   
+   # filter temperature filters by range
+   dTSymMin = ifelse(is.na(ui.input$dTSymMin), -Inf, ui.input$dTSymMin)
+   dTSymMax = ifelse(is.na(ui.input$dTSymMax), Inf, ui.input$dTSymMax)
+   dTasMin = ifelse(is.na(ui.input$dTasMin), -Inf, ui.input$dTasMin)
+   dTasMax = ifelse(is.na(ui.input$dTasMax), Inf, ui.input$dTasMax)
+   dTsym.dTasMin = ifelse(is.na(ui.input$dTsym.dTasMin), -Inf, ui.input$dTsym.dTasMin)
+   dTsym.dTasMax = ifelse(is.na(ui.input$dTsym.dTasMax), Inf, ui.input$dTsym.dTasMax)
+   
+   data = data %>%
+      filter(dTSym >= dTSymMin) %>%
+      filter(dTSym <= dTSymMax)
+   
+   data = data %>%
+      filter(dTas >= dTasMin) %>%
+      filter(dTas <= dTasMax)
+   
+   data = data %>%
+      filter(dTsym.dTas >= dTsym.dTasMin) %>%
+      filter(dTsym.dTas <= dTsym.dTasMax)
+   
+   # filter by sensor positions
+   if (ui.input$sensorFilter != ""){
+      sensorFilter = as.numeric(unlist(strsplit(ui.input$sensorFilter,",")))
+      data = data %>%
+         filter(position %in% sensorFilter)
+   }
+   return(data)
+}
+
 ########### SAVE #############
 
 save.figure = function(name, plotObject, prjName = "PrjName", 
