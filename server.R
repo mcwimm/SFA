@@ -433,23 +433,13 @@ shinyServer(function(input, output, session) {
     
     #### Variables ####
     
-    cleanedDataAndKvalues <- reactive({ # get cleaned data for regression plot
-        d = deltaTempLong() %>%
-            filter(position == input$kPositionSelect)
-        
-        if (input$dTimeFilter){
-          if (nightTimeStart < nightTimeEnd){
-            d = d %>% 
-              filter(dTime >= input$kRegressionTime.start & dTime <= input$kRegressionTime.end) 
-          } else {
-            d = d %>% 
-              filter(dTime >= input$kRegressionTime.start | dTime <= input$kRegressionTime.end) 
-          }
-
-        }
-        return(clean.data.iteration(d))
+    cleanedDataAndKvalues <- reactive({
+      data = deltaTempLong() %>%
+          filter(position == input$kPositionSelect)
+      data = get.time.filtered.data(data = data,
+                                    ui.input = input)
+      return(clean.data.iteration(data))
     })
-    
     
     kValue <- reactive({     # get k value by selected method for selected position
         if (input$kMethod == "manual"){

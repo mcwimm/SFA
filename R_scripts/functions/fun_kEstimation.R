@@ -45,15 +45,8 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
    datapoints_sensordepth = nrow(data)
 
    # Filter 0-trend data points by time, if filter is enables
-   if (ui.input$dTimeFilter){
-      if (nightTimeStart < nightTimeEnd){
-         data = data %>% 
-            filter(dTime >= nightTimeStart & dTime <= nightTimeEnd)
-      } else {
-         data = data %>% 
-            filter(dTime >= nightTimeStart | dTime <= nightTimeEnd)
-      }
-   }
+   data = get.time.filtered.data(data = data,
+                                 ui.input = ui.input)
 
    # Iterate through data
    data.adj = clean.data.iteration(data)
@@ -83,6 +76,21 @@ get.regressionKvalues <- function(data, ui.input){
 }
 
 #### data cleaing
+
+get.time.filtered.data = function(data, ui.input){
+   if (ui.input$dTimeFilter){
+      if (nightTimeStart < nightTimeEnd){
+         data = data %>% 
+            filter(dTime >= ui.input$kRegressionTime.start & 
+                      dTime <= ui.input$kRegressionTime.end) 
+      } else {
+         data = data %>% 
+            filter(dTime >= ui.input$kRegressionTime.start |
+                      dTime <= ui.input$kRegressionTime.end) 
+      }
+   }
+   return(data)
+}
 
 remove.right <- function(data, x.col, y.col){
    y.max <- max(data[, y.col])
