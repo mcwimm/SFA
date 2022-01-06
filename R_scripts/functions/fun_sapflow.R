@@ -9,6 +9,22 @@ get.sapWoodDepth = function(ui.input){
          swd = ui.input$sapWoodDepth
       }
    return(swd)
+add.k2data = function(data, values){
+   # Get sensor positions for which a k-value exist
+   kValues = values$kvalues
+   kValues[, "k"] = as.numeric(kValues[, "k"])
+   positions = unique(kValues[!is.na(kValues$k), ]$position)
+   
+   # Filter data by positions
+   data = data %>% 
+      filter(position %in% positions)
+   
+   # Add k-value to data set by position
+   data = merge(data, kValues[, c("position", "k")], by = "position")
+   data = data[!is.na(data$datetime), ]
+   return(data)
+}
+
 get.sapFlowDensity <- function(method = "HFD", data, 
                                sapWoodDepth, ui.input){
    Dst = ui.input$ThermalDiffusivity

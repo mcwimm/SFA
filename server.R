@@ -661,21 +661,12 @@ shinyServer(function(input, output, session) {
     
     
     sapFlowDens <- reactive({
-      #req(input$setK, input$setKfromRegression)
-      kValues = values$kvalues
-      kValues[, "k"] = as.numeric(kValues[, "k"])
-      positions = unique(kValues[!is.na(kValues$k), ]$position)
-      data = deltaTempLong()
-      data = data[data$position %in% positions, ]
-      data = merge(data, kValues[, c("position", "k")], by = "position")
-      data = data[!is.na(data$datetime), ]
-      
-      data = get.sapFlowDensity(method = "HFD",
+      data = add.k2data(data = deltaTempLong(),
+                        values = values)
+      return(get.sapFlowDensity(method = "HFD",
                                 data = data,
                                 sapWoodDepth = sapWoodDepth(),
-                                ui.input = input)
-      return(data)
-      
+                                ui.input = input))
     })
     
     sensor.dist <- reactive({
