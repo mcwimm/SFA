@@ -256,8 +256,8 @@ shinyServer(function(input, output, session) {
         return(rawData())
     }, options = list(scrollX = TRUE))
     
-    output$raw.long <- DT::renderDataTable({ # raw data
-      return(deltaTempLong() %>% 
+    output$raw.long <- DT::renderDataTable({
+      return(deltaTempLongNoFilter() %>% 
                mutate_if(is.numeric, round, 3))
     }, options = list(scrollX = TRUE))
     
@@ -311,7 +311,7 @@ shinyServer(function(input, output, session) {
     #### Buttons ####
     
     observeEvent(input$save_dat_upl, {
-        csvObject = deltaTempLong()
+        csvObject = deltaTempLongNoFilter()
         path = paste(projectPath(), 
                      "/csv-files/",
                      "deltaT_longFormat", sep = "")
