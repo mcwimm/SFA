@@ -157,34 +157,11 @@ shinyServer(function(input, output, session) {
         req(input$setData)
       } 
       
-      positions = get.positionsFromRawData(dataSource = rawData(),
-                                           input = input)
-
-      # update sensor positions if a filter was applied to the data set
-      if (input$LoadFilter != 0){
-        # case if FilterApply button was activated the first time: use filtered data
-        if (!is.null(input$FilterApply)){
-          d = values$deltaTempLong
-          positions = unique(d$position)
-        }
-        # case if FilterDelete button was activated the first time: use raw data
-        if (!is.null(input$FilterDelete)){
-          positions = get.positionsFromRawData(dataSource = rawData(), 
-                                               input = input)
-        }
-        # case if filters have been applied and deleted button was activated
-        # the first time
-        if ((!is.null(input$FilterApply)) & (!is.null(input$FilterDelete))){
-          if (input$FilterApply > input$FilterDelete){
-            d = values$deltaTempLong
-            positions = unique(d$position)
-          } else{
-            positions = get.positionsFromRawData(dataSource = rawData(), 
-                                                 input = input)
-          }
-        }
-      } 
-      
+      h = update.positions(data = rawData(), 
+                           ui.input = input, 
+                           reactive.value = values)
+      values = h[[1]]
+      positions = h[[2]]
       return(positions)
     })
     

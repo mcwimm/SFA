@@ -307,6 +307,38 @@ add.Props2Depths = function(depths, rxy, swd){
    return(depths)
 }
 
+update.positions = function(data, ui.input, reactive.value){
+   positions = get.positionsFromRawData(dataSource = data,
+                                        input = ui.input)
+   
+   # Update sensor positions if a filter was applied to the data set
+   if (ui.input$LoadFilter != 0){
+      # Case if FilterApply button was activated the first time: use filtered data
+      if (!is.null(ui.input$FilterApply)){
+         d = reactive.value$deltaTempLong
+         positions = unique(d$position)
+      }
+      # Case if FilterDelete button was activated the first time: use raw data
+      if (!is.null(ui.input$FilterDelete)){
+         positions = get.positionsFromRawData(dataSource = data, 
+                                              input = ui.input)
+      }
+      # Case if filters have been applied and deleted button was activated
+      # the first time
+      if ((!is.null(ui.input$FilterApply)) & (!is.null(ui.input$FilterDelete))){
+         if (ui.input$FilterApply > ui.input$FilterDelete){
+            d = reactive.value$deltaTempLong
+            positions = unique(d$position)
+         } else{
+            positions = get.positionsFromRawData(dataSource = data, 
+                                                 input = ui.input)
+         }
+      }
+   } 
+   return(list(reactive.value, positions))
+}
+
+
 ########### CLEAN #############
 
 remove.outlier <- function(data, data.vector){
