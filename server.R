@@ -272,22 +272,6 @@ shinyServer(function(input, output, session) {
     
     
     #### Text output ####
-    
-    output$positions <- renderPrint({
-        # cat("As atomic vector:\n")
-        print(positions())
-    })
-    
-    
-    output$depths <- renderPrint({
-      # cat("As atomic vector:\n")
-      d = depths() %>% mutate_at(vars(3, 4, 5), round, 1) %>% 
-        select(-R) %>%
-        `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                        "Circ. (cm)"))
-      print(d)
-    })
-    
     output$dataPoints <- renderText({
       n_diff = nrow(deltaTempLongNoFilter()) - nrow(deltaTempLong())
       paste(n_diff, " data points removed.")
