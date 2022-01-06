@@ -116,6 +116,26 @@ get.sapFlowByMethod <- function(data, method,
    }
 }
 
+get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
+   methods <- list("treeScaleSimple1" = ui.input$treeScaleSimple1,
+                   "treeScaleSimple2" = ui.input$treeScaleSimple2,
+                   "treeScaleSimple3" = ui.input$treeScaleSimple3)
+   
+   data = data %>% 
+      merge(., depths, by = "position")
+   
+   for (m in c(1:length(methods))){
+      if (methods[[m]]){
+         method = names(methods)[m]
+         data = get.sapFlowByMethod(data = data,
+                                    method = method, 
+                                    swd = sapWoodDepth) 
+         
+      } 
+   }        
+   return(data)
+}
+
 get.treeWaterUseByMethod = function(data, input){
    groups = c()
    if (input$treeScaleSimple1){

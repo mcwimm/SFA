@@ -674,27 +674,10 @@ shinyServer(function(input, output, session) {
     })
     
     sapFlow <- reactive({
-      methods <- list("treeScaleSimple1" = input$treeScaleSimple1,
-                      "treeScaleSimple2" = input$treeScaleSimple2,
-                      "treeScaleSimple3" = input$treeScaleSimple3)
-
-      data = sapFlowDens()
-      data = merge(data, depths(), by = "position")
-      
-      for (m in c(1:length(methods))){
-        if (methods[[m]]){
-          method = names(methods)[m]
-          data = get.sapFlowByMethod(data = data,
-                                     method = method, 
-                                     swd = sapWoodDepth()) 
-
-        } 
-      }        
-
-      print(paste("SAP WOOD DEPTH  ", sapWoodDepth()))
-      print(paste("SAP WOOD AREA", mean(data$SWDarea)))
-      
-      return(data)
+      return(get.sapFlow(data = sapFlowDens(),
+                         depths = depths(), 
+                         sapWoodDepth = sapWoodDepth(),
+                         ui.input = input))
     })
     
     #' Calculate daily tree water use in kg per h and kg per day
