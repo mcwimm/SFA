@@ -42,6 +42,19 @@ get.sapFlowDensity <- function(method = "HFD", data,
 }
 
 
+get.sensorDistance <- function(ui.input){
+   if (ui.input$sensorType == "HFD8-50"){
+      return(0.5)
+   }
+   if (ui.input$sensorType == "HFD8-100"){
+      return(1)
+   }
+   if (ui.input$sensorType == "Manual"){
+      return(ui.input$distInput)
+   }
+}
+
+
 #### Scale tree-level ####
 
 treeScaleSimple1 <- function(data, swd) {

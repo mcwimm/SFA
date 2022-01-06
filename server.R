@@ -670,15 +670,7 @@ shinyServer(function(input, output, session) {
     })
     
     sensor.dist <- reactive({
-      if (input$sensorType == "HFD8-50"){
-        return(0.5)
-      }
-      if (input$sensorType == "HFD8-100"){
-        return(1)
-      }
-      if (input$sensorType == "Manual"){
-        return(input$distInput)
-      }
+      return(get.sensorDistance(ui.input = input))
     })
     
     sapFlow <- reactive({
