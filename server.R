@@ -169,8 +169,6 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding sensor positions
     #' (a vector numbering the sensors) derived from input file
     positions <- reactive({
-      # If an input file is given wait until 'set data' button
-      # is pressed
       if (!is.null(input$file1)){  
         req(input$setData)
       } 
@@ -213,15 +211,12 @@ shinyServer(function(input, output, session) {
     minMaxDatetime <- reactive({
       if (!is.null(input$file1)){
         req(input$setData)
-        print("Require set data1")
       } 
-      # d = deltaTempLong()
       d = rawData()
       minDate = as.Date(d[which.min(as.POSIXct(d$datetime)),
                           "datetime"])
       maxDate = as.Date(d[which.max(as.POSIXct(d$datetime)),
                           "datetime"])
-      print(c(minDate, maxDate))
       return(c(minDate, maxDate))
     })
     
@@ -294,7 +289,6 @@ shinyServer(function(input, output, session) {
     
     output$dataPoints <- renderText({
       n_diff = nrow(deltaTempLongNoFilter()) - nrow(deltaTempLong())
-      # paste(nrow(deltaTempLong()), " data points remaining.")
       paste(n_diff, " data points removed.")
     })
     
