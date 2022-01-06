@@ -468,66 +468,31 @@ shinyServer(function(input, output, session) {
     observeEvent(input$setK, {  
       click = click()
       if (click == 1 && is.null(input$file2)){
-        values$df_data <-  data.frame(position = positions(),  
-                                      method = rep(NA),
-                                      k = rep(NA))
+        emptyKvalues()
       }
-      
-      values$df_data[values$df_data$position == input$kPositionSelect, 2:3] <- cbind(
+      values$kvalues[values$kvalues$position == input$kPositionSelect, 2:3] <- cbind(
         method = as.character(input$kMethod),
         k = round(kValue(), 3))
     })
-    
-    #' Button to use uploaded k-Values
-    observeEvent(input$setKfromCsv, {
-      values$df_data <-  data.frame(position = positions(),  
-                                    method = rep(NA),
-                                    k = rep(NA))
-      csvK = kFromCsv()
 
-      for (pos in unique(csvK[, "position"])){
-        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
-          method = ifelse(is.null(as.character(csvK$method)), "csv",
-          as.character(csvK[csvK$position == pos, "method"])),
-          k = csvK[csvK$position == pos, "k"])
-      }
     })
    
     #' Button to use all k-Values from automatic regression
     observeEvent(input$setKfromRegression, {
-      values$df_data <-  data.frame(position = positions(),  
-                                    method = rep(NA),
-                                    k = rep(NA))
-      
-      regK = kComplete()$regression %>% round(., 3)
-      
-      method_name = "auto. regression"
-      if (input$dTimeFilter){
-        method_name = paste(method_name, " (",
-                            input$kRegressionTime.start, " - ",
-                            input$kRegressionTime.end, ")",
-                            sep = "")
-      }
-      for (pos in unique(regK[, "position"])){
-        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
-          method = method_name,
-          k = regK[regK$position == pos, "k"])
-      }
+      emptyKvalues()
+      values = fill.k.table(method = "regression",
+                            k.data = kComplete()$regression %>% round(., 3), 
+                            ui.input = input, 
+                            reactive.value = values)
     })
     
     #' Button to use all k-Values from closest estimate
     observeEvent(input$setKfromClosest, {
-      values$df_data <-  data.frame(position = positions(),  
-                                    method = rep(NA),
-                                    k = rep(NA))
-      
-      closK = kComplete()$closest %>% round(., 3)
-      
-      for (pos in unique(closK[, "position"])){
-        values$df_data[values$df_data$position == pos, 2:3] <- cbind(
-          method = "closest",
-          k = closK[closK$position == pos, "k"])
-      }
+      emptyKvalues()
+      values = fill.k.table(method = "closest",
+                            k.data = kComplete()$closest %>% round(., 3), 
+                            ui.input = input, 
+                            reactive.value = values)
     })
 
     #### Text outputs ####

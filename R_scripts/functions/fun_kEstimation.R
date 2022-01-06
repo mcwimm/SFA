@@ -32,6 +32,37 @@ get.kByMethodAll <- function(data, ui.input){
                 "closest" = get.closestKvalues(data)))
 }
 
+fill.k.table = function(method, k.data, ui.input, reactive.value){
+   # Define method name
+   if (method == "regression"){
+      method_name = "auto. regression"
+      if (ui.input$dTimeFilter){
+         method_name = paste(method_name, " (",
+                             ui.input$kRegressionTime.start, " - ",
+                             ui.input$kRegressionTime.end, ")",
+                             sep = "")
+      }
+   }
+   if (method == "closest"){
+      method_name = "closest"
+   }
+   
+   # Fill method and k-value by row/ position
+   for (pos in unique(k.data[, "position"])){
+      if (method == "csv"){
+         method_name = ifelse(is.null(as.character(k.data$method)), "csv",
+                              paste("csv: ",
+                                    as.character(k.data[k.data$position == pos, "method"]),
+                                    sep = ""))
+      }
+      
+      reactive.value$kvalues[reactive.value$kvalues$position == pos, 2:3] <- cbind(
+         method = method_name,
+         k = k.data[k.data$position == pos, "k"])
+   }
+   return(reactive.value)
+}
+
 ##################
 ### regression ###
 ##################
