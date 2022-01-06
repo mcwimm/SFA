@@ -120,12 +120,13 @@ shinyServer(function(input, output, session) {
       if (is.null(input$file1)){
         defaultData = "./tests/ICT_rawdata.csv"
         print("Default data")
-        return(get.temperatures.ICT(defaultData,
+        data = get.temperatures.ICT(defaultData,
                                     sep = ",",
-                                    skip = 10))
+                                    skip = 10)
       } else {
-        return(get.rawData(input))
+        data = get.rawData(input)
       }
+      return(data)
     })
     
     #' Reactive variable holding sap flow data in long format
