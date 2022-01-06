@@ -226,89 +226,12 @@ shinyServer(function(input, output, session) {
       if (!is.null(input$file1)){
         req(input$setData)
       } 
-      
-      output$filterOptions <- renderUI({
-        req(input$LoadFilter)
-        
-        tagList(
-          # Date and time range
-          h4(strong("Time filters")),
-          
-          fluidRow(# Date
-            column(2,
-                   p(strong('Date'))),
-            column(10,
-                   dateRangeInput("daterange", "Range")
-            )),
-          
-          fluidRow(# Time of day
-            column(2,
-                   p(strong('Time'))),
-            column(5, 
-                   numericInput("timerangeStart", "Start", value = 0)),
-            column(5, numericInput("timerangeEnd", "End", value = 24)),
-          ),
-          
-          br(), 
-          
-          # Temperature ranges
-          h4(strong("Temperature ranges")),
-          fluidRow(# dTSym
-            column(4,
-                   p(strong('dTSym'))),
-            column(4, 
-                   numericInput("dTSymMin", "Min", value = Inf)),
-            column(4, numericInput("dTSymMax", "Max", value = Inf)),
-          ),
-          
-          fluidRow(# dTas
-            column(4,
-                   p(strong('dTas'))),
-            column(4, 
-                   numericInput("dTasMin", "Min", value = Inf)),
-            column(4, numericInput("dTasMax", "Max", value = Inf)),
-          ),
-          
-          fluidRow(# dTsym.dTas
-            column(4,
-                   p(strong('dTsym.dTas'))),
-            column(4, 
-                   numericInput("dTsym.dTasMin", "Min", value = Inf)),
-            column(4, numericInput("dTsym.dTasMax", "Max", value = Inf)),
-          ),
-          
-          # Sensor filters
-          h4(strong("Sensor positions")),
-          fluidRow(# sensor positions
-            column(12,
-                   textInput("sensorFilter", "",
-                 placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3"))
-            ),
-          
-          
-          br(), 
-          
-          # General filters
-          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
-  
-          checkboxInput("removeNA", "Remove NA-rows", F),
-          
-          # Buttons
-          fluidRow(
-            column(5, (actButton("FilterApply", "Apply filter", "update"))),
-            column(5, (actButton("FilterDelete", "Delete filter", "update"))),
-          ),
-          
-          textOutput("dataPoints")
-        )
-      })
-      
+      output = update.filter.ui(ui.output = output, ui.input = input)
       updateDateRangeInput(session, "daterange",
                            start = minMaxDatetime()[1],
                            end = minMaxDatetime()[2],
                            min = minMaxDatetime()[1],
                            max = minMaxDatetime()[2])
-
     })
     
     
