@@ -120,7 +120,7 @@ kValueOutput <- function(){
                          output.figure("kvaluePlot2")),
                 tabPanel("Control-diagram 2", br(),
                          output.figure("kvaluePlot3")),
-                tabPanel("Night time", br(),
+                tabPanel("Diurnal flow", br(),
                          output.figure("kNightTimePlot"))
              ),
              
