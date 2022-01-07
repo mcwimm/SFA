@@ -163,6 +163,7 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding long-format data for
     #' specific UI-selected sensor position
     deltaTempLong.depth <- reactive({
+      req(input$kPositionSelect)
       deltaTempLong() %>% 
         filter(position == input$kPositionSelect)
     })
@@ -544,7 +545,8 @@ shinyServer(function(input, output, session) {
     #' depending on selected position and method
     #' (K-value > Estimation > K-value estimation)
     output$kCurrent <- renderPrint({ 
-        paste("K-value", round(kValue(), 3))
+      req(input$kPositionSelect)
+      paste("K-value", round(kValue(), 3))
     })
     
     
@@ -578,6 +580,7 @@ shinyServer(function(input, output, session) {
     #### Graphics ####
     
     #' Reactive variable holding the diurnal flow plot
+    #' ggplot warnings are suppressed
     kplotDiurnalFlow <- reactive({
       plot.nighttime(data.complete = deltaTempLong.depth())
     })
@@ -588,9 +591,11 @@ shinyServer(function(input, output, session) {
     
     #' Reactive variable holding the k-diagram
     kplot1 <- reactive({
-      plot.kEst1(data.complete = deltaTempLong.depth(),
+      suppressWarnings(print(
+        plot.kEst1(data.complete = deltaTempLong.depth(),
                  data.adj = cleanedDataAndKvalues()[[1]],
                  ui.input = input)
+      ))
     })
     
     #' UI output of K-diagram
@@ -598,11 +603,14 @@ shinyServer(function(input, output, session) {
     output$kvaluePlot1 <- renderPlot({ kplot1() })
     
     #' Reactive variable holding the control-diagram 1
+    #' ggplot warnings are suppressed
     kplot2 <- reactive({
-      plot.kEst2(data.complete = deltaTempLong.depth(),
+      suppressWarnings(print(
+        plot.kEst2(data.complete = deltaTempLong.depth(),
                  data.adj =cleanedDataAndKvalues()[[1]],
                  k = kValue(),
                  ui.input = input)
+      ))
     })
     
     #' UI output of Control-diagram 1
@@ -610,11 +618,14 @@ shinyServer(function(input, output, session) {
     output$kvaluePlot2 <- renderPlot({ kplot2() })
     
     #' Reactive variable holding the control-diagram 2
+    #' ggplot warnings are suppressed
     kplot3 <- reactive({
+      suppressWarnings(print(
         plot.kEst3(data.complete = deltaTempLong.depth(), 
                    data.adj = cleanedDataAndKvalues()[[1]],
                    k = kValue(),
                    ui.input = input)
+      ))
     })
     
     #' UI output of Control-diagram 2
