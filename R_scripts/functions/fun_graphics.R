@@ -581,25 +581,89 @@ plot.sapFlowDensity <- function(data, ui.input, boxplot = F){
 
 ######## SAP FLOW RATE ########
 
-plot.sapFLowRate = function(data, ui.input){
+get.selectedMethods = function(ui.input){
+   groups = c()
+   if (ui.input$treeScaleSimple1){
+      groups = rbind(groups, "sfM1")
+   }
+   if (ui.input$treeScaleSimple2){
+      groups = rbind(groups, "sfM2")
+   }
+   if (ui.input$treeScaleSimple3){
+      groups = rbind(groups, "sfM3")
+   }
    
+   groups = groups[,1]
+   return(groups)
+}
+
+plot.sapFLowRate = function(data, ui.input){
+   N = 0
    p = data %>% 
       ggplot(.) +
       labs(x = "",
            y = labels["SF"][[1]],
-           color = "Scaling method")
+           color = "Scaling method",
+           linetype = "Scaling method")
    if (ui.input$treeScaleSimple1){
       p = p +
-         geom_line(aes(x = datetime, y = sfM1, color = "method 1"))
+         geom_line(aes(x = datetime, y = sfM1, color = "Method 1",
+                       linetype = "Method 1"),
+                   size = 0.9)
+      N = N + 1
    }
    if (ui.input$treeScaleSimple2){
       p = p +
-         geom_line(aes(x = datetime, y = sfM2, color = "method 2"))
+         geom_line(aes(x = datetime, y = sfM2, color = "Method 2",
+                       linetype = "Method 2"),
+                   size = 0.9)
+      N = N + 1
    }
    if (ui.input$treeScaleSimple3){
       p = p +
-         geom_line(aes(x = datetime, y = sfM3, color = "method 3"))
+         geom_line(aes(x = datetime, y = sfM3, color = "Method 3",
+                       linetype = "Method 3"),
+                   size = 0.9)
+      N = N + 1
    }
+   p = p +
+      scale_color_manual(values = fillcolors(N))
+   
    return(p)
+}
+
+plot.sapFlowDay = function(data, ui.input){
+   groups = c()
+   if (ui.input$treeScaleSimple1){
+      groups = rbind(groups, "sfM1")
+   }
+   if (ui.input$treeScaleSimple2){
+      groups = rbind(groups, "sfM2")
+   }
+   if (ui.input$treeScaleSimple3){
+      groups = rbind(groups, "sfM3")
+   }
+   
+   groups = groups[,1]
+   
+   data = data %>% 
+      gather(., Method, SFrate, groups) %>% 
+      mutate(Method = ifelse(Method == "sfM1", "Method 1",
+                             ifelse(Method == "sfM2", "Method 2",
+                                    "Method 3")),
+             Balance = ifelse(SFrate >= 0, "Positive", "Negative")) %>% 
+      mutate(Balance = factor(Balance, levels = c("Positive", "Negative"))) %>% 
+      filter(complete.cases(.)) %>% 
+      group_by(doy, Method, Balance) %>% 
+      arrange(dTime) %>% 
+      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) 
+   return(data %>% 
+      ggplot(., aes(x = factor(doy), fill = Method, y = auc)) +
+         geom_bar(position="dodge", stat="identity", 
+                  col = "black", alpha = 0.6) +
+         scale_fill_manual(values = fillcolors(length(groups))) +
+         labs(x = labels["doy"][[1]],
+              y = "Area under curve (kg)",
+              fill = "Scaling method"))
 }
 

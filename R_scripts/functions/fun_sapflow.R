@@ -150,21 +150,24 @@ get.treeWaterUseByMethod = function(data, input){
    }
    
    groups = groups[,1]
-   print(paste('groups  ', groups))
-   return(data %>% 
-      gather(., key, value, groups) %>% 
-      group_by(doy, key) %>% 
-      mutate(key = ifelse(key == "sfM1", "method 1",
-                          ifelse(key == "sfM2", "method 2",
-                                 "method 3"))) %>% 
+   
+   # Credits for AUC: Victor Klos (https://stackoverflow.com/a/30280873)
+   data = data %>% 
+      gather(., Method, SFrate, groups) %>% 
+      mutate(Method = ifelse(Method == "sfM1", "Method 1",
+                             ifelse(Method == "sfM2", "Method 2",
+                                    "Method 3")),
+             Balance = ifelse(SFrate >= 0, "Positive", "Negative")) %>% 
+      mutate(Balance = factor(Balance, levels = c("Positive", "Negative"))) %>% 
+      filter(complete.cases(.)) %>% 
+      group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
-      mutate(delta_time = dTime - lag(dTime),
-             delta_sp = abs(value - lag(value))) %>% 
-      mutate(m = delta_time * delta_sp) %>% 
-      distinct(s_kg_h = sum(m, na.rm = T),
-               s_kg_d = round(s_kg_h*24, 2)) %>%
-      arrange(doy) %>% 
-      select(-s_kg_h) %>% 
-      spread(., key, s_kg_d))
+      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
+      rename('tree water use' = 'auc',
+             "Day of year" = "doy") %>% 
+      spread(., Balance, 'tree water use') %>% 
+      mutate_at(c(3,4), round, 2)
+   
+   return(data)
 }
 

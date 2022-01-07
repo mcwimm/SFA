@@ -826,13 +826,13 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to show figure of sap flow rate
-    #' (Sap Flow > Sap Flow > Figures)
+    #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     output$SapFlowPlot <- renderPlot({
       sapFlowTreePlot()
     })
     
     #' Eventlistener to save sap flow rate figure
-    #' (Sap Flow > Sap Flow > Figures)
+    #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     observeEvent(input$save.SapFlow, {
       name = paste(projectPath(),
                    "/graphics/",
@@ -842,13 +842,45 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to save sap flow rate data as csv
-    #' (Sap Flow > Sap Flow > Figures)
+    #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     observeEvent(input$save.SapFlowCsv, {
       name = paste(projectPath(),
                    "/csv-files/",
                    "sapFlow_scaled", sep = "")
       obj = sapFlow()
       save.csv(name, obj, fileAppendix())
+    })
+    
+    
+    #' Reactive variable holding figure of daily water balance
+    #' for selected methods
+    sapFlowTreePlotBar <- reactive({
+      print(paste('click ', click()))
+      if (click() == 0 && is.null(input$file2)){
+        plot.emptyMessage(message = "No k-values have been set yet.")
+      } else {
+        if (sapWoodDepth() == 0){
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        } else {
+          plot.sapFlowDay(data = sapFlow(), 
+                          ui.input = input)
+        }}
+    })
+    
+    #' Eventlistener to show figure of daily water balance
+    #' (Sap Flow > Sap Flow > Figures > Daily balance)
+    output$SapFlowPlotBar <- renderPlot({
+      sapFlowTreePlotBar()
+    })
+    
+    #' Eventlistener to save daily water balance
+    #' (Sap Flow > Sap Flow > Figures > Daily balance)
+    observeEvent(input$save.SapFlowPlot, {
+      name = paste(projectPath(),
+                   "/graphics/",
+                   "sapFlow_scaled_balance", sep = "")
+      obj = sapFlowTreePlotBar()
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
     #' Eventlistener to save daily tree water use as csv
