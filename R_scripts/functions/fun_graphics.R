@@ -419,12 +419,6 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
    
    newAdj = data.adj %>% 
-      mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) 
-   names(newAdj)
-   int1 = round(get.intersection(newAdj, "dTas", "dTsym.dTas", "R = (k + dTsa) / dTas"), 2)
-   int2 = round(get.intersection(newAdj, "dTsa", "dTsym.dTas", "R = (k + dTsa) / dTas"), 2)
-
-   newAdj = data.adj %>% 
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
    
@@ -460,14 +454,8 @@ plot.kEst3 <- function(data.complete, data.adj, k,
                   fullrange = T, se = F) +
       
       geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
-                     label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6) + #D2D0AD
-      geom_label(aes(x = 0, y = int1[2]*1.15,
-                     label = paste(int1[1], int1[2], sep = " | ")), 
-                     fill = "#C9C9C9", alpha = 0.5) +
-      geom_label(aes(x = 0, y = int2[2]*1.15,
-                     label = paste(int2[1], int2[2], sep = " | ")), 
-                 fill = "#C9C9C9", alpha = 0.5) +
-      
+                     label = paste("k = ", round(k, 2))), 
+                 fill = "#B8B361", alpha = 0.6) + #D2D0AD
       scale_color_manual(values=fillcolors(2)) +
       scale_shape_manual(values = c(21, 24)) +
       xlim(xmin, max(d$x.value)) +
