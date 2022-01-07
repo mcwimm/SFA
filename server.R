@@ -267,14 +267,14 @@ shinyServer(function(input, output, session) {
     #' (Data > Upload > Preview data)
     output$raw.wide <- DT::renderDataTable({
       return(rawData())
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with raw data, long-format 
     #' (Data > Upload > Preview data)
     output$raw.long <- DT::renderDataTable({
       return(deltaTempLongNoFilter() %>% 
                mutate_if(is.numeric, round, 3))
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with sensor data, i.e.
     #' sensor position, depth, area and circumference of ring
@@ -285,7 +285,7 @@ shinyServer(function(input, output, session) {
                select(-R) %>%
                `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
                         "Circ. (cm)")))
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, searching = F))
     
     
     #### Text output ####
@@ -556,25 +556,25 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation > Selected)
     output$kSelected <- DT::renderDataTable({  
       return(values$kvalues)
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable({  
       return(kComplete()$regression  %>% round(., 2))
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Closest)
     output$kClosest <- DT::renderDataTable({
       return(kComplete()$closest %>% round(., 2))
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, dom = 't'))
 
     #' UI table output of uploaded k-values
     #' (K-value > Estimation > K-value estimation > Read csv)
     output$uploadedKvalues <- DT::renderDataTable({ 
       return(kFromCsv())
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, dom = 't'))
   
     
     #### Graphics ####
@@ -880,5 +880,5 @@ shinyServer(function(input, output, session) {
     #' UI-Table with daily tree water use
     output$twu.table <- DT::renderDataTable({ 
       treeWaterUse()
-    }, options = list(scrollX = TRUE))
+    }, options = list(scrollX = TRUE, dom = 't'))
 })

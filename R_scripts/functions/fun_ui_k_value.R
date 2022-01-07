@@ -64,11 +64,10 @@ kValueOutput <- function(){
              
              tabsetPanel(
                 
-                tabPanel("Selected", br(),
-                         br(),
+                tabPanel("Selected",
                          output.table("kSelected"),
                          actButton("save.kValues", "Save csv", "saveCsv")),
-                tabPanel("Regression", br(),
+                tabPanel("Regression",
                          output.table("kRegression"),
                          actButton("setKfromRegression", "Use k-values", "setValue")),
                 tabPanel("Closest",
