@@ -35,7 +35,7 @@ kValueOutput <- function(){
              
              selectInput("kMethod", "Method",
                          choices = c("regression" = "regression",
-                                     "closest" = "closest",
+                                     "no-flow" = "no.flow",
                                      "manual" = "manual",
                                      "csv" = "csv")),
              conditionalPanel(
@@ -47,7 +47,7 @@ kValueOutput <- function(){
                 numericInput("kManual", "Enter k manually", value = 1.11)
              ),
              
-             checkboxInput("dTimeFilter", "Custom zero-flow time", F),
+             checkboxInput("dTimeFilter", "Custom no-flow time", F),
              conditionalPanel(
                 condition = "input.dTimeFilter == true",
                 fluidRow(
@@ -70,9 +70,9 @@ kValueOutput <- function(){
                 tabPanel("Regression",
                          output.table("kRegression"),
                          actButton("setKfromRegression", "Use k-values", "setValue")),
-                tabPanel("Closest",
-                         output.table("kClosest"),
-                         actButton("setKfromClosest", "Use k-values", "setValue")),
+                tabPanel("No flow",
+                         output.table("kZeroFlow"),
+                         actButton("setKfromZeroFlow", "Use k-values", "setValue")),
                 tabPanel("Read csv", br(),
                          # Input: Select a file ----
                          fileInput("file2", "Choose CSV File",

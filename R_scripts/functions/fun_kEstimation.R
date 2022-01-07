@@ -14,8 +14,8 @@ get.kByMethod <- function(data, ui.input){
       k = get.regressionK.depth(data, sensorDepth, ui.input)[, "k"]
    }
    
-   if (method == "closest"){
-      allK = get.closestKvalues(data)
+   if (method == "no.flow"){
+      allK = get.zeroflowKvalues(data)
       k = allK[allK$position == sensorDepth, "k"][[1]]
    }
    
@@ -29,7 +29,7 @@ get.kByMethod <- function(data, ui.input){
 
 get.kByMethodAll <- function(data, ui.input){
    return(list( "regression" = get.regressionKvalues(data, ui.input),
-                "closest" = get.closestKvalues(data)))
+                "no.flow" = get.zeroflowKvalues(data)))
 }
 
 fill.k.table = function(method, k.data, ui.input, reactive.value){
@@ -43,8 +43,8 @@ fill.k.table = function(method, k.data, ui.input, reactive.value){
                              sep = "")
       }
    }
-   if (method == "closest"){
-      method_name = "closest"
+   if (method == "no.flow"){
+      method_name = "No-flow"
    }
    
    # Fill method and k-value by row/ position
@@ -208,15 +208,15 @@ clean.data.iteration = function(data_ini, initial.cutoff = 0){
 
 
 
-###############
-### closest ###
-###############
+#################
+### zero-flow ###
+#################
 
 get_min_at_min <- function(vec1, vec2) {
    return(vec2[order(vec1, vec2)[1]])
 }
 
-get.closestKvalues <- function(data){
+get.zeroflowKvalues <- function(data){
    
    return(data %>% 
              group_by(position) %>% 

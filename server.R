@@ -459,7 +459,7 @@ shinyServer(function(input, output, session) {
     })
 
     #' Reactive variable holding k-values derived
-    #' based on selected method (closest and regression)
+    #' based on selected method (zero-flow and regression)
     #' for all sensor positions, shown in tables
     kComplete <- reactive({
       return(get.kByMethodAll(deltaTempLong(),
@@ -477,7 +477,7 @@ shinyServer(function(input, output, session) {
     #' if any k-values have been set
     click <- reactive(({
       click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
-        input$setKfromClosest[1]
+        input$setKfromZeroFlow[1]
     }))
     
     #### Store and display selected k-values ####
@@ -528,13 +528,13 @@ shinyServer(function(input, output, session) {
                             reactive.value = values)
     })
     
-    #' Eventlistener to store k-values from closest 
+    #' Eventlistener to store k-values from zero-flow 
     #' no-flow estimate as reactive values
     #' (K-value > Estimation > K-value estimation)
-    observeEvent(input$setKfromClosest, {
+    observeEvent(input$setKfromZeroFlow, {
       emptyKvalues()
-      values = fill.k.table(method = "closest",
-                            k.data = kComplete()$closest %>% round(., 3), 
+      values = fill.k.table(method = "no.flow",
+                            k.data = kComplete()$no.flow %>% round(., 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -565,9 +565,9 @@ shinyServer(function(input, output, session) {
     }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of closest zero-flow k-values
-    #' (K-value > Estimation > K-value estimation > Closest)
-    output$kClosest <- DT::renderDataTable({
-      return(kComplete()$closest %>% round(., 2))
+    #' (K-value > Estimation > K-value estimation > Zero-flow)
+    output$kZeroFlow <- DT::renderDataTable({
+      return(kComplete()$no.flow %>% round(., 2))
     }, options = list(scrollX = TRUE, dom = 't'))
 
     #' UI table output of uploaded k-values
