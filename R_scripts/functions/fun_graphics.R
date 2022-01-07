@@ -530,47 +530,62 @@ plot.sapFlowDensity.Helper = function(data, ui.input, boxplot = F){
    if (SFDensity == 0){
       p = plot.emptyMessage(message = "Wood properties are missing.")
    } else{
-      if (boxplot){
+      p = plot.sapFlowDensity(data = data, 
+                              ui.input = ui.input,
+                              boxplot = boxplot) 
+   }
+   return(p)
+}
+
+
+plot.sapFlowDensity <- function(data, ui.input, boxplot = F){
+   scales = ui.input$sapFlowDensityPlot_scales
+   facetWrap = ui.input$sapFlowDensityPlot_facetWrap
+   facet.col = ui.input$sapFlowDensityPlot.facet
+   facet.col.no = ui.input$sapFlowDensityPlot_facet.cols
+   
+   y = ui.input$sapFlowDensityPlot.y
+   col = ui.input$sapFlowDensityPlot.color
+   y.col = data[, y]
+   
+   col = ifelse(facet.col == "position", "doy", "position")
+   col.col = data[, col]
+
+   if (boxplot){
+      p = data %>% 
+         ggplot(.) +
+         geom_boxplot(aes(x = factor(position), y = y.col,
+                          col = factor(position))) +
+         labs(x = labels["position"][[1]], 
+              y = labels[y][[1]],
+              col = labels["position"][[1]])
+      if (facetWrap){
+         p = p +
+            facet_wrap(~ doy, scales = scales,
+                       ncol = facet.col.no)
+      }
+      
+   } else {
+      p = data %>% 
+         ggplot(.) +
+         geom_line(aes(x = datetime, y = y.col, col = factor(col.col))) +
+         labs(x = "", 
+              y = labels[y][[1]],
+              col = labels[col][[1]])
+      if (facetWrap){
+         facet = get.labelledFacets(data, facet.col)
          p = data %>% 
-            ggplot(., aes(x = factor(position), y = SFS, 
-                          col = factor(position)))+
-            geom_boxplot() +
-            facet_wrap(~ doy)
-      } else {
-         p = plot.sapFlowDensity(data = data, 
-                                 ui.input = ui.input) 
+            ggplot(aes(x = dTime, y = y.col)) +
+            geom_line(aes(col = factor(col.col))) +
+            labs(x = labels["dTime"][[1]], 
+                 y = labels[y][[1]],
+                 col = labels[col][[1]]) +
+            facet_wrap(~ (facet), scales = scales,
+                       ncol = facet.col.no)
       }
    }
    return(p)
 }
-
-plot.sapFlowDensity <- function(data, ui.input){
-   y = ui.input$sapFlowDensityPlot.y
-   col = ui.input$sapFlowDensityPlot.color
-   scales = ui.input$sapFlowDensityPlot_scales
-   facetWrap = ui.input$sapFlowDensityPlot_facetWrap
-   facet.col = ui.input$sapFlowDensityPlot.facet
-   
-   y.col = data[, y]
-   col.col = factor(data[, col])
-   
-   p = data %>% 
-      ggplot(.) +
-      geom_line(aes(x = dTime, y = y.col, col = col.col)) +
-      labs(x = labels["dTime"][[1]], 
-           col = labels[col][[1]],
-           y = labels[y][[1]])
-   
-
-   if (facetWrap){
-      facet = get.labelledFacets(data, facet.col)
-      p = p +
-         facet_wrap(~ (facet), scales = scales)
-   }
-   
-   return(p)
-}
-
 
 ######## SAP FLOW RATE ########
 

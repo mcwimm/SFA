@@ -752,13 +752,13 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to show figure of sap flow density
-    #' (Sap Flow > Sap Flow Density > Figure > Chart)
+    #' (Sap Flow > Sap Flow Density > Figure > Diurnal pattern)
     output$sapFlowDensity <- renderPlot({
       sapFlowDensityPlot()
     })
     
     #' Eventlistener to save sap flow density plot
-    #' (Sap Flow > Sap Flow Density > Figure > Chart)
+    #' (Sap Flow > Sap Flow Density > Figures > Diurnal pattern)
     observeEvent(input$save.sapFlowDensityPlot, {
       name = paste(projectPath(),
                    "/graphics/",
@@ -767,8 +767,19 @@ shinyServer(function(input, output, session) {
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
+    #' Eventlistener to save sap flow density plot
+    #' vertical profile
+    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    observeEvent(input$save.sapFlowDensity, {
+      name = paste(projectPath(),
+                   "/csv-files/",
+                   "sapFlowDensity", sep = "")
+      obj = sapFlowDens()
+      save.csv(name, obj, fileAppendix())
+    })
+    
     #' Reactive variable holding figure of sap flow density
-    #' vertical profile, represented as boxplot
+    #' sensor profile, represented as boxplot
     sapFlowDensityPlot.Boxplot = reactive({
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
@@ -781,21 +792,21 @@ shinyServer(function(input, output, session) {
     
     #' Eventlistener to show figure of sap flow density
     #' vertical profile
-    #' (Sap Flow > Sap Flow Density > Figure > Boxplot)
+    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     output$sapFlowDensity.Boxplot <- renderPlot({
       sapFlowDensityPlot.Boxplot()
     })
     
     #' Eventlistener to save sap flow density plot
-    #' vertical profile
-    #' (Sap Flow > Sap Flow Density > Figure > Boxplot)
-    observeEvent(input$save.sapFlowDensity, {
+    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    observeEvent(input$save.sapFlowDensityPlot.Boxplot, {
       name = paste(projectPath(),
-                   "/csv-files/",
-                   "sapFlowDensity", sep = "")
-      obj = sapFlowDens()
-      save.csv(name, obj, fileAppendix())
+                   "/graphics/",
+                   "sf_profile_", input$sapFlowDensityPlot.y, sep = "")
+      obj = sapFlowDensityPlot.Boxplot()
+      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
+
     
     ##### Sap Flow Rate #####
     

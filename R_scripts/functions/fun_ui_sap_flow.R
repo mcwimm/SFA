@@ -109,40 +109,45 @@ sfDensityOutput <- function(){
              collapsible = T, width = 4,
              status = "warning",
              
-             checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
-             conditionalPanel(
-                condition = "input.sapFlowDensityPlot_facetWrap == true",
-                radioButtons("sapFlowDensityPlot_scales","Scales", 
-                             choiceNames =  list(
-                                HTML("<span title='choose free'>free</span>"),
-                                HTML("<span title='choose fixed'>fixed</span>")
-                             ),
-                             choiceValues = list("free", "fixed"),
-                             inline=T),
-                selectInput("sapFlowDensityPlot.facet", "Facet",
-                            choices = c("doy" = "doy",
-                                        "position" = "position"))),
-             
              selectInput("sapFlowDensityPlot.y", "Y-axis",
                          choices = c("Sap flow per section" = "SFS",
                                      "Sap-wood-related density" = "SFDsw")),
-             selectInput("sapFlowDensityPlot.color", "Color",
-                         choices = c("position" = "position",
-                                     "doy" = "doy"))
-         ),
-         box(title = "Figure",
+             
+             checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
+             conditionalPanel(
+                condition = "input.sapFlowDensityPlot_facetWrap == true",
+                
+                radioButtons("sapFlowDensityPlot_scales","Scales", 
+                             choiceNames =  list(
+                                HTML("<span title='choose fixed'>fixed</span>"),
+                                HTML("<span title='choose free'>free</span>")
+                             ),
+                             choiceValues = list("fixed", "free"),
+                             inline=T),
+                fluidRow(
+                   column(6, selectInput("sapFlowDensityPlot.facet", "Facet",
+                                         choices = c("doy" = "doy",
+                                                     "position" = "position"))),
+                   column(6, numericInput("sapFlowDensityPlot_facet.cols", "No. columns",
+                                          value = 4))
+                )
+         )),
+         box(title = "Figures",
              collapsible = T, width = 8,
              status = "info",
              tabsetPanel(
-                tabPanel("Chart", br(),
+                tabPanel("Diurnal pattern", br(),
                          output.figure("sapFlowDensity"),
                          actButton("save.sapFlowDensityPlot",
                                    "Save figure", 
                                    "saveFigure"),
                          actButton("save.sapFlowDensity", 
                                    "Save csv", "saveCsv")),
-                tabPanel("Boxplot", br(),
-                         output.figure("sapFlowDensity.Boxplot"))
+                tabPanel("Sensor profile", br(),
+                         output.figure("sapFlowDensity.Boxplot"),
+                         actButton("save.sapFlowDensityPlot.Boxplot",
+                                   "Save figure", 
+                                   "saveFigure"))
              ))
          )))
 }
