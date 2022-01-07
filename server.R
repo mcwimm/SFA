@@ -714,54 +714,30 @@ shinyServer(function(input, output, session) {
     ##### Sap Flow Index #####
     
     #' Reactive variable holding figure of sap flow index
-    #' Complete
     sapFlowIndex <- reactive({
       plot.sapFlowIndex(data = deltaTempLong(), 
                         ui.input = input)
     })
     
     #' Eventlistener to show figure of sap flow index
-    #' Complete
-    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Complete)
+    #' (Sap Flow > Sap Flow Index > Figure)
     output$sapFlowIndex <- renderPlot({
       sapFlowIndex()
     })
     
     #' Eventlistener to save sap flow index plot
-    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Complete)
+    #' (Sap Flow > Sap Flow Index > Figure)
     observeEvent(input$save.sfIndex, {
+      name_ap = ifelse(input$sfIndexPlot_wrap, 
+                       paste("_", input$sfIndexPlot.facet, sep = ""), "")
       name = paste(projectPath(),
                    "/graphics/",
-                   "sapFlowIndexComplete", sep = "")
+                   "sapFlowIndex", name_ap, sep = "")
       obj = sapFlowIndex()
       save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
     
-    #' Reactive variable holding figure of sap flow index
-    #' Daily
-    sapFlowIndex.Day <- reactive({
-      plot.sapFlowIndex.Day(data = deltaTempLong(), 
-                            ui.input = input)
-    })
-    
-    #' Eventlistener to show figure of sap flow index
-    #' Daily
-    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Daily)
-    output$sapFlowIndex.Day <- renderPlot({
-      sapFlowIndex.Day()
-    })
-    
-    #' Eventlistener to save sap flow index plot
-    #' (Sap Flow > Sap Flow Index > Sap Flow Index > Daily)
-    observeEvent(input$save.sfIndex.day, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sapFlowIndexDaily", sep = "")
-      obj = sapFlowIndex.Day()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
-    })
-    
-    
+
     ##### Sap Flow Density #####
     
     #' Reactive variable holding figure of sap flow density

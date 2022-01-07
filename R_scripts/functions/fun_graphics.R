@@ -263,9 +263,9 @@ plot.nighttime <- function(data.complete){
       # ylim(0, max(data.complete$dTsym.dTas)) +
       geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
       geom_line() +
-      labs(x = "Time (h)", 
+      labs(x = labels["dTime"][[1]], 
            y = labels["dTsym.dTas"][[1]],
-           col = "DOY") 
+           col = labels["doy"][[1]]) 
       )
 }
 
@@ -465,12 +465,12 @@ plot.kEst3 <- function(data.complete, data.adj, k,
 
 ######## SAP FLOW INDEX ########
 
-plot.sapFlowIndex = function(data, ui.input){
-   yRange = ui.input$sfIndexPlot.y
+plot.sapFlowIndex <- function(data, ui.input){
    scales = ui.input$sfIndexPlot_scales
    facetWrap = ui.input$sfIndexPlot_wrap
    facet.col = ui.input$sfIndexPlot.facet
-   
+   facet.col.no = ui.input$sfIndexPlot.facet.cols
+
    p = data %>% 
       ggplot(.) +
       geom_line(aes(x = datetime, y = dTSym, col = factor(position))) +
@@ -478,68 +478,30 @@ plot.sapFlowIndex = function(data, ui.input){
            y = labels["SFI"][[1]],
            col = labels["position"][[1]])
    
-   # if (facetWrap){
-   #    # timelist.minor = seq(from = min(data[data$dTime == 6, ]$datetime),
-   #    #                      to = max(data[data$dTime == 6, ]$datetime) + 1,
-   #    #                      by = "day")
-   #    # timelist = seq(from = min(data[data$dTime == 12, ]$datetime),
-   #    #                to = max(data[data$dTime == 12, ]$datetime) + 1,
-   #    #                by = "day")
-   #    # print(timelist)
-   #    
-   #    
-   #    p = p +
-   #       facet_wrap(~ position, labeller = label_both, scales = scales) +
-   #       scale_x_datetime(#minor_breaks = date_breaks("6 hours"), 
-   #                        # breaks = timelist,
-   #                        labels = date_format("%d-%m\n%H:%M"))
-   #    
-   # }
-   
    if (facetWrap){
       facet = get.labelledFacets(data, facet.col)
-      p = p +
-         facet_wrap(~ (facet), scales = scales)
+      p = data %>% 
+         ggplot(aes(x = dTime, y = dTSym))
+      
+      if (facet.col == "position"){
+         p = p +
+            geom_line(aes(col = factor(doy))) +
+            labs(x = labels["dTime"][[1]], 
+                 y = labels["SFI"][[1]],
+                 col = labels["doy"][[1]])
+      }
+      if (facet.col == "doy"){
+         p = p +
+            geom_line(aes(col = factor(position))) +
+            labs(x = labels["dTime"][[1]], 
+                 y = labels["SFI"][[1]],
+                 col = labels["position"][[1]])
+      }
+      p = p  +
+         facet_wrap(~ (facet), scales = scales,
+                    ncol = facet.col.no)
+      
    }
-   
-   
-   if (scales == "fixed"){
-      p = p +
-         ylim(yRange[1], yRange[2]) 
-   }
-   
-  
-   return(p)
-}
-
-
-
-plot.sapFlowIndex.Day = function(data, ui.input){
-   xRange = ui.input$sfIndexPlot.x
-   yRange = ui.input$sfIndexPlot.y
-   scales = ui.input$sfIndexPlot_scales
-   facetWrap = ui.input$sfIndexPlot_wrap
-   facet.col = ui.input$sfIndexPlot.facet
-   
-   p = data %>% 
-      ggplot(.) +
-      geom_line(aes(x = dTime, y = dTSym, group = factor(doy), col = factor(doy))) +
-      labs(x = labels["dTime"][[1]], 
-           col = labels["doy"][[1]],
-           y = labels["SFI"][[1]]) 
-   
-   if (facetWrap){
-      facet = get.labelledFacets(data, facet.col)
-      p = p +
-         facet_wrap(~ (facet), scales = scales)
-   }
-   
-   if (scales == "fixed"){
-      p = p +
-         xlim(xRange[1], xRange[2]) +
-         ylim(yRange[1], yRange[2])
-   }
-
    return(p)
 }
 

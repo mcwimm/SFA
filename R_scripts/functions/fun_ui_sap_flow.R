@@ -65,48 +65,38 @@ sfIndexOutput <- function(){
          box(title = "Settings",
              collapsible = T, width = 4,
              status = "warning",
-             # ToDO: Conditional panel not working
-             
-             radioButtons("sfIndexPlot_scales","Scales", 
-                          choiceNames =  list(
-                             HTML("<span title='choose free'>free</span>"),
-                             HTML("<span title='choose fixed'>fixed</span>")
-                          ),
-                          choiceValues = list("free", "fixed"),
-                          inline=T),
-             conditionalPanel(
-                condition = "input.sfIndexPlot_scales == 'fixed'",
-                
-                sliderInput("sfIndexPlot.x", "Time slider (0-24 h), only available for 'Daily'-figure",
-                            min = 0, max = 24, step = 0.25,
-                            value = c(0, 24)),
-                sliderInput("sfIndexPlot.y", "y-axis range",
-                            min = -10, max = 10, step = 0.25,
-                            value = c(-0.5, 2))
-             ),
+
+             checkboxInput("sfIndexPlot_wrap", "Facet wrap", F),
              
              
-             checkboxInput("sfIndexPlot_wrap", "Facet wrap", T),
+             
              conditionalPanel(
                 condition = "input.sfIndexPlot_wrap == true",
                 
-                selectInput("sfIndexPlot.facet", "Facet",
-                            choices = c("doy" = "doy",
-                                        "position" = "position"))
+                radioButtons("sfIndexPlot_scales","Scales", 
+                             choiceNames =  list(
+                                HTML("<span title='choose free'>free</span>"),
+                                HTML("<span title='choose fixed'>fixed</span>")
+                             ),
+                             choiceValues = list("free", "fixed"),
+                             inline=T),
+                
+                fluidRow(
+                   column(6, selectInput("sfIndexPlot.facet", "Facet",
+                                         choices = c("doy" = "doy",
+                                                     "position" = "position"))),
+                   column(6, numericInput("sfIndexPlot.facet.cols", "No. columns",
+                                          value = 4))
+                )
+                
              )
              
          ),
-         box(title = "Sap Flow Index",
+         box(title = "Figure",
              collapsible = T, width = 8,
              status = "info",
-             tabsetPanel(
-                tabPanel("Complete", br(),
-                         output.figure("sapFlowIndex"),
-                         actButton("save.sfIndex", "Save figure", "saveFigure")),
-                tabPanel("Daily", br(),
-                         output.figure("sapFlowIndex.Day"),
-                         actButton("save.sfIndex.day", "Save figure", "saveFigure"))
-             ))
+             output.figure("sapFlowIndex"),
+             actButton("save.sfIndex", "Save figure", "saveFigure"))
       )))
 }
 
