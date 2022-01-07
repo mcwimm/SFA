@@ -866,6 +866,10 @@ shinyServer(function(input, output, session) {
     
     #' UI-Table with daily tree water use
     output$twu.table <- DT::renderDataTable({ 
-      treeWaterUse()
+      if (sapWoodDepth() == 0){
+        data.frame('.' = "Wood properties are missing (see 'Project settings')")
+      } else {
+        treeWaterUse()
+      }
     }, options = list(scrollX = TRUE, dom = 't'))
 })

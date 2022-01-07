@@ -188,7 +188,8 @@ sfRateOutput <- function(){
                width = 8, offset = 4,
                box(title = "Tree water use",
                    p("Daily tree water use (in liter per day) estimated as the area under
-                     the curve (AUC) of the figure above."),
+                     the curve (AUC) of the figure above.
+                     Note: Incomplete data sets (e.g. half a day) might lead to an over- or underestimation."),
                    collapsible = T,
                    width = NULL,
                    status = "info",
