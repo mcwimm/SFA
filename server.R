@@ -312,30 +312,40 @@ shinyServer(function(input, output, session) {
       filterPlot()
     })
     
-    #' Reactive variable holding the plot showing temperature
-    #' differences
-    deltaTfacetWrap <- reactive({
-        plot.deltaTfacetWrap(data = deltaTempLong(), 
-                             ui.input = input)
+
+    ##### Custom View ####
+    
+    #' Assign empty reactive value holding ui inputs for
+    #' customized figure
+    values <- reactiveValues(plotSettings = NULL)
+    
+    #' Eventlistener assigning ui inputs to customize figure
+    #' to reactive value
+    observeEvent(input$renderPlot, {
+      values$plotSettings <- get.customizedPlotSettings(ui.input = input)
     })
     
-    #' UI plot of temperature differences
-    #' (Data > View > Figures)
-    output$deltaTfacetWrap <- renderPlot({
-      deltaTfacetWrap()
+    #' Reactive variable holding ui inputs to customize figure
+    plotSettings <- reactive({
+      return(values$plotSettings)
     })
     
     #' Reactive variable holding the plot showing customized
     #' temperature visualizations
-    deltaTSingle <- reactive({
-        plot.singleTemperature(data = deltaTempLong(),
-                               ui.input = input)
+    custumPlot <- reactive({
+      req(input$renderPlot)
+      plot.singleTemperature(data = deltaTempLong(),
+                             ui.input.processed = plotSettings())
     })
-    
-    #' UI of customized plot
-    #' (Data > View > Figures)
-    output$deltaTSingle <- renderPlot({
-      deltaTSingle()
+
+    #' #' UI of customized plot
+    #' #' (Data > View > Figure)
+    output$custumPlot <- renderPlot({
+      if (input$renderPlot == 0){
+        plot.emptyMessage("Customize your figure (settings).")
+      } else {
+        custumPlot()
+      }
     })
     
     
@@ -352,19 +362,9 @@ shinyServer(function(input, output, session) {
         
     })
     
-    #' Eventlistener to save plot with temperature differences
-    #' (Data > View > Figures)
-    observeEvent(input$save.deltaTfacetWrap, {
-        name = paste(projectPath(),
-                     "/graphics/",
-                     "deltaT_", input$rawPlot.facet, sep = "")
-        obj = deltaTfacetWrap()
-        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
-    })
-    
     #' Eventlistener to save plot with customized temperatures
-    #' (Data > View > Figures)
-    observeEvent(input$save.deltaTSingle, {
+    #' (Data > View > Figure)
+    observeEvent(input$save.custumPlot, {
         v = paste(input$rawPlot.xcol, 
                   input$rawPlot.ycol, 
                   input$rawPlot.col,  
@@ -373,8 +373,8 @@ shinyServer(function(input, output, session) {
         
         name = paste(projectPath(),
                      "/graphics/",
-                     "tempDiff_", v, sep = "")
-        obj = deltaTSingle()
+                     "customized_", v, sep = "")
+        obj = custumPlot()
         save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
     })
 

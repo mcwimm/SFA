@@ -230,46 +230,47 @@ dataViewOutput = function(){
           checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
           conditionalPanel(
              condition = "input.rawPlot_facetWrap == true",
-             
-             selectInput("rawPlot.facet", "Facet",
-                         choices = c("position" = "position",
-                                     #"day time" = "dTime",
-                                     "doy" = "doy"))
+             fluidRow(
+                column(6, selectInput("rawPlot.facet", "Facet",
+                                      choices = c("position" = "position",
+                                                  "doy" = "doy"))),
+                column(6, numericInput("rawPlot.columns", "No. columns",
+                                       value = 3))
+             )
           ),
           
-          tags$hr(),
-          p(strong("Optional settings only available for figure 'Customized'")),
+          # tags$hr(),
+          # p(strong("Optional settings only available for figure 'Customized'")),
           
-          
-          selectInput("rawPlot.xcol", "X-axis",
-                      choices = c("dTsym.dTas" = "dTsym.dTas",
-                                  "dTas" = "dTas",
-                                  "dTsa" = "dTsa",
-                                  "dTSym" = "dTSym")),
-          selectInput("rawPlot.ycol", "Y-axis",
-                      choices = c("dTas" = "dTas",
-                                  "dTsa" = "dTsa",
-                                  "dTSym" = "dTSym",
-                                  "dTsym.dTas" = "dTsym.dTas")),
-          selectInput("rawPlot.col", "Color",
-                      choices = c("day time" = "dTime",
-                                  "doy" = "doy",
-                                  "position" = "position")),
-          selectInput("rawPlot.shape", "Shape",
-                      choices = c("position" = "position",
-                                  "doy" = "doy"))
+          fluidRow(
+             column(6, selectInput("rawPlot.xcol", "X-axis",
+                                  choices = c("dTsym.dTas" = "dTsym.dTas",
+                                              "dTas" = "dTas",
+                                              "dTsa" = "dTsa",
+                                              "dTSym" = "dTSym"))),
+             column(6, selectInput("rawPlot.ycol", "Y-axis",
+                                  choices = c("dTas" = "dTas",
+                                              "dTsa" = "dTsa",
+                                              "dTSym" = "dTSym",
+                                              "dTsym.dTas" = "dTsym.dTas")))
+          ),
+          fluidRow(
+             column(6, selectInput("rawPlot.col", "Color",
+                                   choices = c("day time" = "dTime",
+                                               "doy" = "doy",
+                                               "position" = "position"))),
+             column(6, selectInput("rawPlot.shape", "Shape",
+                                   choices = c("position" = "position",
+                                               "doy" = "doy")))
+          ),
+          actButton("renderPlot", "Render figure", "update")
+      
       ),
-      box(title = "Figures",
+      box(title = "Figure",
           collapsible = T, width = 8,
           status = "info",
-          tabsetPanel(
-             tabPanel("Temperature difference", br(),
-                      output.figure("deltaTfacetWrap"),
-                      actButton("save.deltaTfacetWrap", "Save figure", "saveFigure")),
-             tabPanel("Customized", br(),
-                      output.figure("deltaTSingle"),
-                      actButton("save.deltaTSingle", "Save figure", "saveFigure"))
-          ))
+          output.figure("custumPlot"),
+          actButton("save.custumPlot", "Save figure", "saveFigure"))
    ))   
 }
 

@@ -172,54 +172,34 @@ plot.histogram <- function(data, ui.input){
 
 ######## TEMPERATURES ########
 
-
-
-plot.deltaTfacetWrap <- function(data, ui.input){
-   xRange = ui.input$rawPlot.x
-   yRange = ui.input$rawPlot.y
-   scales = ui.input$rawPlot_scales
-   facetWrap = ui.input$rawPlot_facetWrap
-   facet = ui.input$rawPlot.facet
-
-   p = data %>% 
-      gather(., key, value, "dTas", "dTsa", "dTSym") %>% 
-      ggplot(.) +
-      geom_line(mapping=aes(x = dTsym.dTas, y = value, 
-                            col = factor(key), 
-                            group = factor(key))) +
-      scale_color_manual(values = fillcolors(3)) +
-      labs(x = labels["dTsym.dTas"][[1]], 
-           y = labels["dT"][[1]],
-           col = labels["T"][[1]])
-
-   
-   if (facetWrap){
-      facet = get.labelledFacets(data, facet.col)
-      p = p +
-         facet_wrap(~ (facet), scales = scales)
-   }
-   
-   if (scales == "fixed"){
-      p = p +
-         xlim(xRange[1], xRange[2]) +
-         ylim(yRange[1], yRange[2]) 
-         
-   }
-   return(p)
+get.customizedPlotSettings = function(ui.input){
+   return(list(
+      x.col = ui.input$rawPlot.xcol,
+      y.col = ui.input$rawPlot.ycol,
+      col.col = ui.input$rawPlot.col,
+      shape.col = ui.input$rawPlot.shape,
+      facetWrap = ui.input$rawPlot_facetWrap,
+      xRange = ui.input$rawPlot.x,
+      yRange = ui.input$rawPlot.y,
+      scales = ui.input$rawPlot_scales,
+      facet = ui.input$rawPlot.facet,
+      no.cols = ui.input$rawPlot.columns
+   ))
 }
 
-plot.singleTemperature <- function(data, ui.input){
+plot.singleTemperature <- function(data, ui.input.processed){
    
-   x.col = ui.input$rawPlot.xcol
-   y.col = ui.input$rawPlot.ycol
-   col.col = ui.input$rawPlot.col
-   shape.col = ui.input$rawPlot.shape
-   facetWrap = ui.input$rawPlot_facetWrap
-   xRange = ui.input$rawPlot.x
-   yRange = ui.input$rawPlot.y
-   scales = ui.input$rawPlot_scales
-   facet = ui.input$rawPlot.facet
-
+   x.col = ui.input.processed$x.col
+   y.col = ui.input.processed$y.col
+   col.col = ui.input.processed$col.col
+   shape.col = ui.input.processed$shape.col
+   facetWrap = ui.input.processed$facetWrap
+   xRange = ui.input.processed$xRange
+   yRange = ui.input.processed$yRange
+   scales = ui.input.processed$scales
+   facet = ui.input.processed$facet
+   no.cols = ui.input.processed$no.cols
+   
    x = data[, x.col]
    y = data[, y.col]
    col = data[, col.col]
@@ -245,9 +225,10 @@ plot.singleTemperature <- function(data, ui.input){
    }
    
    if (facetWrap){
-      facet = get.labelledFacets(data, facet.col)
+      facet = get.labelledFacets(data, facet) #facet.col
       p = p +
-         facet_wrap(~ (facet), scales = scales)
+         facet_wrap(~ (facet), scales = scales,
+                    ncol = no.cols)
    }
    
    if (length(unique(shape)) > 6){
