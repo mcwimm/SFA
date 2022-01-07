@@ -311,12 +311,13 @@ plot.kEst1 <- function(data.complete, data.adj, ui.input){
       geom_point(ad, 
                  mapping = aes(x = dTsym.dTas, y = value, group = temp), 
                  col = "black", shape = 4) +
-      stat_smooth(ad, method = "lm", 
+      stat_smooth(ad, method = "lm", formula = 'y ~ x',
                   mapping=aes(x = dTsym.dTas, y = value, group = temp),
                   col = "red") +
       stat_regline_equation(ad,
                             mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                        label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                                        label =  paste(..eq.label.., ..adj.rr.label.., 
+                                                       sep = "~~~~")),
                             label.y.npc = c("top", "bottom")) + #"center", 
       scale_color_manual(values=fillcolors(3)) +
       xlim(xmin, max(d$dTsym.dTas)) +
@@ -364,7 +365,6 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    newAdj = data.adj %>% 
       mutate("K+dTsa" = (dTsa + k))%>% 
       gather(., temp, value, dTSym, `K+dTsa`) #dTsa, dTas, 
-   
 
    p = ggplot() +
       geom_point(d, 
@@ -397,7 +397,9 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    
    if (fixedScales){
       p = p +
-         xlim(xRange[1], xRange[2])
+         xlim(xRange[1], xRange[2]) +
+         geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$value),
+                        label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
    }
    if (fullrange){
       p = p +
@@ -435,7 +437,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       geom_point(newAdj, 
                  mapping=aes(x = x.value, y = dTas), 
                  shape = 4) +
-      stat_smooth(newAdj, method = "lm",
+      stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
                   mapping=aes(x = x.value, y = dTas,
                               col = x.temp, group = x.temp),
                   col = "red", size = 0.5,
@@ -447,7 +449,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       geom_point(newAdj, 
                  mapping=aes(x = x.value, y = dTsa), 
                  shape = 4) +
-      stat_smooth(newAdj, method = "lm",
+      stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
                   mapping=aes(x = x.value, y = dTsa,
                               col = x.temp, group = x.temp),
                   col = "red", size = 0.5,
@@ -472,7 +474,9 @@ plot.kEst3 <- function(data.complete, data.adj, k,
    
    if (fixedScales){
       p = p +
-         xlim(xRange[1], xRange[2])
+         xlim(xRange[1], xRange[2]) +
+         geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$dTas),
+                        label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
    }
 
    return(p)
