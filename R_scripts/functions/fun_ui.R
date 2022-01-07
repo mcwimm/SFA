@@ -86,12 +86,7 @@ menuOutput = function(){
                menuSubItem("Description", tabName = "sf_des"), 
                menuSubItem("Sap Flow Index", tabName = "sf_ind"),
                menuSubItem("Sap Flow Density", tabName = "sf_dens"),
-               menuSubItem("Sap Flow", tabName = "sf_flow")),
-      menuItem("Diagnostics", tabName = "diagnostics", icon = icon("th"),
-               menuSubItem("VPD", tabName = "vpd"))
-      # br(), tags$hr(), br(),
-      # downloadButton("DownloadProject", "Download project",
-      #                style=buttonStyles())
+               menuSubItem("Sap Flow", tabName = "sf_flow"))
       ))
 }
 
