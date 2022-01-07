@@ -43,8 +43,12 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "dTime" = "Time (h)",
                "position" = "Sensor position",
                "SFI" = "Sap Flow Index (\u00B0 C)",
-               "SFS" = expression(paste("Sap Flow per Section (g \u22C5 ", cm^-1, "\u22C5", h^-1, ")")),
-               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5", cm^-2, "\u22C5", h^-1, ")")))
+               "SF" = expression(paste("Sap Flow rate (kg \u22C5 ",
+                                       h^-1, ")")),
+               "SFS" = expression(paste("Sap Flow per Section (g \u22C5 ",
+                                        cm^-1, "\u22C5", h^-1, ")")),
+               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5",
+                                          cm^-2, "\u22C5", h^-1, ")")))
 
 
 ######### labels working for PDF but not in shiny
@@ -582,7 +586,7 @@ plot.sapFLowRate = function(data, ui.input){
    p = data %>% 
       ggplot(.) +
       labs(x = "",
-           y = "Sap flow rate (kg/h)",
+           y = labels["SF"][[1]],
            color = "Scaling method")
    if (ui.input$treeScaleSimple1){
       p = p +
