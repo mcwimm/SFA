@@ -282,7 +282,9 @@ plot.nighttime <- function(data.complete){
       # ylim(0, max(data.complete$dTsym.dTas)) +
       geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
       geom_line() +
-      labs(x = "Time (h)", y = labels["dTsym.dTas"][[1]]) 
+      labs(x = "Time (h)", 
+           y = labels["dTsym.dTas"][[1]],
+           col = "DOY") 
       )
 }
 
