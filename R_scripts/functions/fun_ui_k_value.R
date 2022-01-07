@@ -121,7 +121,7 @@ kValueOutput <- function(){
                 tabPanel("Control-diagram 2", br(),
                          output.figure("kvaluePlot3")),
                 tabPanel("Diurnal flow", br(),
-                         output.figure("kNightTimePlot"))
+                         output.figure("kDiurnalPlot"))
              ),
              
              actButton("save.kPlots", "Save figures", "saveFigure")

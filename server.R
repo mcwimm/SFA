@@ -577,14 +577,14 @@ shinyServer(function(input, output, session) {
     
     #### Graphics ####
     
-    #' Reactive variable holding the nighttime plot
-    kNightTime <- reactive({
+    #' Reactive variable holding the diurnal flow plot
+    kplotDiurnalFlow <- reactive({
       plot.nighttime(data.complete = deltaTempLong.depth())
     })
     
-    #' UI output of nighttime plot
-    #' (K-value > Estimation > Control plots > Night time)
-    output$kNightTimePlot <- renderPlot({ kNightTime() })
+    #' UI output of diurnal flow plot
+    #' (K-value > Estimation > Control plots > Diurnal flow)
+    output$kDiurnalPlot <- renderPlot({ kplotDiurnalFlow() })
     
     #' Reactive variable holding the k-diagram
     kplot1 <- reactive({
