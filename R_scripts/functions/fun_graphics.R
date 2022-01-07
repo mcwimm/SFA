@@ -179,8 +179,6 @@ get.customizedPlotSettings = function(ui.input){
       col.col = ui.input$rawPlot.col,
       shape.col = ui.input$rawPlot.shape,
       facetWrap = ui.input$rawPlot_facetWrap,
-      xRange = ui.input$rawPlot.x,
-      yRange = ui.input$rawPlot.y,
       scales = ui.input$rawPlot_scales,
       facet = ui.input$rawPlot.facet,
       no.cols = ui.input$rawPlot.columns
@@ -194,8 +192,6 @@ plot.singleTemperature <- function(data, ui.input.processed){
    col.col = ui.input.processed$col.col
    shape.col = ui.input.processed$shape.col
    facetWrap = ui.input.processed$facetWrap
-   xRange = ui.input.processed$xRange
-   yRange = ui.input.processed$yRange
    scales = ui.input.processed$scales
    facet = ui.input.processed$facet
    no.cols = ui.input.processed$no.cols
@@ -235,14 +231,6 @@ plot.singleTemperature <- function(data, ui.input.processed){
       p = p +
          scale_shape_manual(values = c(1:length(unique(shape))))
    }
-   
-   if (scales == "fixed"){
-      p = p +
-         xlim(xRange[1], xRange[2]) +
-         ylim(yRange[1], yRange[2]) 
-      
-   }
-   
    return(p)
 }
 

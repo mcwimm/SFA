@@ -209,27 +209,17 @@ dataViewOutput = function(){
           collapsible = T, width = 4,
           status = "warning",
           
-          radioButtons("rawPlot_scales","Scales", 
-                       choiceNames =  list(
-                          HTML("<span title='choose free'>free</span>"),
-                          HTML("<span title='choose fixed'>fixed</span>")
-                       ),
-                       choiceValues = list("free", "fixed"),
-                       inline=T),
-          conditionalPanel(
-             condition = "input.rawPlot_scales == 'fixed'",
-             
-             sliderInput("rawPlot.x", "x-axis range",
-                         min = -10, max = 10, step = 0.25,
-                         value = c(-0.5, 1.5)),
-             sliderInput("rawPlot.y", "y-axis range",
-                         min = -10, max = 10, step = 0.25,
-                         value = c(-2, 2))
-          ),
-          
           checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
+
           conditionalPanel(
              condition = "input.rawPlot_facetWrap == true",
+             radioButtons("rawPlot_scales","Scales", 
+                          choiceNames =  list(
+                             HTML("<span title='choose free'>free</span>"),
+                             HTML("<span title='choose fixed'>fixed</span>")
+                          ),
+                          choiceValues = list("free", "fixed"),
+                          inline=T),
              fluidRow(
                 column(6, selectInput("rawPlot.facet", "Facet",
                                       choices = c("position" = "position",
@@ -239,9 +229,8 @@ dataViewOutput = function(){
              )
           ),
           
-          # tags$hr(),
-          # p(strong("Optional settings only available for figure 'Customized'")),
-          
+          tags$hr(),
+
           fluidRow(
              column(6, selectInput("rawPlot.xcol", "X-axis",
                                   choices = c("dTsym.dTas" = "dTsym.dTas",
