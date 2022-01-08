@@ -293,8 +293,14 @@ shinyServer(function(input, output, session) {
     #' UI Test output of remaining data points after filtering
     #' (Data > Filter > Subset data)    
     output$dataPoints <- renderText({
-      n_diff = nrow(deltaTempLongNoFilter()) - nrow(deltaTempLong())
-      paste(n_diff, " data points removed.")
+      filtered_data = deltaTempLong()
+      n_diff = nrow(deltaTempLongNoFilter()) - nrow(filtered_data)
+      if (any(is.na(filtered_data))){
+        paste("Data set contains NA values. <br/><br/>", 
+                    n_diff, " data points removed.")
+      } else {
+        paste(n_diff, " data points removed.")
+      }
     })
     
     #### Graphics ####
