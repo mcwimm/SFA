@@ -436,9 +436,9 @@ shinyServer(function(input, output, session) {
           condition = "input.k1Plot_scales == 'TRUE'",
           fluidRow(
             column(6, numericInput("k1Plot.x.min", "Min. x-value", 
-                                   round(min(data$dTsym.dTas), 2))),
+                                   round(min(data$dTsym.dTas, na.rm = T), 2))),
             column(6, numericInput("k1Plot.x.max", "Max. x-value", 
-                                   round(max(data$dTsym.dTas), 2))))
+                                   round(max(data$dTsym.dTas, na.rm = T), 2))))
         ))
     })
     

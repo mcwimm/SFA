@@ -216,12 +216,14 @@ get_min_at_min <- function(vec1, vec2) {
    return(vec2[order(vec1, vec2)[1]])
 }
 
+# get_mean_at_min <- function()
+
 get.zeroflowKvalues <- function(data){
    
    return(data %>% 
              group_by(position) %>% 
              mutate(abs = abs((dTsym.dTas))) %>% 
-             distinct("min abs(dTsym.dTas)" = min(abs),
+             distinct("distance y-axis" = min(abs, na.rm = T),
                        "k" = get_min_at_min(abs, dTas)) 
    )
 }

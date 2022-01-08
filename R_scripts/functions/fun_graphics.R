@@ -271,8 +271,8 @@ plot.kEst1 <- function(data.complete, data.adj, ui.input){
    ad = data.adj %>% 
       gather(., temp, value, dTsa, dTas)
    
-   if (min(data.complete$dTsym.dTas < 0)){
-      xmin = min(data.complete$dTsym.dTas < 0)
+   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
+      xmin = min(data.complete$dTsym.dTas, na.rm = T)
    } else {
       xmin = -0.1
    }
@@ -323,8 +323,8 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    force = ui.input$k1Plot.forceOrigin
    
    
-   if (min(data.complete$dTsym.dTas < 0)){
-      xmin = min(data.complete$dTsym.dTas < 0)
+   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
+      xmin = min(data.complete$dTsym.dTas, na.rm = T)
    } else {
       xmin = -0.1
    }
@@ -397,8 +397,8 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
    
-   if (min(data.complete$dTsym.dTas < 0)){
-      xmin = min(data.complete$dTsym.dTas < 0)
+   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
+      xmin = min(data.complete$dTsym.dTas, na.rm = T)
    } else {
       xmin = -0.1
    }

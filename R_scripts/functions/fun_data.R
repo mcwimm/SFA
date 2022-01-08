@@ -365,7 +365,7 @@ update.depths = function(ui.input, positions, sensor_distance, swd){
 remove.outlier <- function(data, data.vector){
    d = data[, data.vector]
    Q <- quantile(d, probs=c(.25, .75), na.rm = T)
-   iqr <- IQR(d)
+   iqr <- IQR(d, na.rm = T)
    up <-  Q[2] + 1.5 * iqr # Upper Range  
    low <- Q[1] - 1.5 * iqr # Lower Range
 
