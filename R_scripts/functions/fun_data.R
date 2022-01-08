@@ -480,7 +480,7 @@ update.filter.ui = function(ui.output, ui.input){
          h4(strong("Sensor positions")),
          fluidRow(# sensor positions
             column(12, textInput("sensorFilter", "",
-                                 placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3"))
+                                 placeholder = "comma delimited: 1, 2, 3"))
          ),
          
          

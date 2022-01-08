@@ -96,7 +96,7 @@ settingsOutput = function(){
                                    choices = names(themes)),
                        uiOutput('theme_output'),
                        textInput("fillColors", "Fill colors for discrete data*",
-                                 placeholder = 'Hex color codes as vector (comma delimited): #CD5C5C, #FFBF00, #6495ED'),
+                                 placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
                        p("*Number of colors required = max(number of sensors, doy)")
           )))
       )
