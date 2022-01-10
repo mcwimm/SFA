@@ -1,7 +1,7 @@
 **Time filters**
 
-- Select the range of dates and times included.  
-- To select night times, start must be > end, e.g. 22 - 6, otherwise start is < end, e.g. 10 - 20.
+- Select the range of dates and times included
+- To select night times, start is > end, e.g. 22 - 6, otherwise start is < end, e.g. 10 - 20
 
 
 **Temperature ranges**
