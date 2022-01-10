@@ -478,17 +478,16 @@ update.filter.ui = function(ui.output, ui.input){
             column(4, numericInput("dTsym.dTasMax", "Max", value = Inf)),
          ),
          
+         # General filters
+         checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
+         checkboxInput("removeNA", "Remove NA-rows", F),
+         
          # Sensor filters
          h4(strong("Sensor positions")),
          fluidRow(# sensor positions
             column(12, textInput("sensorFilter", "",
                                  placeholder = "comma delimited: 1, 2, 3"))
          ),
-         
-         # General filters
-         checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
-         
-         checkboxInput("removeNA", "Remove NA-rows", F),
          
          # Buttons
          fluidRow(
