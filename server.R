@@ -58,6 +58,21 @@ shinyServer(function(input, output, session) {
       return(col[1:N])
     }
     
+    #' Reactive variable holding colors to be used in 
+    #' all plots with gradient color scale
+    #' Can be defined in UI
+    gradientcolors_react = reactive({
+      return(get.gradientcolors(ui.input = input))
+    })
+    
+    #' Global function (accessible from other scripts) 
+    #' that returns 2 colors
+    gradientcolors <<- function(){
+      col = gradientcolors_react()
+      return(col)
+    }
+    
+    
 
     #### UI output ####
     

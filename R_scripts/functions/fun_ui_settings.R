@@ -97,7 +97,10 @@ settingsOutput = function(){
                        uiOutput('theme_output'),
                        textInput("fillColors", "Fill colors for discrete data*",
                                  placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
-                       p("*Number of colors required = max(number of sensors, doy)")
+                       textInput("gradientColors", "Colors for gradient color scale**",
+                                 placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00'),
+                       p("**Two colors representing low and high values."),
+                       
           )))
       )
    )

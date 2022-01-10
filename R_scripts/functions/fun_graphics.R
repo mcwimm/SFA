@@ -1,9 +1,3 @@
-gradientcolors <- function(){
-   col = c("#d8b365", "#5ab4ac")
-   return(col)
-}
-
-
 get.labelledFacets = function(data, facet.col){
    facet = as.integer(data[, facet.col]) 
    facet.factor <- c(unique(facet))
@@ -30,6 +24,27 @@ get.fillcolors = function(ui.input){
    }
    return(col)
 }
+
+get.gradientcolors = function(ui.input){
+   # If no colors are defined use default set
+   if (ui.input$gradientColors == ""){
+      print("Gradient color scheme: default")
+      col = c("#d8b365", "#5ab4ac")
+      
+   } else {
+      print("Gradient color scheme: customized")
+      cols = ui.input$gradientColors
+      cols_split = strsplit(cols, ",")[[1]]
+      col = c()
+      for (i in 1:length(cols_split)){
+         # remove white spaces
+         c = gsub(" ", "", cols_split[i], fixed = TRUE)
+         col = append(col, c)
+      }
+   }
+   return(col)
+}
+
 
 ######### labels working in shiny ggplot
 # mit den Labels funktioniert die Anzeige, aber nicht das speichern an svg und beim pdf fehlen delta fehlt
@@ -215,7 +230,10 @@ plot.singleTemperature <- function(data, ui.input.processed){
    if (col.col == "dTime"){
       p = p +
          geom_point(aes(col = col)) +
-         scale_color_gradient(low = gradientcolors()[1], high = gradientcolors()[2])
+         scale_color_gradient2(low = gradientcolors()[2], 
+                               high = gradientcolors()[2], 
+                               mid = gradientcolors()[1],
+                               midpoint = 12)
       
       
    } else {
