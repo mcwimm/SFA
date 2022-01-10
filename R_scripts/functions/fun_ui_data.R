@@ -3,37 +3,38 @@
 ############
 
 ### Upload ###
-
 dataUplOutput = function(){
-   return(list(
+   return(
       fluidRow(
-         box(title = "Description",
-             collapsible = T,
-             status = "info",
-             includeMarkdown("./man/des_data.md")),
-         box(title = "Upload file",
-             collapsible = T,
-             status = "warning",
-             box.dat_upl.upload())),
-      fluidRow(box(title = "Preview data",
-                   collapsible = T,
-                   status = "info",
-                   
-                   tabsetPanel(
-                      tabPanel("wide", br(),
-                               output.table("raw.wide")),
-                      tabPanel("long", br(),
-                               actButton("save_dat_upl", "Save csv", "saveCsv"),
-                               br(),
-                               output.table("raw.long")))),
-               box(title = "Sensor settings (optional)",
-                   collapsible = T,
-                   status = "warning",
-                   box.dat_upl.depths()
-               )
-      )
-      
-   ))
+         column(6,
+                box(title = "Description",
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    includeMarkdown("./man/des_data.md")),
+                box(title = "Preview data",
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    
+                    tabsetPanel(
+                       tabPanel("wide", br(),
+                                output.table("raw.wide")),
+                       tabPanel("long", br(),
+                                actButton("save_dat_upl", "Save csv", "saveCsv"),
+                                br(),
+                                output.table("raw.long"))))),
+         column(6,
+                box(title = "Upload file",
+                    collapsible = T, width = "100%",
+                    status = "warning",
+                    box.dat_upl.upload()
+                    ),
+                box(title = "Sensor settings (optional)",
+                    collapsible = T, width = "100%",
+                    status = "warning",
+                    box.dat_upl.depths()
+                    )
+                )
+      ))
 }
 
 box.dat_upl.upload = function(){
