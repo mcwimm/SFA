@@ -70,7 +70,7 @@ kValueOutput <- function(){
                 tabPanel("Regression",
                          output.table("kRegression"),
                          actButton("setKfromRegression", "Use k-values", "setValue")),
-                tabPanel("No flow",
+                tabPanel("No-flow",
                          output.table("kZeroFlow"),
                          actButton("setKfromZeroFlow", "Use k-values", "setValue")),
                 tabPanel("Read csv", br(),
