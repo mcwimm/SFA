@@ -71,7 +71,7 @@ shinyServer(function(input, output, session) {
     #' Show project path in Project Settings > Project
     #' if a project folder is selected
     output$prjDir <- renderPrint({
-        print(projectPath())
+        projectPath()
     })
     
     
@@ -103,7 +103,7 @@ shinyServer(function(input, output, session) {
                            type = "message")
       }
       output$prjName <- renderPrint({
-          print(projectName())
+          projectName()
       })
     })
     
