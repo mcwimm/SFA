@@ -553,6 +553,9 @@ save.csv = function(name, csvObject, fileAppendix = ""){
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
       name = paste(name, "_", fileAppendix, ".csv", sep = "")
+   } else {
+      name = paste(name, ".csv", sep = "")
+      
    }
 
    res = try(write.csv(csvObject, 
