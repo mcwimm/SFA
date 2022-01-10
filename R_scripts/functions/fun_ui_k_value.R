@@ -47,7 +47,7 @@ kValueOutput <- function(){
                 numericInput("kManual", "Enter k manually", value = 1.11)
              ),
              
-             checkboxInput("dTimeFilter", "Custom no-flow time", F),
+             checkboxInput("dTimeFilter", "Custom no-flow time (regression)", F),
              conditionalPanel(
                 condition = "input.dTimeFilter == true",
                 fluidRow(

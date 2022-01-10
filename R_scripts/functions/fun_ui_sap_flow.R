@@ -164,8 +164,8 @@ sfRateOutput <- function(){
                        status = "warning",
                        
                        p(strong("<Note>"), "The estimation of sap flow is based
-                                        on sensor positions (see 'Data | Upload') and wood
-                                        properties (see 'Project settings')."),
+                                        wood properties (see 'Project settings') and 
+                         the correct assignment of sensor positions (see 'Data | Upload')."),
                        
                        checkboxInput("treeScaleSimple1", 
                                      "Method 1: sum(SFD * Aring)", T),
