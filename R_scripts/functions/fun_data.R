@@ -383,16 +383,20 @@ get.filteredData <- function(data, ui.input){
    minDoy = as.numeric(strftime(ui.input$daterange[1], format = "%j"))
    maxDoy = as.numeric(strftime(ui.input$daterange[2], format = "%j"))
    
-   start = ui.input$timerangeStart
-   end = ui.input$timerangeEnd
-   
    data = data %>%
       filter(doy >= minDoy) %>%
       filter(doy <= maxDoy)
    
-   data = data %>%
-      filter(dTime >= start) %>% 
-      filter(dTime <= end)
+   start = ui.input$timerangeStart
+   end = ui.input$timerangeEnd
+   
+   if (start < end){
+      data = data %>% 
+         filter(dTime >= start & dTime <= end) 
+   } else {
+      data = data %>% 
+         filter(dTime >= start | dTime <= end) 
+   }
    
    # remove outlier
    if (ui.input$removeOutlier){
