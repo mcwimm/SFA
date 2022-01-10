@@ -135,33 +135,28 @@ box.dat_upl.depths = function(){
 ### Filter ###
 
 dataFilterOutput = function(){
-   return(list(
+   return(
       fluidRow(
-         box(title = "Subset data",
-             collapsible = T, width = 4,
-             status = "warning",
-             actButton("LoadFilter", "Load filter options", "update"),
-             uiOutput("filterOptions")
-         ),
-         
-         box(title = "Figures",
-             collapsible = T, width = 8,
-             status = "info",
-             box.filter.figures(),
-             actButton("save_dat_filter", "Save csv", "saveCsv"),
-             actButton("save_dat_filter_fig", "Save figure", "saveFigure"),
-         ),
-         column(
-            width = 8, offset = 4,
-            box(title = "Info",
-                collapsible = T,
-                width = NULL,
-                status = "info",
-                includeMarkdown("./man/des_data_filter.md")
-            )
-         )
-      )
-   ))
+         column(4, box(title = "Filter options",
+                       collapsible = T,  width = "100%",
+                       status = "warning",
+                       actButton("LoadFilter", "Load filter options", "update"),
+                       uiOutput("filterOptions")
+         )),
+         column(8,
+                box(title = "Figures",
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    box.filter.figures(),
+                    actButton("save_dat_filter", "Save csv", "saveCsv"),
+                    actButton("save_dat_filter_fig", "Save figure", "saveFigure")),
+                box(title = "Info",
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    includeMarkdown("./man/des_data_filter.md"))
+                
+      ))
+   )
 }
 
 box.filter.figures = function(){

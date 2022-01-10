@@ -454,8 +454,6 @@ update.filter.ui = function(ui.output, ui.input){
             column(5, numericInput("timerangeEnd", "End", value = 24)),
          ),
          
-         br(), 
-         
          # Temperature ranges
          h4(strong("Temperature ranges")),
          fluidRow(# dTSym
@@ -482,9 +480,6 @@ update.filter.ui = function(ui.output, ui.input){
             column(12, textInput("sensorFilter", "",
                                  placeholder = "comma delimited: 1, 2, 3"))
          ),
-         
-         
-         br(), 
          
          # General filters
          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
