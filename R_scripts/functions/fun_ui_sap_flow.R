@@ -189,20 +189,16 @@ sfRateOutput <- function(){
                                    actButton("save.SapFlowPlot",
                                              "Save figures", "saveFigure")))
                        
-                   )),
-            column(
-               width = 8, offset = 4,
-               box(title = "Tree water use",
-                   p("Daily tree water use (in liter per day) estimated as the area under
+                   ),
+                   box(title = "Tree water use",
+                       p("Daily tree water use (in liter per day) estimated as the area under
                      the curve (AUC) of the figure above, separated by flow direction (i.e. positive flow rates = transpiration, negative flow rates = reverse flow)."),
-                   p("Note: Incomplete data sets (e.g. half a day) might lead to an over- or underestimation."),
-                   collapsible = T,
-                   width = NULL,
-                   status = "info",
-                   output.table("twu.table"),
-                   actButton("save.TreeWaterUseCsv", "Save csv", "saveCsv")
-               ))
-         )
-      )
-   )
+                       p("Note: Incomplete data sets (e.g. half a day) might lead to an over- or underestimation."),
+                       collapsible = T,
+                       width = NULL,
+                       status = "info",
+                       output.table("twu.table"),
+                       actButton("save.TreeWaterUseCsv", "Save csv", "saveCsv")
+                   ))
+         )))
 }
