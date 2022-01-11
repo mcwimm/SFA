@@ -160,14 +160,15 @@ get.treeWaterUseByMethod = function(data, input){
              Balance = ifelse(SFrate >= 0, "Positive", "Negative")) %>% 
       mutate(Balance = factor(Balance, levels = c("Positive", "Negative"))) %>% 
       filter(complete.cases(.)) %>% 
+      distinct(datetime, doy, dTime, Method, SFrate, Balance) %>% 
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
       distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
       rename('tree water use' = 'auc',
-             "Day of year" = "doy") %>% 
+             "Day of year" = "doy") %>%  
       spread(., Balance, 'tree water use') %>% 
-      mutate_at(c(3,4), round, 2)
-   
+      mutate_if(is.numeric, round, 2)
+
    return(data)
 }
 
