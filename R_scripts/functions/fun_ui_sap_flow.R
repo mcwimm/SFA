@@ -75,10 +75,10 @@ sfIndexOutput <- function(){
                 
                 radioButtons("sfIndexPlot_scales","Scales", 
                              choiceNames =  list(
-                                HTML("<span title='choose free'>free</span>"),
-                                HTML("<span title='choose fixed'>fixed</span>")
+                                HTML("<span title='choose fixed'>fixed</span>"),
+                                HTML("<span title='choose free'>free</span>")
                              ),
-                             choiceValues = list("free", "fixed"),
+                             choiceValues = list("fixed", "free"),
                              inline=T),
                 
                 fluidRow(
