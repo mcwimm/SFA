@@ -73,7 +73,8 @@ box.dat_upl.upload = function(){
       # Input: Select separator ----
       
       actButton("setData", "Use data", "create"),
-      p(em("<Note> If your data set contains non-numeric rows, e.g. logger warnings, they are converted to NA. Remove them in the 'Data > Filter' section."))
+      p(em("<Note> If your data set contains non-numeric rows, e.g. logger warnings,
+           they are converted to NA values. Remove them in the 'Data > Filter' section."))
    ))
 }
 
