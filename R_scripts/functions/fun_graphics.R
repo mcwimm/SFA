@@ -117,8 +117,7 @@ plot.histogram <- function(data, ui.input){
    binwidth = ui.input$filterPlot_binwidth
    type = ui.input$filterPlot_type
    facetGrid = ui.input$filterPlot_facetGrid
-   scales = ui.input$filterPlot_scales
-   
+
    x = data[, x.col]
 
    if (fill.col != "none"){
@@ -181,7 +180,7 @@ plot.histogram <- function(data, ui.input){
    
    if (facetGrid){
       p = p +
-         facet_grid(position ~ doy, labeller = label_both, scales = scales)
+         facet_grid(position ~ doy, labeller = label_both, scales = "free_x")
    }
    
 

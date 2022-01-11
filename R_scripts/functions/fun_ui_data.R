@@ -164,15 +164,8 @@ dataFilterOutput = function(){
 box.filter.figures = function(){
    return(list(
       fluidRow(
-         column(4, checkboxInput("filterPlot_facetGrid", "Facet wrap", F)),
-         column(4, 
-                conditionalPanel(condition = "input.filterPlot_facetGrid == true",
-                                 
-                                 radioButtons("filterPlot_scales", "Scales", 
-                                              inline = T,
-                                              choices = c("fixed" = "fixed", 
-                                                          "free" = "free")))
-         )
+         column(4, checkboxInput("filterPlot_facetGrid", 
+                                 "Facet grid (doy ~ position)", F))
       ),
       
       radioButtons("filterPlot_type", "Diagram type", inline = T,
