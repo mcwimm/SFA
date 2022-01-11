@@ -1,4 +1,4 @@
-# How to upload your data?
+## How to upload your data?
 
 1. Browse to your target directory.
 2. Select the type of input, i.e. the manufacturer.
@@ -7,11 +7,9 @@
 
 If nothing is selected, a default file is used. This file contains data of a....
 
-<br>
 
 ## Current input types
 
-- [x] **Raw**: original sensor output/ raw temperature measurments
-- [x] **Delta**: data sets with calculated temperature differences, e.g. Sap Flow Analyzer output
-
+- **Raw**: original sensor output/ raw temperature measurments
+- **Delta**: data sets with calculated temperature differences, e.g. Sap Flow Analyzer output
 
