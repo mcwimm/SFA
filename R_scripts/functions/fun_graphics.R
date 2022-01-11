@@ -489,6 +489,9 @@ plot.sapFlowIndex <- function(data, ui.input){
            col = labels["position"][[1]])
    
    if (facetWrap){
+      # Remove NA values in facet column if present
+      data = data[complete.cases(data[, facet.col]), ]
+
       facet = get.labelledFacets(data, facet.col)
       p = data %>% 
          ggplot(aes(x = dTime, y = dTSym))
