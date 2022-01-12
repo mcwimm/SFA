@@ -355,7 +355,7 @@ shinyServer(function(input, output, session) {
     #' temperature visualizations
     custumPlot <- reactive({
       req(input$renderPlot)
-      plot.singleTemperature(data = deltaTempLong(),
+      plot.customTemperature(data = deltaTempLong(),
                              ui.input.processed = plotSettings())
     })
 
