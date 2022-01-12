@@ -1,3 +1,8 @@
+#' Facet labels
+#' @description Helper function to get facets based on column name.
+#' @param data: data.frame, long-format
+#' @param facet.col: character, name of facet variable
+#' @return factor
 get.labelledFacets = function(data, facet.col){
    facet = as.integer(data[, facet.col]) 
    facet.factor <- c(unique(facet))
@@ -5,6 +10,10 @@ get.labelledFacets = function(data, facet.col){
    return(factor(facet, labels = labs))
 }
 
+#' Fill colors
+#' @description Helper function to get fill colors for discrete data. Colors are either default colors or manually obtained from UI.
+#' @param ui.input: UI-input
+#' @return vector
 get.fillcolors = function(ui.input){
    # If no colors are defined use default set
    if (ui.input$fillColors == ""){
@@ -25,6 +34,10 @@ get.fillcolors = function(ui.input){
    return(col)
 }
 
+#' Gradient colors
+#' @description Helper function to get gradient colors for continious data. Colors are either default colors or manually obtained from UI.
+#' @param ui.input: UI-input
+#' @return vector
 get.gradientcolors = function(ui.input){
    # If no colors are defined use default set
    if (ui.input$gradientColors == ""){
@@ -48,6 +61,9 @@ get.gradientcolors = function(ui.input){
 
 ######### labels working in shiny ggplot
 # mit den Labels funktioniert die Anzeige, aber nicht das speichern an svg und beim pdf fehlen delta fehlt
+
+#' Labels
+#' @description Helper variable to get uniform labels.
 labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "dTas" = "dTas",
                "dTsa" = "dTsa",
@@ -100,8 +116,11 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
 
 
 
-# Function to produce summary statistics (mean and +/- sd)
-# Source: http://www.sthda.com/english/wiki/ggplot2-violin-plot-quick-start-guide-r-software-and-data-visualization
+#' Statistic summary
+#' @description Helper function to produce summary statistics (mean and +/- sd) 
+#' Source: http://www.sthda.com/english/wiki/ggplot2-violin-plot-quick-start-guide-r-software-and-data-visualization
+#' @param x: vector
+#' @return vector
 data_summary <- function(x) {
    m <- mean(x)
    ymin <- m-sd(x)
@@ -111,6 +130,11 @@ data_summary <- function(x) {
 
 ######## FILTER ########
 
+#' Filter diagram
+#' @description Shows filtered data as histogram, boxplot, violin plot or frequency plot
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.histogram <- function(data, ui.input){
    x.col = ui.input$filterPlot_X
    fill.col = ui.input$filterPlot_col
@@ -133,9 +157,6 @@ plot.histogram <- function(data, ui.input){
          labs(fill = labels[fill.col][[1]],
               col = labels[fill.col][[1]])
    }
-   
-   
-
    
    if (type == "hist"){
       p = p +
@@ -190,6 +211,10 @@ plot.histogram <- function(data, ui.input){
 
 ######## TEMPERATURES ########
 
+#' Customized diagram settings
+#' @description Get UI-settings to render plot
+#' @param ui.input: UI-input
+#' @return list
 get.customizedPlotSettings = function(ui.input){
    return(list(
       x.col = ui.input$rawPlot.xcol,
@@ -203,8 +228,12 @@ get.customizedPlotSettings = function(ui.input){
    ))
 }
 
-plot.singleTemperature <- function(data, ui.input.processed){
-   
+#' Customized diagram
+#' @description Shows (filtered) data as customized plot
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return ggplot-object
+plot.customTemperature <- function(data, ui.input.processed){
    x.col = ui.input.processed$x.col
    y.col = ui.input.processed$y.col
    col.col = ui.input.processed$col.col
@@ -266,6 +295,10 @@ get.intersection <- function(data, y.col, x.col1, x.col2){
    return(c(x, y))
 }
 
+#' Diurnal dTsym.dTas diagram
+#' @description Shows diurnal pattern of dTsym.dTas to determine low-flow times
+#' @param data: data.frame, long-format
+#' @return ggplot-object
 plot.nighttime <- function(data.complete){
    return(ggplot(data.complete, aes(x = dTime, y = dTsym.dTas,
                              col = doy, group = doy)) +
@@ -278,6 +311,12 @@ plot.nighttime <- function(data.complete){
       )
 }
 
+#' K-diagram
+#' @description Shows temperature differences against dTsym.dTas to determine K
+#' @param data: data.frame, long-format, complete data per positions
+#' @param data.adj: data.frame, long-format, data per position selected for regression
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.kEst1 <- function(data.complete, data.adj, ui.input){
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
@@ -332,6 +371,12 @@ plot.kEst1 <- function(data.complete, data.adj, ui.input){
    return(p)
 }
 
+#' K-control diagram 1
+#' @param data: data.frame, long-format, complete data per positions
+#' @param data.adj: data.frame, long-format, data per position selected for regression
+#' @param ui.input: UI-input
+#' @param k: K
+#' @return ggplot-object
 plot.kEst2 <- function(data.complete, data.adj, k, 
                        ui.input){
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
@@ -401,6 +446,12 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    return(p)
 }
 
+#' K-control diagram 2
+#' @param data: data.frame, long-format, complete data per positions
+#' @param data.adj: data.frame, long-format, data per position selected for regression
+#' @param ui.input: UI-input
+#' @param k: K
+#' @return ggplot-object
 plot.kEst3 <- function(data.complete, data.adj, k,
                        ui.input){
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
@@ -474,6 +525,10 @@ plot.kEst3 <- function(data.complete, data.adj, k,
 
 ######## SAP FLOW INDEX ########
 
+#' Sap flow index diagram
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.sapFlowIndex <- function(data, ui.input){
    scales = ui.input$sfIndexPlot_scales
    facetWrap = ui.input$sfIndexPlot_wrap
@@ -520,6 +575,9 @@ plot.sapFlowIndex <- function(data, ui.input){
 
 ######## SAP FLOW DENSITY ########
 
+#' Empty diagram
+#' @param message: message to be shown
+#' @return ggplot-object
 plot.emptyMessage = function(message){
    return(p = ggplot() +
              annotate(geom = "text", x = 5, y = 5, 
@@ -528,6 +586,10 @@ plot.emptyMessage = function(message){
              theme_void())
 }
 
+#' Sap flow density diagram helper
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.sapFlowDensity.Helper = function(data, ui.input, boxplot = F){
    # check if sap flow density is Inf
    # helper variable; if 0 no sap flow density data is avail.
@@ -549,7 +611,11 @@ plot.sapFlowDensity.Helper = function(data, ui.input, boxplot = F){
    return(p)
 }
 
-
+#' Sap flow density diagram
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @param boxplot: boolean indicating whether or not to return a boxplot
+#' @return ggplot-object
 plot.sapFlowDensity <- function(data, ui.input, boxplot = F){
    scales = ui.input$sapFlowDensityPlot_scales
    facetWrap = ui.input$sapFlowDensityPlot_facetWrap
@@ -601,6 +667,10 @@ plot.sapFlowDensity <- function(data, ui.input, boxplot = F){
 
 ######## SAP FLOW RATE ########
 
+#' Upscaling method
+#' @description Determine which methods have been selected in UI
+#' @param ui.input: UI-input
+#' @return vector
 get.selectedMethods = function(ui.input){
    groups = c()
    if (ui.input$treeScaleSimple1){
@@ -617,6 +687,10 @@ get.selectedMethods = function(ui.input){
    return(groups)
 }
 
+#' Sap flow diagram
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.sapFLowRate = function(data, ui.input){
    N = 0
    p = data %>% 
@@ -652,6 +726,11 @@ plot.sapFLowRate = function(data, ui.input){
    return(p)
 }
 
+#' Water balance diagram
+#' @description Shows the area under the curve for measured sap flow density in kg, separated by direct and reverse flow.
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @return ggplot-object
 plot.sapFlowDay = function(data, ui.input){
    groups = get.selectedMethods(ui.input)
    
