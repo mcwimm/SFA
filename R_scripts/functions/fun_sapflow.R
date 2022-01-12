@@ -1,3 +1,7 @@
+#' Sapwood depth
+#' @description Estimates sapwood depth based on ui-inputs
+#' @param ui.input: UI-input
+#' @return numeric
 get.sapWoodDepth = function(ui.input){
    if (ui.input$sapWoodDepth == 0){
       if (ui.input$stemCircumference == 0){
@@ -27,6 +31,12 @@ add.k2data = function(data, values){
    return(data)
 }
 
+#' Sap flow density
+#' @param method: character
+#' @param data: data.frame, long-format
+#' @param sapWoodDepth: numeric
+#' @param ui.input: UI-input
+#' @return data.frame
 get.sapFlowDensity <- function(method = "HFD", data, 
                                sapWoodDepth, ui.input){
    Dst = ui.input$ThermalDiffusivity
@@ -43,7 +53,9 @@ get.sapFlowDensity <- function(method = "HFD", data,
    return(data)
 }
 
-
+#' Sensor distance
+#' @param ui.input: UI-input
+#' @return numeric
 get.sensorDistance <- function(ui.input){
    if (ui.input$sensorType == "HFD8-50"){
       return(0.5)
@@ -59,6 +71,10 @@ get.sensorDistance <- function(ui.input){
 
 #### Scale tree-level ####
 
+#' Upscaling method 1: area of circular rings
+#' @param data: data.frame, long-format
+#' @param sapWoodDepth: numeric
+#' @return data.frame
 treeScaleSimple1 <- function(data, swd) {
    # Calculate sap flow rate at each sensor depth
    data$SFdepth = data$SFDsw * data$Aring
@@ -71,6 +87,10 @@ treeScaleSimple1 <- function(data, swd) {
    return(data)
 }
 
+#' Upscaling method 2: sapwood area
+#' @param data: data.frame, long-format
+#' @param sapWoodDepth: numeric
+#' @return data.frame
 treeScaleSimple2 <- function(data, swd) {
    depths = unique(data$depth)
    
@@ -93,6 +113,10 @@ treeScaleSimple2 <- function(data, swd) {
    return(data)
 }
 
+#' Upscaling method 2: circumference of circular rings
+#' @param data: data.frame, long-format
+#' @param sapWoodDepth: numeric
+#' @return data.frame
 treeScaleSimple3 <- function(data, swd) {
    data$SFdepthm3 = data$SFS * data$Cring
    
@@ -103,6 +127,11 @@ treeScaleSimple3 <- function(data, swd) {
    return(data)
 }
 
+#' Sap flow by method (helper)
+#' @param data: data.frame, long-format
+#' @param sapWoodDepth: numeric
+#' @param method: character
+#' @return data.frame
 get.sapFlowByMethod <- function(data, method, swd) {
    if (method == "treeScaleSimple1") {
       return(treeScaleSimple1(data, swd))
@@ -117,6 +146,12 @@ get.sapFlowByMethod <- function(data, method, swd) {
    }
 }
 
+#' Sap flow with different methods
+#' @param data: data.frame, long-format
+#' @param depths: vector
+#' @param sapWoodDepth: numeric
+#' @param ui.input: UI-input
+#' @return data.frame
 get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
    methods <- list("treeScaleSimple1" = ui.input$treeScaleSimple1,
                    "treeScaleSimple2" = ui.input$treeScaleSimple2,
@@ -137,7 +172,10 @@ get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
    return(data)
 }
 
-get.treeWaterUseByMethod = function(data, input){
+#' Tree water use by method (helper)
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return data.frame
 get.treeWaterUseByMethod = function(data, ui.input){
    groups = c()
    if (ui.input$treeScaleSimple1){
