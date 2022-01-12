@@ -138,14 +138,15 @@ get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
 }
 
 get.treeWaterUseByMethod = function(data, input){
+get.treeWaterUseByMethod = function(data, ui.input){
    groups = c()
-   if (input$treeScaleSimple1){
+   if (ui.input$treeScaleSimple1){
       groups = rbind(groups, "sfM1")
    }
-   if (input$treeScaleSimple2){
+   if (ui.input$treeScaleSimple2){
       groups = rbind(groups, "sfM2")
    }
-   if (input$treeScaleSimple3){
+   if (ui.input$treeScaleSimple3){
       groups = rbind(groups, "sfM3")
    }
    

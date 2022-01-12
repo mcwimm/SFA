@@ -724,7 +724,7 @@ shinyServer(function(input, output, session) {
     treeWaterUse <- reactive({
       if (click() > 0){
         get.treeWaterUseByMethod(data = sapFlow(),
-                                 input = input)
+                                 ui.input = input)
       } else {
         return(data.frame(x = "No k-values have been set yet."))
       }
