@@ -653,18 +653,7 @@ plot.sapFLowRate = function(data, ui.input){
 }
 
 plot.sapFlowDay = function(data, ui.input){
-   groups = c()
-   if (ui.input$treeScaleSimple1){
-      groups = rbind(groups, "sfM1")
-   }
-   if (ui.input$treeScaleSimple2){
-      groups = rbind(groups, "sfM2")
-   }
-   if (ui.input$treeScaleSimple3){
-      groups = rbind(groups, "sfM3")
-   }
-   
-   groups = groups[,1]
+   groups = get.selectedMethods(ui.input)
    
    data = data %>% 
       gather(., Method, SFrate, groups) %>% 
