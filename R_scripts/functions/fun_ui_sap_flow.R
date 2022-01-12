@@ -168,11 +168,11 @@ sfRateOutput <- function(){
                          the correct assignment of sensor positions (see 'Data | Upload')."),
                        
                        checkboxInput("treeScaleSimple1", 
-                                     "Method 1: sum(SFD * Aring)", T),
+                                     "Method 1: Area of circular ring", T),
                        checkboxInput("treeScaleSimple2", 
-                                     "Method 2: mean(SFD) * Asw", T),
+                                     "Method 2: Sapwood area", T),
                        checkboxInput("treeScaleSimple3", 
-                                     "Method 3: mean(SFS * Csd)", T)
+                                     "Method 3: Circumference of circular ring", T)
                    )),
             column(width = 8,
                    box(title = "Figures",
