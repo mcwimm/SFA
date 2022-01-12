@@ -1,3 +1,7 @@
+#' Wrapper function to get uploaded raw data based on selected
+#' method
+#' @param UI-input: file, file-args, method, etc.
+#' @return data.frame
 get.rawData = function(input){
    if (input$inputType == "HFD_raw"){
       # print("HFD_raw")
@@ -14,7 +18,10 @@ get.rawData = function(input){
 }
 
 #' Reads raw temperatures from ICT-data file.
-#' 
+#' @param file: uploaded file
+#' @param sep: symbol to use as separator
+#' @param skip: number of rows to skip
+#' @return data.frame
 get.temperatures.ICT = function(file, sep, skip){
    rawData <- read.csv(file,
                        header = TRUE, sep = sep, 
@@ -35,7 +42,10 @@ get.temperatures.ICT = function(file, sep, skip){
 }
 
 #' Reads temperature differences from processed ICT-data file.
-#' 
+#' @param file: uploaded file
+#' @param sep: symbol to use as separator
+#' @param skip: number of rows to skip
+#' @return data.frame
 get.temp.differences.ICT = function(file, sep, skip){
    rawData <- read.csv(file,
                        header = TRUE, sep = sep, 
@@ -50,6 +60,9 @@ get.temp.differences.ICT = function(file, sep, skip){
    return(rawData)
 }
 
+#' Function to convert string to data-time format
+#' @param datetime: datetime as string
+#' @return datetime object
 get.datetime.format = function(datetime){
    # datetime = rawData[1, c("Date", "Time")]
    if (!is.na(as.POSIXct(x = paste(datetime$Date, datetime$Time), 
@@ -76,7 +89,9 @@ get.datetime.format = function(datetime){
 #' sensors installed above, below and alongside the heater.
 #' 
 #' @usage get.delta.temp.depth(rawData, position)
-#' 
+#' @param rawData: data.frame containing raw data in wide-format
+#' @param position: numeric indicating selected position
+#' @return data.frame
 get.delta.from.temp.depth <- function(rawData, position){
    raw_temperatures <- rawData[, grepl("Temp", colnames(rawData))]
    raw_temperatures <- raw_temperatures[, !grepl("Batt", colnames(raw_temperatures))]
@@ -99,13 +114,6 @@ get.delta.from.temp.depth <- function(rawData, position){
       print(paste("There is more than one temperature dataset for position ", position,
             ". Please check your raw data file.", sep = ""))
    }
-   
-   # delta.temp <- cbind(datetime = rawData[, "datetime"],
-   #                     Date = rawData[, "Date"],
-   #                     Time = rawData[, "Time"],
-   #                       dTas = t_side[, 1] - t_low[, 1],
-   #                       dTsa = t_up[, 1] - t_side[, 1],
-   #                       dTSym = t_up[, 1] - t_low[, 1])
 
    delta.temp <- data.frame(
                      datetime = rawData[, "datetime"],
@@ -127,6 +135,9 @@ get.delta.from.temp.depth <- function(rawData, position){
 #' Returns asymetric and symetric temperature differences as well as 
 #' their ratio.
 #' 
+#' @param rawData: data.frame containing raw data in wide-format
+#' @param positions: vector containing all positions
+#' @return data.frame
 get.delta.from.temp = function(rawData, positions){
    delta.temp = do.call(rbind, 
                         lapply(positions, function(x)
@@ -141,8 +152,11 @@ get.delta.from.temp = function(rawData, positions){
 }
 
 
-#' Helper function for get.delta.temp
-#' 
+#' Function to get temperature differences
+#' @description  Helper function for get.delta.temp
+#' @param rawData: data.frame containing raw data in wide-format
+#' @param position: numeric for selected position
+#' @return data.frame
 get.delta.temp.depth = function(rawData, position){
    reg.sym <- paste("dTSym", position, sep = "")
    reg.asym <- paste("dTas", position, sep = "")
@@ -174,6 +188,10 @@ get.delta.temp.depth = function(rawData, position){
 }
 
 #' Make long format delta temperature data from wide format
+#' 
+#' @param rawData: data.frame containing raw data in wide-format
+#' @param positions: vector containing all positions
+#' @return data.frame
 get.delta.temp = function(rawData, positions){
    delta.temp = do.call(rbind, 
            lapply(positions, function(x)
@@ -188,6 +206,9 @@ get.delta.temp = function(rawData, positions){
 
 
 #' Converts character time HH:MM:SS to decimal time
+#' 
+#' @param time: time object or character
+#' @return numeric
 convertTimeToDeci <- function(time){
    dt = sapply(strsplit(time,":"),
                function(x) {
@@ -202,7 +223,9 @@ convertTimeToDeci <- function(time){
 #' @description 
 #' Sensor positions are either extracted from raw data file or
 #' entered manually
-#' 
+#' @param dataSource: data.frame
+#' @param input: UI-input
+#' @return vector
 get.positionsFromRawData = function(dataSource, input){
 
    if (input$inputType == "HFD_raw"){
@@ -224,8 +247,15 @@ get.positionsFromRawData = function(dataSource, input){
 }
 
 
-#' Sensor positions as depth from stem center
-#' 
+#' Sensor positions relative to stem center
+#' @description Position of each sensor as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
+#' @param depthManual: boolean indicating whether depth is defined manually in UI (default: F)
+#' @param inputType: character string indicating sensor type
+#' @param positions: vector with sensor positions
+#' @param rxy: numeric indicating distance between stem center and outer sap wood
+#' @param depthInput: character string indicating manual sensor depths
+#' @param sensor_distance: numeric indicating distance between sensors
+#' @return data.frame
 get.depths <- function(depthManual = F, inputType,
                        positions, rxy, depthInput, sensor_distance){
    if (depthManual){
@@ -258,7 +288,10 @@ get.depths <- function(depthManual = F, inputType,
 }
 
 #' Get area and circumference of circular ring to dataframe with positions and depths
-#'
+#' @param depths: vector indicating sensor depths
+#' @param rxy: numeric indicating distance between stem center and outer sapwood
+#' @param swd: numeric indicating sapwooddepth in cm
+#' @return data.frame
 add.Props2DepthsHelper = function(depths, rxy, swd){
 
    #depths = depths %>% arrange(desc(depth))
@@ -280,7 +313,12 @@ add.Props2DepthsHelper = function(depths, rxy, swd){
    return(depths)
 }
 
-
+#' Function to create data.frame with sensor information and corresponding 
+#' areas and circumferences
+#' @param depths: vector indicating sensor depths
+#' @param rxy: numeric indicating distance between stem center and outer sapwood
+#' @param swd: numeric indicating sapwooddepth in cm
+#' @return data.frame
 add.Props2Depths = function(depths, rxy, swd){
    if (all(depths$depth > 0)){
       depths = add.Props2DepthsHelper(depths = depths, 
@@ -307,6 +345,12 @@ add.Props2Depths = function(depths, rxy, swd){
    return(depths)
 }
 
+#' Update sensor positions
+#' @param ui.input: UI-inputs
+#' @param data: data.frame: long-format data
+#' @param reactive.value: reactive values
+#' 
+#' @return list with reactive values and vector
 update.positions = function(data, ui.input, reactive.value){
    positions = get.positionsFromRawData(dataSource = data,
                                         input = ui.input)
@@ -338,6 +382,12 @@ update.positions = function(data, ui.input, reactive.value){
    return(list(reactive.value, positions))
 }
 
+#' Update sensor depths
+#' @param ui.input: UI-inputs
+#' @param positions: vector: sensor positions
+#' @param sensor_distance: numeric: distance between sensors, mm
+#' @param swd: numeric: sapwood depth
+#' @return data.frame
 update.depths = function(ui.input, positions, sensor_distance, swd){
    # Calculate the distance Rxy from the stem center to the inner bark
    # Prioritize information on sap wood depth over dbh
@@ -362,6 +412,11 @@ update.depths = function(ui.input, positions, sensor_distance, swd){
 
 ########### CLEAN #############
 
+#' Remove outlier
+#' @description Function that removes outlier of a defined variable
+#' @param data: data.frame with long-format data
+#' @param data.vector: character indicating column name of selected variable
+#' @return data.frame
 remove.outlier <- function(data, data.vector){
    d = data[, data.vector]
    Q <- quantile(d, probs=c(.25, .75), na.rm = T)
@@ -374,7 +429,11 @@ remove.outlier <- function(data, data.vector){
    return(data)
 }
 
-
+#' Filter
+#' @description Function to filter uploaded data set
+#' @param data: data.frame with long-format data
+#' @param ui.input: UI-input
+#' @return data.frame
 get.filteredData <- function(data, ui.input){
    
    data$doy <- as.numeric(data$doy)
@@ -437,7 +496,11 @@ get.filteredData <- function(data, ui.input){
    return(data)
 }
 
-
+#' Filter UI
+#' @description Function to update data filter in UI based on uploaded data set
+#' @param ui.input: UI-input
+#' @param ui.output: UI-output
+#' @return UI-output
 update.filter.ui = function(ui.output, ui.input){
    
    ui.output$filterOptions <- renderUI({
@@ -501,6 +564,15 @@ update.filter.ui = function(ui.output, ui.input){
 }
 ########### SAVE #############
 
+
+#' Save figure
+#' @description Handler to save ggplots as as jpg, svg or pdf
+#' @return success-message
+#' @param name: file name
+#' @param plotObject: object to be saved, i.e. ggplot-object
+#' @param fileAppendix: character to be appended to file name
+#' @param format: file format
+#' @param prjName: project name, added as title to plot
 save.figure = function(name, plotObject, prjName = "PrjName", 
                        fileAppendix = "", format = "svg"){
    if (fileAppendix != ""){
@@ -547,6 +619,12 @@ save.figure = function(name, plotObject, prjName = "PrjName",
 
 }
 
+#' Save csv
+#' @description Handler to save data.frames as csv-file.
+#' @return success-message
+#' @param name: file name
+#' @param csvObject: object to be saved, i.e. data.frame
+#' @param fileAppendix: character to be appended to file name
 save.csv = function(name, csvObject, fileAppendix = ""){
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
