@@ -1,4 +1,7 @@
-
+#' K estimate per depth by method
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return numeric
 get.kByMethod <- function(data, ui.input){
    # Extract ui-input values
    method = ui.input$kMethod
@@ -27,11 +30,21 @@ get.kByMethod <- function(data, ui.input){
    return(k)
 }
 
+#' K estimates by method
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return list
 get.kByMethodAll <- function(data, ui.input){
    return(list( "regression" = get.regressionKvalues(data, ui.input),
                 "no.flow" = get.zeroflowKvalues(data)))
 }
 
+#' K table helper
+#' @param data: data.frame, long-format
+#' @param method: character, method to estimate k
+#' @param ui.input: UI-input
+#' @param reactive.value: reactive values
+#' @return reactive values
 fill.k.table = function(method, k.data, ui.input, reactive.value){
    # Define method name
    if (method == "regression"){
@@ -67,6 +80,10 @@ fill.k.table = function(method, k.data, ui.input, reactive.value){
 ### regression ###
 ##################
 
+#' K estimate by no-flow regression, per depth
+#' @param data: data.frame, long-format
+#' @param sensorDepth: numeric, sensor position
+#' @param ui.input: UI-input 
 get.regressionK.depth <- function(data, sensorDepth, ui.input){
    # Filter repective sensor depth
    data = data %>% 
@@ -95,6 +112,10 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
    return(df)
 }
 
+#' K estimates by no-flow regression
+#' @param data: data.frame, long-format
+#' @param sensorDepth: numeric, sensor position
+#' @param ui.input: UI-input 
 get.regressionKvalues <- function(data, ui.input){
    positions = unique(data$position)
    h = do.call(rbind, lapply(positions, 
@@ -106,6 +127,10 @@ get.regressionKvalues <- function(data, ui.input){
 
 #### data cleaing
 
+#' Time filter
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input 
+#' @return data.frame
 get.time.filtered.data = function(data, ui.input){
    if (ui.input$dTimeFilter){
       if (nightTimeStart < nightTimeEnd){
@@ -121,6 +146,11 @@ get.time.filtered.data = function(data, ui.input){
    return(data)
 }
 
+#' Romve right
+#' @param data: data.frame, long-format
+#' @param x.col: character, x-column name 
+#' @param y.col: character, y-column name 
+#' @return data.frame
 remove.right <- function(data, x.col, y.col){
    y.max <- max(data[, y.col])
    x.cutoff <- data[data[, y.col] == y.max, x.col]
@@ -129,7 +159,11 @@ remove.right <- function(data, x.col, y.col){
    return(data)
 }
 
-
+#' Romve below
+#' @param data: data.frame, long-format
+#' @param x.col: character, x-column name 
+#' @param y.col: character, y-column name 
+#' @return data.frame
 remove.below <- function(data,  x.col, y.col){
    x.min <- min(data[, x.col])
    y.cutoff <- data[data[, x.col] == x.min, y.col]
@@ -138,17 +172,20 @@ remove.below <- function(data,  x.col, y.col){
    return(data)
 }
 
+#' Cleaning
+#' @param data: data.frame, long-format
+#' @param x.col: character, x-column name 
+#' @param y.col: character, y-column name 
+#' @return data.frame
 cleaning <- function(data, x.col, y.col){
-   # data <- remove.outlier(data, data[, x.col])
-   # data <- remove.outlier(data, data[, y.col])
-   
    data <- remove.below(data, x.col, y.col)
    data <- remove.right(data, x.col, y.col)
-   
-   
    return(data)
 }
 
+#' dTas as K
+#' @param data: data.frame, long-format
+#' @return vector (K, R²adj)
 get.K.dTas <- function(clean.data){
    dTas.lm <- summary(lm(dTas ~ dTsym.dTas, 
                          clean.data))
@@ -156,6 +193,9 @@ get.K.dTas <- function(clean.data){
    return(c(dTas.K, dTas.lm$adj.r.squared))
 }
 
+#' dTs-a as K
+#' @param data: data.frame, long-format
+#' @return vector (K, R²adj)
 get.K.dTsa <- function(clean.data){
    dTsa.lm <- summary(lm(dTsa ~ dTsym.dTas, 
                          clean.data))
@@ -163,6 +203,9 @@ get.K.dTsa <- function(clean.data){
    return(c(dTsa.K, dTsa.lm$adj.r.squared))
 }
 
+#' K iteration
+#' @param data: data.frame, long-format
+#' @return list (data, K.dTas, K.dTsa)
 clean.data.iteration = function(data_ini, initial.cutoff = 0){
    data <- data_ini[data_ini$timestep > initial.cutoff, ]
    step = 0
@@ -207,7 +250,6 @@ clean.data.iteration = function(data_ini, initial.cutoff = 0){
 }
 
 
-
 #################
 ### zero-flow ###
 #################
@@ -216,7 +258,8 @@ get_min_at_min <- function(vec1, vec2) {
    return(vec2[order(vec1, vec2)[1]])
 }
 
-
+#' K estimate by no-flow median
+#' @return data.frame
 get.zeroflowKvalues <- function(data){
    zeroFlowK = data %>% 
       group_by(position) %>% 
@@ -230,11 +273,12 @@ get.zeroflowKvalues <- function(data){
 }
 
 
-
 #################
 ### from file ###
 #################
 
+#' K estimate from csv-file upload
+#' @return data.frame
 get.csvKvalues <- function(ui.input){
    file = ui.input$file2
    
@@ -245,10 +289,3 @@ get.csvKvalues <- function(ui.input){
                        skip = ui.input$skip2)
    return(kValues)
 }
-
-
-
-##############
-### manual ###
-##############
-
