@@ -573,8 +573,9 @@ update.filter.ui = function(ui.output, ui.input){
 #' @param fileAppendix: character to be appended to file name
 #' @param format: file format
 #' @param prjName: project name, added as title to plot
-save.figure = function(name, plotObject, prjName = "PrjName", 
-                       fileAppendix = "", format = "svg"){
+save.figure = function(path, name, plotObject, ui.input){
+   fileAppendix = ui.input$fileAppend
+   format = ui.input$figFor
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
       name = paste(name, fileAppendix, sep = "_")
@@ -584,6 +585,21 @@ save.figure = function(name, plotObject, prjName = "PrjName",
       ggtitle(prjName) +
       theme_bw(base_size = 14)
    
+   # Check if project directory is defined
+   # If not show warning and set path to root directory
+   if (!isTruthy(ui.input$folder)){
+      file = paste(path, name, sep = "/")
+      noti_note = "No project selected. File saved in root directory."
+      noti_type = "warning"
+      
+   } else {
+      file = paste(path, "csv-files", name, sep = "/")
+      noti_note = "File saved successfully!"
+      noti_type = "message"
+   }
+
+   # Check if file already exists, if yes append unique number
+   # based on system time
    if (file.exists(paste(name, format, sep = "."))){
       name = paste(name, as.numeric(Sys.time()), sep = "_")
    }
@@ -608,15 +624,14 @@ save.figure = function(name, plotObject, prjName = "PrjName",
                        width = 12, height = 6, dpi = 900))
    }
 
-   print(res)
+   
    if (is.null(res) || res){
-      showNotification("File saved successfully!",
-                       type = "message")
+      showNotification(noti_note, 
+                       type = noti_type)
    } else {
       showNotification("Error: File not saved!",
                        type = "error")
    }
-
 }
 
 #' Save csv
@@ -625,24 +640,37 @@ save.figure = function(name, plotObject, prjName = "PrjName",
 #' @param name: file name
 #' @param csvObject: object to be saved, i.e. data.frame
 #' @param fileAppendix: character to be appended to file name
-save.csv = function(name, csvObject, fileAppendix = ""){
+save.csv = function(path, name, csvObject, ui.input){
+   fileAppendix = ui.input$fileAppend
+   
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
       name = paste(name, "_", fileAppendix, ".csv", sep = "")
    } else {
       name = paste(name, ".csv", sep = "")
-      
    }
-
+   
+   # Check if project directory is defined
+   # If not show warning and set path to root directory
+   if (!isTruthy(ui.input$folder)){
+      file = paste(path, name, sep = "/")
+      noti_note = "No project selected. File saved in root directory."
+      noti_type = "warning"
+      
+   } else {
+      file = paste(path, "csv-files", name, sep = "/")
+      noti_note = "File saved successfully!"
+      noti_type = "message"
+   }
+   
    res = try(write.csv(csvObject, 
-                       file = name,
+                       file = file,
                        row.names = FALSE))
    if (is.null(res)){
-      showNotification("File saved successfully!",
-                       type = "message")
+      showNotification(noti_note, 
+                       type = noti_type)
    } else {
       showNotification("Error: File not saved!",
                        type = "error")
    }
 }
-

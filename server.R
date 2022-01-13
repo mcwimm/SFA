@@ -14,9 +14,17 @@ shinyServer(function(input, output, session) {
                                    roots=c(wd='.'), 
                                    filetypes=c('', 'txt'))
     
+    
+    
     #' Reactive variable holding the current project path
+    #' If not project is selected it returns the root directory
     projectPath <- reactive({
-      parseDirPath(c(wd=getwd()), input$folder)
+      roots = c(wd = getwd())
+      if (!isTruthy(input$folder)){
+        roots[[1]]
+      } else {
+        parseDirPath(roots = roots, selection = input$folder)      
+      }
     })
 
     #' Reactive variable holding the current project name
@@ -375,52 +383,48 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save unfiltered, long-format data
     #' (Data > Upload > Preview data)
     observeEvent(input$save_dat_upl, {
-        csvObject = deltaTempLongNoFilter()
-        path = paste(projectPath(), 
-                     "/csv-files/",
-                     "deltaT_longFormat", sep = "")
-        save.csv(path, csvObject, fileAppendix())
+        save.csv(path = projectPath(), 
+                 name = "dTemp",
+                 csvObject = deltaTempLongNoFilter(), 
+                 ui.input = input)
         
     })
     
     #' Eventlistener to save plot with customized temperatures
     #' (Data > View > Figure)
     observeEvent(input$save.custumPlot, {
-        v = paste(input$rawPlot.xcol, 
-                  input$rawPlot.ycol, 
-                  input$rawPlot.col,  
-                  input$rawPlot.shape,
-                  input$rawPlot.facet, sep = "-")
-        
-        name = paste(projectPath(),
-                     "/graphics/",
-                     "customized_", v, sep = "")
-        obj = custumPlot()
-        save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      name = paste("dT",
+                   input$rawPlot.xcol, 
+                   input$rawPlot.ycol, 
+                   input$rawPlot.col,  
+                   input$rawPlot.shape,
+                   input$rawPlot.facet, sep = "_")
+      save.figure(path = projectPath(),
+                  name = name,
+                  plotObject = custumPlot(), 
+                  ui.input = input)
     })
 
     #' Eventlistener to save filtered, long-format data
     #' (Data > Filter > Figures)
     observeEvent(input$save_dat_filter, {
-      csvObject = values$deltaTempLong
-      path = paste(projectPath(), 
-                   "/csv-files/",
-                   "deltaT_longFormat_filtered", sep = "")
-      save.csv(path, csvObject, fileAppendix())
+      save.csv(path = projectPath(), 
+               name = "dTemp_filtered",
+               csvObject = values$deltaTempLong, 
+               ui.input = input)
     })
     
     #' Eventlistener to save plot with filtered data
     #' (Data > Filter > Figures)
     observeEvent(input$save_dat_filter_fig, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   as.character(input$filterPlot_type), "_",
-                   "filtered_",
-                   as.character(input$filterPlot_X), "_",
-                   as.character(input$filterPlot_col), sep = "")
-
-      obj = filterPlot()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      name = paste("dT_filtered",
+                   as.character(input$filterPlot_type),
+                   as.character(input$filterPlot_X),
+                   as.character(input$filterPlot_col), sep = "_")
+      save.figure(path = projectPath(),
+                  name = name,
+                  plotObject = filterPlot(), 
+                  ui.input = input)
     })
     
     
@@ -626,12 +630,12 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding the control-diagram 1
     #' ggplot warnings are suppressed
     kplot2 <- reactive({
-      suppressWarnings(print(
+      # suppressWarnings(print(
         plot.kEst2(data.complete = deltaTempLong.depth(),
                  data.adj =cleanedDataAndKvalues()[[1]],
                  k = kValue(),
                  ui.input = input)
-      ))
+      # ))
     })
     
     #' UI output of Control-diagram 1
@@ -658,28 +662,29 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save selected k-values as csv 
     #' (K-value > Estimation > K-value estimation > Selected)
     observeEvent(input$save.kValues, {
-      path = paste(projectPath(), 
-                   "/csv-files", sep = "")
       csvObject = values$kvalues
-      save.csv(paste(path, "/k-values", sep = ""), 
-               csvObject, fileAppendix())
+      save.csv(path = projectPath(), 
+               name = "K_values",
+               csvObject = csvObject, 
+               ui.input = input)
     })
     
     #' Eventlistener to save k-diagrams
     #' (K-value > Estimation > Control plots)
     observeEvent(input$save.kPlots, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   sep = "")
-      figTitle = figTitle()
-      fileAppendix = fileAppendix()
+      save.figure(path = projectPath(),
+                  name = paste("k-diagram_sensor", input$kPositionSelect, sep = "_"),
+                  plotObject = kplot1(),
+                  ui.input = input)
+      save.figure(path = projectPath(),
+                  name = paste("k-control-1_sensor", input$kPositionSelect, sep = "_"),
+                  plotObject = kplot2(),
+                  ui.input = input)
+      save.figure(path = projectPath(),
+                  name = paste("k-control-2_sensor", input$kPositionSelect, sep = "_"),
+                  plotObject = kplot3(),
+                  ui.input = input)
       
-      save.figure(paste(name, "k_fig1_position_", input$kPositionSelect, sep = ""), 
-                  kplot1(), figTitle, fileAppendix, input$figFor)
-      save.figure(paste(name, "k_fig2_position_", input$kPositionSelect, sep = ""), 
-                  kplot2(), figTitle, fileAppendix, input$figFor)
-      save.figure(paste(name, "k_fig3_position_", input$kPositionSelect, sep = ""), 
-                  kplot3(), figTitle, fileAppendix, input$figFor)
     })
 
     ####################
@@ -751,11 +756,11 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save.sfIndex, {
       name_ap = ifelse(input$sfIndexPlot_wrap, 
                        paste("_", input$sfIndexPlot.facet, sep = ""), "")
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sapFlowIndex", name_ap, sep = "")
-      obj = sapFlowIndex()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      name = paste("SFI", name_ap, sep = "")
+      save.figure(path = projectPath(),
+                  name = name,
+                  plotObject = sapFlowIndex(), 
+                  ui.input = input)
     })
     
 
@@ -781,22 +786,20 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save sap flow density plot
     #' (Sap Flow > Sap Flow Density > Figures > Diurnal pattern)
     observeEvent(input$save.sapFlowDensityPlot, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sf_", input$sapFlowDensityPlot.y, sep = "")
-      obj = sapFlowDensityPlot()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      save.figure(path = projectPath(),
+                  name = input$sapFlowDensityPlot.y, 
+                  plotObject = sapFlowDensityPlot(), 
+                  ui.input = input)
     })
     
     #' Eventlistener to save sap flow density plot
     #' vertical profile
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowDensity, {
-      name = paste(projectPath(),
-                   "/csv-files/",
-                   "sapFlowDensity", sep = "")
-      obj = sapFlowDens()
-      save.csv(name, obj, fileAppendix())
+      save.csv(path = projectPath(), 
+               name = "SFD_radial",
+               csvObject = sapFlowDens(), 
+               ui.input = input)
     })
     
     #' Reactive variable holding figure of sap flow density
@@ -821,11 +824,11 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save sap flow density plot
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowDensityPlot.Boxplot, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sf_profile_", input$sapFlowDensityPlot.y, sep = "")
-      obj = sapFlowDensityPlot.Boxplot()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      save.figure(path = projectPath(),
+                  name = paste(input$sapFlowDensityPlot.y, "r-profil", sep = "_"),
+                  plotObject = sapFlowDensityPlot.Boxplot(), 
+                  ui.input = input)
+      
     })
 
     
@@ -855,21 +858,19 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save sap flow rate figure
     #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     observeEvent(input$save.SapFlow, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sapFlow_scaled", sep = "")
-      obj = sapFlowTreePlot()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      save.figure(path = projectPath(),
+                  name = "SapFlow",
+                  plotObject = sapFlowTreePlot(), 
+                  ui.input = input)
     })
     
     #' Eventlistener to save sap flow rate data as csv
     #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     observeEvent(input$save.SapFlowCsv, {
-      name = paste(projectPath(),
-                   "/csv-files/",
-                   "sapFlow_scaled", sep = "")
-      obj = sapFlow()
-      save.csv(name, obj, fileAppendix())
+      save.csv(path = projectPath(), 
+               name = "SapFlow",
+               csvObject = sapFlow(), 
+               ui.input = input)
     })
     
     
@@ -897,21 +898,19 @@ shinyServer(function(input, output, session) {
     #' Eventlistener to save daily water balance
     #' (Sap Flow > Sap Flow > Figures > Daily balance)
     observeEvent(input$save.SapFlowPlot, {
-      name = paste(projectPath(),
-                   "/graphics/",
-                   "sapFlow_scaled_balance", sep = "")
-      obj = sapFlowTreePlotBar()
-      save.figure(name, obj, figTitle(), fileAppendix(), input$figFor)
+      save.figure(path = projectPath(),
+                  name = "SapFlow_Balance",
+                  plotObject = sapFlowTreePlotBar(), 
+                  ui.input = input)
     })
     
     #' Eventlistener to save daily tree water use as csv
     #' (Sap Flow > Sap Flow > Tree water use)
     observeEvent(input$save.TreeWaterUseCsv, {
-      name = paste(projectPath(),
-                   "/csv-files/",
-                   "treeWaterUsePerDay", sep = "")
-      obj = treeWaterUse()
-      save.csv(name, obj, fileAppendix())
+      save.csv(path = projectPath(), 
+               name = "TWU",
+               csvObject = treeWaterUse(), 
+               ui.input = input)
     })
     
     
