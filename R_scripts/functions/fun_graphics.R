@@ -224,7 +224,8 @@ get.customizedPlotSettings = function(ui.input){
       facetWrap = ui.input$rawPlot_facetWrap,
       scales = ui.input$rawPlot_scales,
       facet = ui.input$rawPlot.facet,
-      no.cols = ui.input$rawPlot.columns
+      no.cols = ui.input$rawPlot.columns,
+      all.dT = ui.input$rawPlot_gathered
    ))
 }
 
@@ -242,32 +243,49 @@ plot.customTemperature <- function(data, ui.input.processed){
    scales = ui.input.processed$scales
    facet = ui.input.processed$facet
    no.cols = ui.input.processed$no.cols
-   
-   x = data[, x.col]
-   y = data[, y.col]
-   col = data[, col.col]
-   shape = data[, shape.col]
 
-   p = data %>% 
-      ggplot(., aes(x = x, y = y, shape = factor(shape))) +
-      labs(x = labels[x.col][[1]],
-           y = labels[y.col][[1]],
-           col = labels[col.col][[1]],
-           shape = labels[shape.col][[1]]) 
-   
-   if (col.col == "dTime"){
-      p = p +
-         geom_point(aes(col = col)) +
-         scale_color_gradient2(low = gradientcolors()[2], 
-                               high = gradientcolors()[2], 
-                               mid = gradientcolors()[1],
-                               midpoint = 12)
+   print(ui.input.processed$all.dT)
+   if (!ui.input.processed$all.dT){
+      x = data[, x.col]
+      y = data[, y.col]
+      col = data[, col.col]
+      shape = data[, shape.col]
       
+      p = data %>% 
+         ggplot(., aes(x = x, y = y, shape = factor(shape))) +
+         labs(x = labels[x.col][[1]],
+              y = labels[y.col][[1]],
+              col = labels[col.col][[1]],
+              shape = labels[shape.col][[1]]) 
       
+      if (col.col == "dTime"){
+         p = p +
+            geom_point(aes(col = col)) +
+            scale_color_gradient2(low = gradientcolors()[2], 
+                                  high = gradientcolors()[2], 
+                                  mid = gradientcolors()[1],
+                                  midpoint = 12)
+         
+         
+      } else {
+         p = p +
+            geom_point(aes(col = factor(col))) +
+            scale_color_manual(values = fillcolors(length(unique(col))))
+      }
+      
+      if (length(unique(shape)) > 6){
+         p = p +
+            scale_shape_manual(values = c(1:length(unique(shape))))
+      }
    } else {
-      p = p +
-         geom_point(aes(col = factor(col))) +
-         scale_color_manual(values = fillcolors(length(unique(col))))
+      p = data %>% 
+         gather(., key, value, dTas, dTSym, dTsym.dTas) %>% 
+         ggplot(., aes(x = datetime, y = value,
+                       col = key, group = key)) +
+         geom_line() +
+         labs(x = labels["datetime"][[1]],
+              y = labels["dT"][[1]],
+              col = labels["dT"][[1]]) 
    }
    
    if (facetWrap){
@@ -276,11 +294,7 @@ plot.customTemperature <- function(data, ui.input.processed){
          facet_wrap(~ (facet), scales = scales,
                     ncol = no.cols)
    }
-   
-   if (length(unique(shape)) > 6){
-      p = p +
-         scale_shape_manual(values = c(1:length(unique(shape))))
-   }
+
    return(p)
 }
 

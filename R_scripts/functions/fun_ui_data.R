@@ -198,28 +198,6 @@ dataViewOutput = function(){
       box(title = "Settings",
           collapsible = T, width = 4,
           status = "warning",
-          
-          checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
-
-          conditionalPanel(
-             condition = "input.rawPlot_facetWrap == true",
-             radioButtons("rawPlot_scales","Scales", 
-                          choiceNames =  list(
-                             HTML("<span title='choose free'>free</span>"),
-                             HTML("<span title='choose fixed'>fixed</span>")
-                          ),
-                          choiceValues = list("free", "fixed"),
-                          inline=T),
-             fluidRow(
-                column(6, selectInput("rawPlot.facet", "Facet",
-                                      choices = c("position" = "position",
-                                                  "doy" = "doy"))),
-                column(6, numericInput("rawPlot.columns", "No. columns",
-                                       value = 3))
-             )
-          ),
-          
-          tags$hr(),
 
           fluidRow(
              column(6, selectInput("rawPlot.xcol", "X-axis",
@@ -243,6 +221,31 @@ dataViewOutput = function(){
                                    choices = c("position" = "position",
                                                "doy" = "doy")))
           ),
+          
+          checkboxInput("rawPlot_facetWrap", "Facet wrap", F),
+          
+          conditionalPanel(
+             condition = "input.rawPlot_facetWrap == true",
+             radioButtons("rawPlot_scales","Scales", 
+                          choiceNames =  list(
+                             HTML("<span title='choose fixed'>fixed</span>"),
+                             HTML("<span title='choose free'>free</span>")
+                          ),
+                          choiceValues = list("fixed", "free"),
+                          inline=T),
+             fluidRow(
+                column(6, selectInput("rawPlot.facet", "Facet",
+                                      choices = c("position" = "position",
+                                                  "doy" = "doy"))),
+                column(6, numericInput("rawPlot.columns", "No. columns",
+                                       value = 3))
+             )
+          ),
+          tags$hr(),
+          
+          checkboxInput("rawPlot_gathered", "Plot all temperature differences over time", F),
+          
+          
           actButton("renderPlot", "Render figure", "update")
       
       ),
