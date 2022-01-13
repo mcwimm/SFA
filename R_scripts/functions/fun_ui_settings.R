@@ -81,9 +81,9 @@ settingsOutput = function(){
                        collapsible = T, width = 12,
                        p(em("(Optional inputs)")),
                        selectInput("figFor", "Figure format",
-                                   c(#"svg" = "svg",
-                                      "jpg" = "jpg",
-                                      "pdf" = "pdf")),
+                                   c("jpg" = "jpg",
+                                     "rdata" = "rdata",
+                                     "pdf" = "pdf")),
                        
                        textInput("figTitle", "Figure title", 
                                  placeholder = "e.g. tree species"),
