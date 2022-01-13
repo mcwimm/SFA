@@ -12,3 +12,5 @@ output
 /tests/tests.R
 /tests/shinyErrorMessagesHelp.md
 /tests/testApp
+
+*.pdf
