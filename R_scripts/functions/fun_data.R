@@ -576,14 +576,16 @@ update.filter.ui = function(ui.output, ui.input){
 save.figure = function(path, name, plotObject, ui.input){
    fileAppendix = ui.input$fileAppend
    format = ui.input$figFor
+   
+   plotObject = plotObject +
+         ggtitle(ui.input$figTitle) +
+      theme(text=element_text(size = 14))
+   
+   # Add appendix to file name and replace whitespace
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
       name = paste(name, fileAppendix, sep = "_")
    }
-
-   plotObject = plotObject +
-      ggtitle(prjName) +
-      theme_bw(base_size = 14)
    
    # Check if project directory is defined
    # If not show warning and set path to root directory
