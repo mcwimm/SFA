@@ -182,12 +182,12 @@ sfRateOutput <- function(){
                        tabsetPanel(
                           tabPanel("Diurnal pattern", br(),
                                    output.figure("SapFlowPlot"),
-                                   actButton("save.SapFlow", "Save figures", "saveFigure"),
+                                   actButton("save.SapFlow", "Save figure", "saveFigure"),
                                    actButton("save.SapFlowCsv", "Save csv", "saveCsv")),
                           tabPanel("Daily balance", br(),
                                    output.figure("SapFlowPlotBar"),
                                    actButton("save.SapFlowPlot",
-                                             "Save figures", "saveFigure")))
+                                             "Save figure", "saveFigure")))
                        
                    ),
                    box(title = "Tree water use",
