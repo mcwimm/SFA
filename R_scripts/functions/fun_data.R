@@ -595,21 +595,21 @@ save.figure = function(path, name, plotObject, ui.input){
       noti_type = "warning"
       
    } else {
-      file = paste(path, "csv-files", name, sep = "/")
+      file = paste(path, "graphics", name, sep = "/")
       noti_note = "File saved successfully!"
       noti_type = "message"
    }
 
    # Check if file already exists, if yes append unique number
    # based on system time
-   if (file.exists(paste(name, format, sep = "."))){
-      name = paste(name, as.numeric(Sys.time()), sep = "_")
+   if (file.exists(paste(file, format, sep = "."))){
+      file = paste(file, as.numeric(Sys.time()), sep = "_")
    }
    
    if (format == "rdata"){
-      res = try(save(plotObject, file = paste(name, format, sep = ".")))
+      res = try(save(plotObject, file = paste(file, format, sep = ".")))
    } else {
-      res = try(ggsave(plotObject, filename = paste(name, format,
+      res = try(ggsave(plotObject, filename = paste(file, format,
                                                     sep = "."),
                        width = 12, height = 6, dpi = 900))
    }
