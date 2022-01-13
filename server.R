@@ -8,18 +8,21 @@ shinyServer(function(input, output, session) {
   
     #' Shiny function that returns 'available volumes on the system'
     volumes = getVolumes()
-
+    
+    #' Variable holding possible root directories
+    roots = c('working directory' = ".",
+              system = volumes())
+    
     #' Shiny function to 'to navigate the filesystem'
     folderInput1 <- shinyDirChoose(input, 'folder',
-                                   roots=c(wd='.'), 
-                                   filetypes=c('', 'txt'))
+                                   roots = roots, 
+                                   filetypes = c('', 'txt'))
     
     
     
     #' Reactive variable holding the current project path
     #' If not project is selected it returns the root directory
     projectPath <- reactive({
-      roots = c(wd = getwd())
       if (!isTruthy(input$folder)){
         roots[[1]]
       } else {
