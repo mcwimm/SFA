@@ -529,8 +529,16 @@ shinyServer(function(input, output, session) {
       if (click == 1 && is.null(input$file2)){
         emptyKvalues()
       }
+      if (input$dTimeFilter & input$kMethod == "regression"){
+        method_name = paste("regression", " (",
+                            input$kRegressionTime.start, " - ",
+                            input$kRegressionTime.end, ")",
+                            sep = "")
+      } else {
+        method_name = gsub(".", "-", input$kMethod, fixed = TRUE)
+      }
       values$kvalues[values$kvalues$position == input$kPositionSelect, 2:3] <- cbind(
-        method = as.character(input$kMethod),
+        method = as.character(method_name),
         k = round(kValue(), 3))
     })
 
