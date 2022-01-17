@@ -526,7 +526,7 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setK, {  
       click = click()
-      if (click == 1 && is.null(input$file2)){
+      if (click == 1){
         emptyKvalues()
       }
       if (input$dTimeFilter & input$kMethod == "regression"){
