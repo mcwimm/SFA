@@ -24,7 +24,7 @@ get.kByMethod <- function(data, ui.input){
    
    if (method == "csv"){
       req(ui.input$file2)
-      kcsv = get.csvKvalues(ui.input = ui.input)
+      kvalues = get.csvKvalues(ui.input = ui.input)
       k = kvalues[kvalues$position == ui.input$kPositionSelect, "k"]
    }
    return(k)
