@@ -6,8 +6,6 @@ get.kByMethod <- function(data, ui.input){
    # Extract ui-input values
    method = ui.input$kMethod
    sensorDepth = ui.input$kPositionSelect
-   nightTimeStart = ui.input$kRegressionTime.start
-   nightTimeEnd = ui.input$kRegressionTime.end
    
    if (method == "manual"){
       k = ui.input$kManual
@@ -133,7 +131,7 @@ get.regressionKvalues <- function(data, ui.input){
 #' @return data.frame
 get.time.filtered.data = function(data, ui.input){
    if (ui.input$dTimeFilter){
-      if (nightTimeStart < nightTimeEnd){
+      if (ui.input$kRegressionTime.start < ui.input$kRegressionTime.end){
          data = data %>% 
             filter(dTime >= ui.input$kRegressionTime.start & 
                       dTime <= ui.input$kRegressionTime.end) 
