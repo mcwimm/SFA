@@ -244,7 +244,6 @@ plot.customTemperature <- function(data, ui.input.processed){
    facet = ui.input.processed$facet
    no.cols = ui.input.processed$no.cols
 
-   print(ui.input.processed$all.dT)
    if (!ui.input.processed$all.dT){
       x = data[, x.col]
       y = data[, y.col]
