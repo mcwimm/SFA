@@ -151,9 +151,9 @@ get.time.filtered.data = function(data, ui.input){
 #' @return data.frame
 remove.right <- function(data, x.col, y.col){
    y.max <- max(data[, y.col])
-   x.cutoff <- data[data[, y.col] == y.max, x.col]
+   x.cutoff <- min(data[data[, y.col] == y.max, x.col])
    
-   data <- subset(data, data[, x.col] < x.cutoff)
+   data <- subset(data, data[, x.col] <= x.cutoff)
    return(data)
 }
 
@@ -164,9 +164,9 @@ remove.right <- function(data, x.col, y.col){
 #' @return data.frame
 remove.below <- function(data,  x.col, y.col){
    x.min <- min(data[, x.col])
-   y.cutoff <- data[data[, x.col] == x.min, y.col]
+   y.cutoff <- min(data[data[, x.col] == x.min, y.col])
    
-   data <- subset(data, data[, y.col] > y.cutoff)
+   data <- subset(data, data[, y.col] >= y.cutoff)
    return(data)
 }
 
