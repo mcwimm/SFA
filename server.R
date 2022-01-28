@@ -681,18 +681,25 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to save k-diagrams
-    #' (K-value > Estimation > Control plots)
+    #' (K-value > Estimation > Control plots) 
     observeEvent(input$save.kPlots, {
+      appendix = input$kPositionSelect
+      if (input$dTimeFilter & input$kMethod == "regression"){
+        appendix = paste(appendix, "time",
+                          input$kRegressionTime.start,
+                          input$kRegressionTime.end, 
+                          sep = "_")
+      }
       save.figure(path = projectPath(),
-                  name = paste("k-diagram_sensor", input$kPositionSelect, sep = "_"),
+                  name = paste("k-diagram_sensor", appendix, sep = "_"),
                   plotObject = kplot1(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-1_sensor", input$kPositionSelect, sep = "_"),
+                  name = paste("k-control-1_sensor", appendix, sep = "_"),
                   plotObject = kplot2(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-2_sensor", input$kPositionSelect, sep = "_"),
+                  name = paste("k-control-2_sensor", appendix, sep = "_"),
                   plotObject = kplot3(),
                   ui.input = input)
       
@@ -808,7 +815,7 @@ shinyServer(function(input, output, session) {
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowDensity, {
       save.csv(path = projectPath(), 
-               name = "SFD_radial",
+               name = "SFD",
                csvObject = sapFlowDens(), 
                ui.input = input)
     })
