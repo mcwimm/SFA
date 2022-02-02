@@ -28,7 +28,7 @@ dataUplOutput = function(){
                     status = "warning",
                     box.dat_upl.upload()
                     ),
-                box(title = "Sensor settings (optional)",
+                box(title = "Thermometer settings (optional)",
                     collapsible = T, width = "100%",
                     status = "warning",
                     box.dat_upl.depths()

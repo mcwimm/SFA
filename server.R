@@ -451,7 +451,7 @@ shinyServer(function(input, output, session) {
     output$kPositionSelect <- renderUI({
       positions = positions()
       pre_selected = positions[1]
-      radioButtons("kPositionSelect", "Sensor position",
+      radioButtons("kPositionSelect", "Thermometer position",
                    choices = positions,
                    selected = pre_selected, inline = T)
     })
