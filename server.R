@@ -186,6 +186,13 @@ shinyServer(function(input, output, session) {
       return(values$deltaTempLong)
     })
   
+    #' Trigger to update reactive data when 'Use data' 
+    #' button is pressed
+    #' Updates data for the whole App
+    observeEvent(input$setData, {
+      values$deltaTempLong <- deltaTempLongNoFilter()
+    })
+    
     #' Reactive variable holding long-format data for
     #' specific UI-selected sensor position
     deltaTempLong.depth <- reactive({
