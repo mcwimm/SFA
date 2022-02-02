@@ -37,9 +37,7 @@ shinyUI(
                 
                 tabItem(tabName = "sf_des",
                         sdDescriptionOutput()),
-                tabItem(tabName = "sf_ind",
-                        sfIndexOutput()),
-                tabItem(tabName = "sf_dens",
+                tabItem(tabName = "sf_metrics",
                         sfDensityOutput()),
                 tabItem(tabName = "sf_flow",
                         sfRateOutput())

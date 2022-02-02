@@ -536,57 +536,155 @@ plot.kEst3 <- function(data.complete, data.adj, k,
    return(p)
 }
 
-######## SAP FLOW INDEX ########
+######## SAP FLOW METRICS ########
 
-#' Sap flow index diagram
-#' @param data: data.frame, long-format, complete data per positions
-#' @param ui.input: UI-input
-#' @return ggplot-object
-plot.sapFlowIndex <- function(data, ui.input){
-   scales = ui.input$sfIndexPlot_scales
-   facetWrap = ui.input$sfIndexPlot_wrap
-   facet.col = ui.input$sfIndexPlot.facet
-   facet.col.no = ui.input$sfIndexPlot.facet.cols
-
-   p = data %>% 
-      ggplot(.) +
-      geom_line(aes(x = datetime, y = dTSym, col = factor(position))) +
-      labs(x = "", 
-           y = labels["SFI"][[1]],
-           col = labels["position"][[1]])
+assign.customized.groups = function(data, ui.input){
+   data$group = "no group assigned"
    
-   if (facetWrap){
-      # Remove NA values in facet column if present
-      data = data[complete.cases(data[, facet.col]), ]
+   groups_char = ui.input$sf_grouped_positions
+   if (groups_char != ""){
+      # remove white spaces
+      # g_chars = gsub(" ", "", groups_char, fixed = TRUE)
+      # get groups
+      g_chars = strsplit(groups_char, ";")[[1]]
 
-      facet = get.labelledFacets(data, facet.col)
-      p = data %>% 
-         ggplot(aes(x = dTime, y = dTSym))
-      
-      if (facet.col == "position"){
-         p = p +
-            geom_line(aes(col = factor(doy))) +
-            labs(x = labels["dTime"][[1]], 
-                 y = labels["SFI"][[1]],
-                 col = labels["doy"][[1]])
+      for (i in 1:length(g_chars)){
+         g_char = strsplit(g_chars[i], ":")[[1]]
+         g_name = g_char[1]
+         g_positions = as.numeric(strsplit(g_char[2], ",")[[1]])
+         data[data$position %in% g_positions, "group"] = g_name
       }
-      if (facet.col == "doy"){
-         p = p +
-            geom_line(aes(col = factor(position))) +
-            labs(x = labels["dTime"][[1]], 
-                 y = labels["SFI"][[1]],
-                 col = labels["position"][[1]])
-      }
-      p = p  +
-         facet_wrap(~ (facet), scales = scales,
-                    ncol = facet.col.no)
-      
+   }
+   return(data)
+}
+
+add.group.mean = function(data, y.col){
+   y.col = sym(y.col)
+   return(data %>% 
+             group_by(datetime, group) %>% 
+             mutate(
+                mean_y = mean({{y.col}})
+             ))
+}
+
+plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
+   data$SFI = data$dTSym
+   if (ui.input$sf_y_axis %in% colnames(data)){
+      p = plot.sf.function(data = data,
+                        ui.input = ui.input, 
+                        radial.profile = radial.profile)
+   } else {
+      p = plot.emptyMessage(message = "Wood properties are missing.")
    }
    return(p)
 }
 
+plot.sf.function = function(data, ui.input, radial.profile = FALSE){
+   if (ui.input$sf_style == "sf_facet_wrap"){
+      p = plot.sf.facets(data, ui.input, radial.profile)
+   } else {
+      if (ui.input$sf_style == "sf_grouped"){
+         p = plot.sf.groups(data, ui.input, radial.profile)
+      } else {
+         p = plot.sf.basic(data, ui.input, radial.profile)
+      }
+   }
+   return(p)
+}
 
-######## SAP FLOW DENSITY ########
+plot.sf.basic = function(data, ui.input, radial.profile = FALSE){
+   y.col = ui.input$sf_y_axis
+   
+   if (radial.profile){
+      p = data %>% 
+         ggplot(., aes(x = factor(position), y = get(y.col))) +
+         geom_boxplot(aes(col = factor(position))) +
+         labs(y = labels[[y.col]],
+              x = labels[["position"]],
+              col = labels[["position"]]) 
+   } else {
+      p = data %>% 
+         ggplot(., aes(x = datetime, y = get(y.col))) +
+         geom_line(aes(col = factor(position))) +
+         labs(y = labels[[y.col]],
+              col = labels[["position"]])
+   }
+   N = length(unique(data$position))
+   p = p +
+      scale_color_manual(values = fillcolors(N))
+   return(p)
+}
+
+plot.sf.facets = function(data, ui.input, radial.profile = FALSE){
+   y.col = ui.input$sf_y_axis
+   
+   scales = ui.input$sf_facet_scales
+   facet.col = ui.input$sf_facet_column
+   facet.col.no = ui.input$sf_facet_col_nums
+   
+   # Remove NA values in facet column if present
+   data = data[complete.cases(data[, facet.col]), ]
+   # Get facets based on column name
+   facet = get.labelledFacets(data, facet.col)
+   
+   col.col = ifelse(facet.col == "position", "doy", "position")
+   
+   if (radial.profile){
+      p = data %>% 
+         ggplot(., aes(x = factor(get(col.col)), y = get(y.col))) +
+         geom_boxplot(aes(col = factor(get(col.col)))) +
+         labs(y = labels[[y.col]],
+              x = labels[["position"]],
+              col = labels[["position"]]) 
+   } else {
+      p = data %>%
+         ggplot(aes(x = dTime, y = get(y.col))) +
+         geom_line(aes(col = factor(get(col.col)))) +
+         labs(x = labels["dTime"][[1]],
+              y = labels[y.col][[1]],
+              col = labels[col.col][[1]])
+   }
+
+   N = length(unique(data[, col.col]))
+   p = p  +
+      scale_color_manual(values = fillcolors(N)) +
+      facet_wrap(~ (facet), scales = scales,
+                 ncol = facet.col.no)
+   return(p)
+}
+
+plot.sf.groups = function(data, ui.input, radial.profile = FALSE){
+   y.col = ui.input$sf_y_axis
+   
+   GroupLegendName = ifelse(ui.input$sf_grouped_name == "", "Group",
+                            ui.input$sf_grouped_name)
+   
+   data = assign.customized.groups(data, ui.input)
+   N = length(unique(data$group))
+   
+   if (radial.profile){
+      p = add.group.mean(data, y.col) %>% 
+         ggplot(., aes(x = factor(group), col = factor(group), y = get(y.col))) +
+         geom_boxplot(aes(col = factor(group))) +
+         labs(x = GroupLegendName, 
+              y = labels[y.col][[1]],
+              col = GroupLegendName) +
+         theme(axis.title.x = element_blank())
+   } else {
+      p = add.group.mean(data, y.col) %>% 
+         ggplot(., aes(x = datetime, col = group)) +
+         geom_line(aes(y = get(y.col), linetype = factor(position))) +
+         geom_line(aes(y = mean_y), size = 1.1) +
+         labs(x = "", 
+              y = labels[y.col][[1]],
+              col = GroupLegendName,
+              linetype = labels["position"][[1]])
+   }
+   p = p +
+      scale_color_manual(values = fillcolors(N))
+   return(p)
+}
+
 
 #' Empty diagram
 #' @param message: message to be shown
@@ -599,84 +697,6 @@ plot.emptyMessage = function(message){
              theme_void())
 }
 
-#' Sap flow density diagram helper
-#' @param data: data.frame, long-format, complete data per positions
-#' @param ui.input: UI-input
-#' @return ggplot-object
-plot.sapFlowDensity.Helper = function(data, ui.input, boxplot = F){
-   # check if sap flow density is Inf
-   # helper variable; if 0 no sap flow density data is avail.
-   SFDensity = nrow(data)
-   if (ui.input$sapFlowDensityPlot.y == "SFDsw"){
-      SFDensity = nrow(data %>% 
-                          mutate(all = n()) %>% 
-                          filter(abs(SFDsw) != Inf))
-   }
-
-   # show error message if sap flow density haven't been calculated (i.e. is Inf)
-   if (SFDensity == 0){
-      p = plot.emptyMessage(message = "Wood properties are missing.")
-   } else{
-      p = plot.sapFlowDensity(data = data, 
-                              ui.input = ui.input,
-                              boxplot = boxplot) 
-   }
-   return(p)
-}
-
-#' Sap flow density diagram
-#' @param data: data.frame, long-format, complete data per positions
-#' @param ui.input: UI-input
-#' @param boxplot: boolean indicating whether or not to return a boxplot
-#' @return ggplot-object
-plot.sapFlowDensity <- function(data, ui.input, boxplot = F){
-   scales = ui.input$sapFlowDensityPlot_scales
-   facetWrap = ui.input$sapFlowDensityPlot_facetWrap
-   facet.col = ui.input$sapFlowDensityPlot.facet
-   facet.col.no = ui.input$sapFlowDensityPlot_facet.cols
-   
-   y = ui.input$sapFlowDensityPlot.y
-   col = ui.input$sapFlowDensityPlot.color
-   y.col = data[, y]
-   
-   col = ifelse(facet.col == "position", "doy", "position")
-   col.col = data[, col]
-
-   if (boxplot){
-      p = data %>% 
-         ggplot(.) +
-         geom_boxplot(aes(x = factor(position), y = y.col,
-                          col = factor(position))) +
-         labs(x = labels["position"][[1]], 
-              y = labels[y][[1]],
-              col = labels["position"][[1]])
-      if (facetWrap){
-         p = p +
-            facet_wrap(~ doy, scales = scales,
-                       ncol = facet.col.no)
-      }
-      
-   } else {
-      p = data %>% 
-         ggplot(.) +
-         geom_line(aes(x = datetime, y = y.col, col = factor(col.col))) +
-         labs(x = "", 
-              y = labels[y][[1]],
-              col = labels[col][[1]])
-      if (facetWrap){
-         facet = get.labelledFacets(data, facet.col)
-         p = data %>% 
-            ggplot(aes(x = dTime, y = y.col)) +
-            geom_line(aes(col = factor(col.col))) +
-            labs(x = labels["dTime"][[1]], 
-                 y = labels[y][[1]],
-                 col = labels[col][[1]]) +
-            facet_wrap(~ (facet), scales = scales,
-                       ncol = facet.col.no)
-      }
-   }
-   return(p)
-}
 
 ######## SAP FLOW RATE ########
 

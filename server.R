@@ -177,6 +177,7 @@ shinyServer(function(input, output, session) {
     #' data set in long format
     values <- reactiveValues(deltaTempLong = NULL)
     
+
     #' Reactive variable holding long-format data
     #' Assigned to reactive value if empty
     deltaTempLong <- reactive({
@@ -492,6 +493,7 @@ shinyServer(function(input, output, session) {
       return(get.kByMethod(data = deltaTempLong(),
                            ui.input = input))
     })
+    
 
     #' Reactive variable holding k-values derived
     #' based on selected method (zero-flow and regression)
@@ -762,96 +764,95 @@ shinyServer(function(input, output, session) {
     
     #### Graphics ####
     
-    ##### Sap Flow Index #####
+    ##### Sap Flow Metrics Diurnal Pattern #####
     
-    #' Reactive variable holding figure of sap flow index
-    sapFlowIndex <- reactive({
-      plot.sapFlowIndex(data = deltaTempLong(), 
-                        ui.input = input)
+    #' Helper function that catches each trigger element in sap flow panel
+    triggerSfPlotUpdate = reactive({
+      return(!is.null(input$sf_y_axis)| 
+               !is.null(input$sf_facet_scales) |
+               !is.null(input$sf_facet_column) |
+               !is.null(input$sf_facet_col_nums) |
+               input$sf_style != "sf_grouped" | 
+               input$sf_grouped_go |
+               click() != 0 |
+               sapWoodDepth() != 0)
     })
-    
-    #' Eventlistener to show figure of sap flow index
-    #' (Sap Flow > Sap Flow Index > Figure)
-    output$sapFlowIndex <- renderPlot({
-      sapFlowIndex()
-    })
-    
-    #' Eventlistener to save sap flow index plot
-    #' (Sap Flow > Sap Flow Index > Figure)
-    observeEvent(input$save.sfIndex, {
-      name_ap = ifelse(input$sfIndexPlot_wrap, 
-                       paste("_", input$sfIndexPlot.facet, sep = ""), "")
-      name = paste("SFI", name_ap, sep = "")
-      save.figure(path = projectPath(),
-                  name = name,
-                  plotObject = sapFlowIndex(), 
-                  ui.input = input)
-    })
-    
-
-    ##### Sap Flow Density #####
     
     #' Reactive variable holding figure of sap flow density
-    sapFlowDensityPlot = reactive({
-      if (click() == 0 && is.null(input$file2)){
-        plot.emptyMessage(message = "No k-values have been set yet.")
-      } else {
-        plot.sapFlowDensity.Helper(data = sapFlowDens(),
-                                   ui.input = input,
-                                   boxplot = F)
-      }
+    #' If group be thermocouple checkbox is activated evaluation stops 
+    #' until button is pressed
+    sapFlowMetricPlot <- eventReactive(triggerSfPlotUpdate(), {
+        if (input$sf_y_axis == "SFI"){
+          plot.sf.helper(data = deltaTempLong(),
+                      ui.input = input)
+        } else {
+          if (click() == 0 && is.null(input$file2)){
+            plot.emptyMessage(message = "No k-values have been set yet.")
+          } else {
+            plot.sf.helper(data = sapFlowDens(),
+                        ui.input = input)
+          }
+        }
     })
     
     #' Eventlistener to show figure of sap flow density
     #' (Sap Flow > Sap Flow Density > Figure > Diurnal pattern)
-    output$sapFlowDensity <- renderPlot({
-      sapFlowDensityPlot()
+    output$sapFlowMetric <- renderPlot({
+      sapFlowMetricPlot()
     })
     
     #' Eventlistener to save sap flow density plot
     #' (Sap Flow > Sap Flow Density > Figures > Diurnal pattern)
-    observeEvent(input$save.sapFlowDensityPlot, {
+    observeEvent(input$save.sapFlowMetricPlot, {
       save.figure(path = projectPath(),
-                  name = input$sapFlowDensityPlot.y, 
-                  plotObject = sapFlowDensityPlot(), 
+                  name = input$sf_y_axis, 
+                  plotObject = sapFlowMetricPlot(), 
                   ui.input = input)
     })
     
     #' Eventlistener to save sap flow density plot
     #' vertical profile
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
-    observeEvent(input$save.sapFlowDensity, {
+    observeEvent(input$save.sapFlowMetrics, {
       save.csv(path = projectPath(), 
-               name = "SFD",
+               name = input$sf_y_axis,
                csvObject = sapFlowDens(), 
                ui.input = input)
     })
     
-    #' Reactive variable holding figure of sap flow density
-    #' sensor profile, represented as boxplot
-    sapFlowDensityPlot.Boxplot = reactive({
-      if (click() == 0 && is.null(input$file2)){
-        plot.emptyMessage(message = "No k-values have been set yet.")
+    ##### Sap Flow Metrics Radial Profile #####
+    
+    #' Reactive variable holding figure of sap flow metrics
+    #' radial profile, represented as boxplots
+    sapFlowMetricPlot.RadialProfile = eventReactive(triggerSfPlotUpdate(), {
+      if (input$sf_y_axis == "SFI"){
+        plot.sf.helper(data = deltaTempLong(),
+                    ui.input = input,
+                    radial.profile = TRUE)
       } else {
-        plot.sapFlowDensity.Helper(data = sapFlowDens(),
-                                   ui.input = input,
-                                   boxplot = T)
+        if (click() == 0 && is.null(input$file2)){
+          plot.emptyMessage(message = "No k-values have been set yet.")
+        } else {
+          plot.sf.helper(data = sapFlowDens(),
+                      ui.input = input,
+                      radial.profile = TRUE)
+        }
       }
     })
     
     #' Eventlistener to show figure of sap flow density
     #' vertical profile
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
-    output$sapFlowDensity.Boxplot <- renderPlot({
-      sapFlowDensityPlot.Boxplot()
+    output$sapFlowMetric.RadialProfile <- renderPlot({
+      sapFlowMetricPlot.RadialProfile()
     })
     
     #' Eventlistener to save sap flow density plot
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
-    observeEvent(input$save.sapFlowDensityPlot.Boxplot, {
+    observeEvent(input$save.sapFlowMetric.RadialProfile, {
       save.figure(path = projectPath(),
-                  name = paste(input$sapFlowDensityPlot.y, "r-profil", sep = "_"),
-                  plotObject = sapFlowDensityPlot.Boxplot(), 
+                  name = paste(input$sf_y_axis, "r-profil", sep = "_"),
+                  plotObject = sapFlowMetricPlot.RadialProfile(), 
                   ui.input = input)
       
     })
@@ -862,7 +863,6 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of sap flow rate
     #' for selected methods
     sapFlowTreePlot <- reactive({
-      print(paste('click ', click()))
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
@@ -902,7 +902,6 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
     sapFlowTreePlotBar <- reactive({
-      print(paste('click ', click()))
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {

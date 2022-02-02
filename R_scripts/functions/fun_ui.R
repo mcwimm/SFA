@@ -84,9 +84,8 @@ menuOutput = function(){
                menuSubItem("Estimation", tabName = "k_est")),
       menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "sf_des"), 
-               menuSubItem("Sap Flow Index", tabName = "sf_ind"),
-               menuSubItem("Sap Flow Density", tabName = "sf_dens"),
-               menuSubItem("Sap Flow", tabName = "sf_flow"))
+               menuSubItem("Sap Flow Metrics", tabName = "sf_metrics"),
+               menuSubItem("Tree water use", tabName = "sf_flow"))
       ))
 }
 

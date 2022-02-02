@@ -57,50 +57,8 @@ sdDescriptionOutput <- function(){
    )
 }
 
-#### Sap flow index ####
 
-sfIndexOutput <- function(){
-   return(list(
-      fluidRow(
-         box(title = "Settings",
-             collapsible = T, width = 4,
-             status = "warning",
-
-             checkboxInput("sfIndexPlot_wrap", "Facet wrap", F),
-             
-             
-             
-             conditionalPanel(
-                condition = "input.sfIndexPlot_wrap == true",
-                
-                radioButtons("sfIndexPlot_scales","Scales", 
-                             choiceNames =  list(
-                                HTML("<span title='choose fixed'>fixed</span>"),
-                                HTML("<span title='choose free'>free</span>")
-                             ),
-                             choiceValues = list("fixed", "free"),
-                             inline=T),
-                
-                fluidRow(
-                   column(6, selectInput("sfIndexPlot.facet", "Facet",
-                                         choices = c("doy" = "doy",
-                                                     "position" = "position"))),
-                   column(6, numericInput("sfIndexPlot.facet.cols", "No. columns",
-                                          value = 4))
-                )
-                
-             )
-             
-         ),
-         box(title = "Figure",
-             collapsible = T, width = 8,
-             status = "info",
-             output.figure("sapFlowIndex"),
-             actButton("save.sfIndex", "Save figure", "saveFigure"))
-      )))
-}
-
-#### Sap flow density ####
+#### Sap flow metrics ####
 
 sfDensityOutput <- function(){
    return(list(
@@ -109,15 +67,21 @@ sfDensityOutput <- function(){
              collapsible = T, width = 4,
              status = "warning",
              
-             selectInput("sapFlowDensityPlot.y", "Y-axis",
-                         choices = c("Sap flow per section" = "SFS",
+             selectInput("sf_y_axis", "Y-axis",
+                         choices = c("Sap flow index" = "SFI",
+                                     "Sap flow per section" = "SFS",
                                      "Sap-wood-related density" = "SFDsw")),
              
-             checkboxInput("sapFlowDensityPlot_facetWrap", "Facet wrap", F),
+             radioButtons("sf_style", "Style",
+                          choices = c("Normal" = "normal",
+                                      "Facet wrap" = "sf_facet_wrap",
+                                      "Group by thermocouple positions" = 
+                                         "sf_grouped")),
+             
              conditionalPanel(
-                condition = "input.sapFlowDensityPlot_facetWrap == true",
+                condition = "input.sf_style == 'sf_facet_wrap'",
                 
-                radioButtons("sapFlowDensityPlot_scales","Scales", 
+                radioButtons("sf_facet_scales","Scales", 
                              choiceNames =  list(
                                 HTML("<span title='choose fixed'>fixed</span>"),
                                 HTML("<span title='choose free'>free</span>")
@@ -125,27 +89,45 @@ sfDensityOutput <- function(){
                              choiceValues = list("fixed", "free"),
                              inline=T),
                 fluidRow(
-                   column(6, selectInput("sapFlowDensityPlot.facet", "Facet",
+                   column(6, selectInput("sf_facet_column", "Facet",
                                          choices = c("doy" = "doy",
                                                      "position" = "position"))),
-                   column(6, numericInput("sapFlowDensityPlot_facet.cols", "No. columns",
+                   column(6, numericInput("sf_facet_col_nums",
+                                          "No. columns",
                                           value = 4))
-                )
-         )),
+                )),
+
+             conditionalPanel(
+                condition = "input.sf_style == 'sf_grouped'",
+                
+                p("Calculates mean of defined groups of thermocouples."),
+                fluidRow(
+                   column(8, textInput("sf_grouped_positions", "Groups*", 
+                                       placeholder = "e.g. inner: 3,4; outer: 1,2,5 <enter>")),
+                   column(4, textInput("sf_grouped_name", "Name",
+                                       placeholder = "Group"))
+                ),
+                actButton("sf_grouped_go", "Render plot",
+                          "update"),
+                p("* provide the name of each group and the corresponding thermocouple 
+                  positions separated by ':', list theromocouples separated by ',' 
+                  and groups separated by ';', i.e. 'name: 2, 4'.")
+             )
+         ),
          box(title = "Figures",
              collapsible = T, width = 8,
              status = "info",
              tabsetPanel(
                 tabPanel("Diurnal pattern", br(),
-                         output.figure("sapFlowDensity"),
-                         actButton("save.sapFlowDensityPlot",
+                         output.figure("sapFlowMetric"),
+                         actButton("save.sapFlowMetricPlot",
                                    "Save figure", 
                                    "saveFigure"),
-                         actButton("save.sapFlowDensity", 
+                         actButton("save.sapFlowMetrics", 
                                    "Save csv", "saveCsv")),
-                tabPanel("Sensor profile", br(),
-                         output.figure("sapFlowDensity.Boxplot"),
-                         actButton("save.sapFlowDensityPlot.Boxplot",
+                tabPanel("Radial profile", br(),
+                         output.figure("sapFlowMetric.RadialProfile"),
+                         actButton("save.sapFlowMetric.RadialProfile",
                                    "Save figure", 
                                    "saveFigure"))
              ))
