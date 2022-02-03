@@ -724,7 +724,7 @@ get.selectedMethods = function(ui.input){
 #' @param data: data.frame, long-format, complete data per positions
 #' @param ui.input: UI-input
 #' @return ggplot-object
-plot.sapFLowRate = function(data, ui.input){
+plot.sapFlowRate = function(data, ui.input){
    N = 0
    p = data %>% 
       ggplot(.) +

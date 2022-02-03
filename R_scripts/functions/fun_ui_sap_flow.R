@@ -134,7 +134,7 @@ sfDensityOutput <- function(){
          )))
 }
 
-#### Sap flow rate ####
+#### Tree water use ####
 
 sfRateOutput <- function(){
    return(
@@ -163,12 +163,14 @@ sfRateOutput <- function(){
                        
                        tabsetPanel(
                           tabPanel("Diurnal pattern", br(),
-                                   output.figure("SapFlowPlot"),
-                                   actButton("save.SapFlow", "Save figure", "saveFigure"),
+                                   output.figure("sapFlowTree"),
+                                   actButton("save.sapFlowTree", "Save figure",
+                                             "saveFigure"),
                                    actButton("save.SapFlowCsv", "Save csv", "saveCsv")),
                           tabPanel("Daily balance", br(),
-                                   output.figure("SapFlowPlotBar"),
-                                   actButton("save.SapFlowPlot",
+                                   output.figure("TWUbar"),
+                                   actButton("save.TWUbarplot",
+                                             "Save figure", "saveFigure")),
                                              "Save figure", "saveFigure")))
                        
                    ),
@@ -179,8 +181,8 @@ sfRateOutput <- function(){
                        collapsible = T,
                        width = NULL,
                        status = "info",
-                       output.table("twu.table"),
-                       actButton("save.TreeWaterUseCsv", "Save csv", "saveCsv")
+                       output.table("TWUtable"),
+                       actButton("save.TWUCsv", "Save csv", "saveCsv")
                    ))
          )))
 }

@@ -859,6 +859,7 @@ shinyServer(function(input, output, session) {
 
     
     ##### Sap Flow Rate #####
+    ###### Diurnal Pattern ######
     
     #' Reactive variable holding figure of sap flow rate
     #' for selected methods
@@ -869,20 +870,20 @@ shinyServer(function(input, output, session) {
         if (sapWoodDepth() == 0){
           plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
         } else {
-          plot.sapFLowRate(data = sapFlow(), 
+          plot.sapFlowRate(data = sapFlow(), 
                            ui.input = input)
         }}
     })
     
     #' Eventlistener to show figure of sap flow rate
     #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
-    output$SapFlowPlot <- renderPlot({
+    output$sapFlowTree <- renderPlot({
       sapFlowTreePlot()
     })
     
     #' Eventlistener to save sap flow rate figure
     #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
-    observeEvent(input$save.SapFlow, {
+    observeEvent(input$save.sapFlowTree, {
       save.figure(path = projectPath(),
                   name = "SapFlow",
                   plotObject = sapFlowTreePlot(), 
@@ -898,10 +899,11 @@ shinyServer(function(input, output, session) {
                ui.input = input)
     })
     
+    ###### Daily Balance ######
     
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
-    sapFlowTreePlotBar <- reactive({
+    TWUbarplot <- reactive({
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
@@ -915,37 +917,39 @@ shinyServer(function(input, output, session) {
     
     #' Eventlistener to show figure of daily water balance
     #' (Sap Flow > Sap Flow > Figures > Daily balance)
-    output$SapFlowPlotBar <- renderPlot({
-      sapFlowTreePlotBar()
+    output$TWUbar <- renderPlot({
+      TWUbarplot()
     })
     
     #' Eventlistener to save daily water balance
     #' (Sap Flow > Sap Flow > Figures > Daily balance)
-    observeEvent(input$save.SapFlowPlot, {
+    observeEvent(input$save.TWUbarplot, {
       save.figure(path = projectPath(),
                   name = "SapFlow_Balance",
-                  plotObject = sapFlowTreePlotBar(), 
+                  plotObject = TWUbarplot(), 
                   ui.input = input)
     })
     
-    #' Eventlistener to save daily tree water use as csv
-    #' (Sap Flow > Sap Flow > Tree water use)
-    observeEvent(input$save.TreeWaterUseCsv, {
-      save.csv(path = projectPath(), 
-               name = "TWU",
-               csvObject = treeWaterUse(), 
-               ui.input = input)
     })
     
     
     #### Table ####
     
     #' UI-Table with daily tree water use
-    output$twu.table <- DT::renderDataTable({ 
+    output$TWUtable <- DT::renderDataTable({ 
       if (sapWoodDepth() == 0){
         data.frame('.' = "Wood properties are missing (see 'Project settings')")
       } else {
         treeWaterUse()
       }
     }, options = list(scrollX = TRUE, dom = 't'))
+    
+    #' Eventlistener to save daily tree water use as csv
+    #' (Sap Flow > Sap Flow > Tree water use)
+    observeEvent(input$save.TWUCsv, {
+      save.csv(path = projectPath(), 
+               name = "TWU",
+               csvObject = treeWaterUse(), 
+               ui.input = input)
+    })
 })
