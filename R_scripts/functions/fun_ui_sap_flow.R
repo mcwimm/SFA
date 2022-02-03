@@ -171,6 +171,10 @@ sfRateOutput <- function(){
                                    output.figure("TWUbar"),
                                    actButton("save.TWUbarplot",
                                              "Save figure", "saveFigure")),
+                          tabPanel("Radial profile", br(),
+                                   p("Note: radial profile is not available for scaling method 2."),
+                                   output.figure("TWUradialprofile"),
+                                   actButton("save.TWUradialprofile",
                                              "Save figure", "saveFigure")))
                        
                    ),

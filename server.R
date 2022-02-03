@@ -930,6 +930,35 @@ shinyServer(function(input, output, session) {
                   ui.input = input)
     })
     
+    ###### Radial profile #####
+    
+    #' Reactive variable holding figure of daily water balance
+    #' for selected methods
+    TWUradialprofilePlot <- reactive({
+      if (click() == 0 && is.null(input$file2)){
+        plot.emptyMessage(message = "No k-values have been set yet.")
+      } else {
+        if (sapWoodDepth() == 0){
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        } else {
+          plot.twu.radialprofile(data = sapFlow(), 
+                                 ui.input = input)
+        }}
+    })
+    
+    #' Eventlistener to show figure of daily water balance
+    #' (Sap Flow > Sap Flow > Figures > Daily balance)
+    output$TWUradialprofile <- renderPlot({
+      TWUradialprofilePlot()
+    })
+    
+    #' Eventlistener to save daily water balance
+    #' (Sap Flow > Sap Flow > Figures > Daily balance)
+    observeEvent(input$save.TWUradialprofile, {
+      save.figure(path = projectPath(),
+                  name = "TWU_r-profile",
+                  plotObject = TWUradialprofilePlot(), 
+                  ui.input = input)
     })
     
     

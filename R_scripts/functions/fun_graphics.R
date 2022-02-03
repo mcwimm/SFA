@@ -759,6 +759,7 @@ plot.sapFlowRate = function(data, ui.input){
    return(p)
 }
 
+
 #' Water balance diagram
 #' @description Shows the area under the curve for measured sap flow density in kg, separated by direct and reverse flow.
 #' @param data: data.frame, long-format, complete data per positions
@@ -767,7 +768,7 @@ plot.sapFlowRate = function(data, ui.input){
 plot.sapFlowDay = function(data, ui.input){
    groups = get.selectedMethods(ui.input)
    
-   data = data %>% 
+   auc.data = data %>% 
       gather(., Method, SFrate, groups) %>% 
       mutate(Method = ifelse(Method == "sfM1", "Method 1",
                              ifelse(Method == "sfM2", "Method 2",
@@ -777,8 +778,9 @@ plot.sapFlowDay = function(data, ui.input){
       filter(complete.cases(.)) %>% 
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
-      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) 
-   return(data %>% 
+      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2)
+   
+   return(auc.data %>% 
       ggplot(., aes(x = factor(doy), fill = Method, y = auc)) +
          geom_bar(position="dodge", stat="identity", 
                   col = "black", alpha = 0.6) +
@@ -788,3 +790,48 @@ plot.sapFlowDay = function(data, ui.input){
               fill = "Scaling method"))
 }
 
+#' Radial profile of sap flow
+#' @description Shows the fraction of sap flow in each annuli in kg/L.
+#' @param data: data.frame, long-format, complete data per positions
+#' @param ui.input: UI-input
+#' @return ggplot-object
+plot.twu.radialprofile = function(data, ui.input){
+   groups = get.selectedMethods(ui.input)
+   # Remove sfM2 from groups as method 2 does not allow to estimate
+   # radial profiles
+   groups = groups[!grepl("sfM2", groups)]
+   # Over ride sf values with radial profile
+   if ("sfM1" %in% groups){
+      data$sfM1 = data$Aring * data$SFDsw
+   }
+   if ("sfM3" %in% groups){
+      data$sfM3 = data$Cring * data$SFS
+   }
+   auc.data = data %>% 
+      gather(., Method, sf_i, groups) %>% 
+      mutate(Date = as.Date(as.character(datetime)),
+             Balance = ifelse(sf_i >= 0, "Positive", "Negative"),
+             Method = ifelse(Method == "sfM1", "Method 1",
+                                    ifelse(Method == "sfM2", "Method 2",
+                                           "Method 3"))) %>%  
+      # mutate(Balance = factor(Balance,
+      #                         levels = c("Positive", "Negative"))) %>% 
+      filter(complete.cases(.)) %>% 
+      group_by(doy, Date, Method, position) %>% 
+      arrange(dTime) %>% 
+      distinct(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) 
+   
+   N = length(unique(auc.data$position))
+   
+   p = auc.data %>% 
+       ggplot(., aes(x = position, y = auc/1000, col = factor(position))) +
+       geom_boxplot(fill = NA) +
+       geom_jitter() +
+       scale_color_manual(values = fillcolors(N)) +
+       guides(col = F) +
+       labs(x = "Thermometer position",
+           y = expression(Tree~water~use~(kg~d^{-1}))) +
+      facet_wrap(~Method, ncol = 3, scales = "free") 
+   
+   return(p)
+}
