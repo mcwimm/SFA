@@ -109,13 +109,19 @@ kValueOutput <- function(){
              
              tabsetPanel(
                 tabPanel("K-diagram", br(),
-                         checkboxInput("k1Plot.fullrange", "Fullrange regression", 
-                                       value = F),
+                         conditionalPanel(
+                            condition = "input.kMethod == `regression`",
+                            checkboxInput("k1Plot.fullrange", "Fullrange regression", 
+                                          value = F)
+                         ),
                          output.figure("kvaluePlot1")),
                 tabPanel("Control-diagram 1", br(),
-                         checkboxInput("k1Plot.forceOrigin", 
-                                       "Force regression through origin", 
-                                       value = F),
+                         conditionalPanel(
+                            condition = "input.kMethod == `regression`",
+                            checkboxInput("k1Plot.forceOrigin", 
+                                          "Force regression through origin", 
+                                          value = F)
+                         ),
                          output.figure("kvaluePlot2")),
                 tabPanel("Control-diagram 2", br(),
                          output.figure("kvaluePlot3")),
