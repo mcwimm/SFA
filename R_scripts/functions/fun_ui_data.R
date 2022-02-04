@@ -81,13 +81,13 @@ box.dat_upl.upload = function(){
 box.dat_upl.depths = function(){
    return(list(
       p(strong("<Note>"), 
-        "Here, optional settings on sensor positions and the resulting stem
+        "Here, optional settings on thermometer positions and the resulting stem
         radius can be defined. Therefore, information on wood properties (see
-        'Project Settings') and sensor distances are required. Based on the sensor
+        'Project Settings') and thermometer distances are required. Based on the thermometer
         position the area and circumference
         of the circular ring, which are required to calculate sap flow rates,
         are estimated."),
-      p("Default: Position 1 is the outermost sensor position (i.e. closest to the bark) 
+      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark) 
       if not defined otherwise."),
       fluidRow(
          column(4, checkboxInput("positionManual", "Manual position input",
@@ -98,13 +98,13 @@ box.dat_upl.depths = function(){
       
       conditionalPanel(
          condition = "input.positionManual == true",
-         textInput("positionInput", "Sensor positions",
-                   placeholder = "Sensor positions as vector (comma delimited): 1, 2, 3")),
+         textInput("positionInput", "Thermometer positions",
+                   placeholder = "Thermometer positions as vector (comma delimited): 1, 2, 3")),
       
       conditionalPanel(
          condition = "input.depthManual == true",
-         textInput("depthInput", "Sensor depths",
-                   placeholder = "Sensor depths (cm) as vector (comma delimited): 
+         textInput("depthInput", "Thermometer depths",
+                   placeholder = "Thermometer depths (cm) as vector (comma delimited): 
                    10, 8, 7.5")),
       
       
@@ -115,7 +115,7 @@ box.dat_upl.depths = function(){
       
       conditionalPanel(
          condition = "input.sensorType == 'Manual'",
-         numericInput("distInput", "Distance between sensors (cm)",
+         numericInput("distInput", "Distance between thermometers (cm)",
                       value = 1)),
       
       
@@ -123,9 +123,9 @@ box.dat_upl.depths = function(){
       # verbatimTextOutput("depths"),
       output.table("depth.table"),
       
-      p("* negative values for 'Sensor R' indicate that the sensor is longer than 
-        tree radius (DBH / 2 - barkthickness) and the respective sensor positions are on the opposite side of the tree. "),
-      p("** negative values for 'Area' indicate that the sensors are located in the heartwood. Please adjust wood properties."),
+      p("* negative values for 'Sensor R' indicate that the thermometer is longer than 
+        tree radius (DBH / 2 - barkthickness) and the respective thermometer positions are on the opposite side of the tree. "),
+      p("** negative values for 'Area' indicate that the thermometers are located in the heartwood. Please adjust wood properties."),
       
       br(),
       p(strong("Schematic representation of an HFD sensor and its placement in the stem")),
