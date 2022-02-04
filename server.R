@@ -192,6 +192,8 @@ shinyServer(function(input, output, session) {
     #' Updates data for the whole App
     observeEvent(input$setData, {
       values$deltaTempLong <- deltaTempLongNoFilter()
+      # Reset selected K values (empty table)
+      emptyKvalues()
     })
     
     #' Reactive variable holding long-format data for
