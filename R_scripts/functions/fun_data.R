@@ -32,13 +32,44 @@ get.temperatures.ICT = function(file, sep, skip){
       col = grep("Exter", colnames(rawData) )[1]
       rawData = rawData[, c(1:col)]
       
-      datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
-      
-      rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
-                                     format=datetimeformat)
+      rawData = unify.datetime(rawData)
    }
    
    return(rawData)
+}
+
+unify.datetime = function(rawData){
+   if ("datetime" %in% tolower(names(rawData))){
+      print("Transform datetime to date and time")
+      datetimeformat = get.datetime.format(rawData[1,]$datetime)
+      rawData$datetime = as.POSIXct(rawData$datetime,
+                                    format = datetimeformat)
+      rawData$date = strftime(rawData$datetime, format="%d.%m.%Y")
+      rawData$time = strftime(rawData$datetime, format="%H:%M:%S")
+   } else {
+      if (all(c(tolower("time"), tolower("date")) %in% tolower(names(rawData)))){
+         print("Add datetime based on date and time")
+         
+         # Define columns with lower case names for further processing
+         rawData$date = rawData[grepl("(?i)date", colnames(rawData))]
+         rawData$time = rawData[grepl("(?i)time", colnames(rawData))]
+         # Remove upper case columns if exist
+         rawData[, names(date_col)] = NULL
+         rawData[, names(time_col)] = NULL
+         
+         datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
+         rawData = rawData %>% 
+            rowwise() %>% 
+            mutate(datetime = as.POSIXct(x = paste(date, time),
+                                         format = datetimeformat))
+      }
+   }
+
+   # # add hour of day and date of year
+   # rawData$dTime = convertTimeToDeci(as.character(rawData$time))
+   # rawData$doy <- strftime(rawData$datetime, format = "%j")
+   
+   return(data.frame(rawData))
 }
 
 #' Reads temperature differences from processed ICT-data file.
@@ -51,29 +82,32 @@ get.temp.differences.ICT = function(file, sep, skip){
                        header = TRUE, sep = sep, 
                        fileEncoding="latin1",
                        skip = skip)
+   rawData = unify.datetime(rawData)
 
-   if (all(c("Date", "Time") %in% colnames(rawData))){
-      datetimeformat = get.datetime.format(rawData[1, c("Date", "Time")])
-      rawData$datetime <- as.POSIXct(x = paste(rawData$Date, rawData$Time), 
-                                     format=datetimeformat)
-   }
    return(rawData)
 }
 
 #' Function to convert string to data-time format
-#' @param datetime: datetime as string
+#' @param date: datetime or date as string
+#' @param time: time as string
 #' @return datetime object
-get.datetime.format = function(datetime){
+get.datetime.format = function(date, time=""){
    # datetime = rawData[1, c("Date", "Time")]
-   if (!is.na(as.POSIXct(x = paste(datetime$Date, datetime$Time), 
+   if (!is.na(as.POSIXct(x = paste(date, time), 
                      format="%d.%m.%Y %H:%M:%S"))){
-      # print("%d.%m.%Y %H:%M")
       return("%d.%m.%Y %H:%M:%S")
    }
-   if (!is.na(as.POSIXct(x = paste(datetime$Date, datetime$Time), 
+   if (!is.na(as.POSIXct(x = paste(date, time), 
                          format="%d/%m/%Y %H:%M:%S"))){
-      # print("%d/%m/%Y %H:%M")
       return("%d/%m/%Y %H:%M:%S")
+   }
+   if (!is.na(as.POSIXct(x = paste(date, time), 
+                         format="%d.%m.%Y %H:%M"))){
+      return("%d.%m.%Y %H:%M")
+   }
+   if (!is.na(as.POSIXct(x = paste(date, time), 
+                         format="%d/%m/%Y %H:%M"))){
+      return("%d/%m/%Y %H:%M")
    }
 }
 
@@ -145,7 +179,7 @@ get.delta.from.temp = function(rawData, positions){
             get.delta.from.temp.depth(rawData = rawData, position = x))))
    
    # add hour of day and date of year
-   delta.temp$dTime = convertTimeToDeci(as.character(rawData$Time))
+   delta.temp$dTime = convertTimeToDeci(as.character(rawData$time))
    delta.temp$doy <- strftime(rawData$datetime, format = "%j")
    
    return(delta.temp)
@@ -199,8 +233,9 @@ get.delta.temp = function(rawData, positions){
                     get.delta.temp.depth(rawData = rawData, 
                                          position = x))))
    
-   delta.temp$dTime = convertTimeToDeci(as.character(rawData$Time))
+   delta.temp$dTime = convertTimeToDeci(as.character(rawData$time))
    delta.temp$doy <- strftime(rawData$datetime, format = "%j")
+   
    return(delta.temp)
 }
 
