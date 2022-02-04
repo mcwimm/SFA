@@ -640,8 +640,8 @@ shinyServer(function(input, output, session) {
     kplot1 <- reactive({
       suppressWarnings(print(
         plot.kEst1(data.complete = deltaTempLong.depth(),
-                 data.adj = cleanedDataAndKvalues()[[1]],
-                 ui.input = input)
+                   data.adj = cleanedDataAndKvalues()[[1]],
+                   ui.input = input)
       ))
     })
     
