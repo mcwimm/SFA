@@ -392,6 +392,9 @@ plot.kEst1 <- function(data.complete, data.adj, ui.input){
 #' @return ggplot-object
 plot.kEst2 <- function(data.complete, data.adj, k, 
                        ui.input){
+   if (is.na(k)){
+      return(plot.emptyMessage("K is not defined."))
+   }
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
    fixedScales = ui.input$k1Plot_scales
@@ -467,6 +470,9 @@ plot.kEst2 <- function(data.complete, data.adj, k,
 #' @return ggplot-object
 plot.kEst3 <- function(data.complete, data.adj, k,
                        ui.input){
+   if (is.na(k)){
+      return(plot.emptyMessage("K is not defined."))
+   }
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fixedScales = ui.input$k1Plot_scales
    
