@@ -130,9 +130,9 @@ get.delta.from.temp.depth <- function(rawData, position){
    raw_temperatures <- rawData[, grepl("Temp", colnames(rawData))]
    raw_temperatures <- raw_temperatures[, !grepl("Batt", colnames(raw_temperatures))]
    
-   reg.U <- paste(position, "U", sep=".")
-   reg.L <- paste(position, "L", sep=".")
-   reg.S <- paste(position, "S", sep=".")
+   reg.U <- paste(position, "\\S*(?i)U", sep=".")
+   reg.L <- paste(position, "\\S*(?i)L", sep=".")
+   reg.S <- paste(position, "\\S*(?i)S", sep=".")
    
    t_up <- matrix(as.numeric(raw_temperatures[, grepl(reg.U,
                                                colnames(raw_temperatures))]))
@@ -192,14 +192,13 @@ get.delta.from.temp = function(rawData, positions){
 #' @param position: numeric for selected position
 #' @return data.frame
 get.delta.temp.depth = function(rawData, position){
-   reg.sym <- paste("dTSym", position, sep = "")
-   reg.asym <- paste("dTas", position, sep = "")
+   # grep everything containg string and position, not case sensitive,
+   # ignore sep. between string & position
+   reg.sym <- paste("(?i)dTSym\\S*", position, sep = "")
+   reg.asym <- paste("(?i)dTas\\S*", position, sep = "")
 
-   sym <- matrix(rawData[, grepl(reg.sym,
-                                           colnames(rawData))])
-   
-   asym <- matrix(rawData[, grepl(reg.asym,
-                                            colnames(rawData))])
+   sym <- matrix(rawData[, grepl(reg.sym, colnames(rawData))])
+   asym <- matrix(rawData[, grepl(reg.asym, colnames(rawData))])
    
    if ((ncol(sym) != 1) | (ncol(asym) != 1)){
       print(paste("There is more than one temperature dataset for position ", position,
@@ -210,7 +209,7 @@ get.delta.temp.depth = function(rawData, position){
       dTas = asym,
       dTSym = sym
    )
-   
+
    delta.temp = cbind(delta.temp, 
                       "dTsa" = delta.temp[, "dTSym"] - 
                          delta.temp[, "dTas"],
@@ -264,11 +263,11 @@ convertTimeToDeci <- function(time){
 get.positionsFromRawData = function(dataSource, input){
 
    if (input$inputType == "HFD_raw"){
-      reg = "Asym"
+      reg = "(?i)Asym"
    }
    
    if (input$inputType == "HFD_delta"){
-      reg = "dTSym"
+      reg = "(?i)dTSym"
    }
    
    if (input$positionManual){
@@ -343,7 +342,7 @@ add.Props2DepthsHelper = function(depths, rxy, swd){
    depths[nrow(depths), "R"] = depths[nrow(depths), "depth"] - sensor_distance / 2
 
    depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"]
-   print(depths)
+   # print(depths)
    
    return(depths)
 }
