@@ -229,10 +229,9 @@ dataViewOutput = function(){
              condition = "input.rawPlot_facetWrap == true",
              radioButtons("rawPlot_scales","Scales", 
                           choiceNames =  list(
-                             HTML("<span title='choose fixed'>fixed</span>"),
-                             HTML("<span title='choose free'>free</span>")
+                             "fixed", "free", "free x", "free y"
                           ),
-                          choiceValues = list("fixed", "free"),
+                          choiceValues = list("fixed", "free", "free_x", "free_y"),
                           inline=T),
              fluidRow(
                 column(6, selectInput("rawPlot.facet", "Facet",
