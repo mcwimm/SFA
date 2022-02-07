@@ -302,7 +302,8 @@ shinyServer(function(input, output, session) {
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
     output$raw.wide <- DT::renderDataTable({
-      return(rawData())
+      return(rawData() %>% 
+               mutate(dTime = round(dTime, 2)))
     }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with raw data, long-format 
