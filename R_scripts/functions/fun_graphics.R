@@ -7,7 +7,8 @@ get.labelledFacets = function(data, facet.col){
    facet = as.integer(data[, facet.col]) 
    facet.factor <- c(unique(facet))
    labs = unlist(lapply(facet.factor, function(x) paste(facet.col, ": ", x, sep = "")))
-   return(factor(facet, labels = labs))
+   # Exclude = NULL includes NA as factor
+   return(factor(facet, labels = labs, exclude = NULL))
 }
 
 #' Fill colors
