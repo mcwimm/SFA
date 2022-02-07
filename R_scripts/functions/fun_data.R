@@ -56,8 +56,8 @@ unify.datetime = function(rawData){
          rawData[, names(date_col)] = NULL
          rawData[, names(time_col)] = NULL
          # Define columns with lower case names for further processing
-         rawData$date = date_col
-         rawData$time = time_col
+         rawData$date = date_col[[1]]
+         rawData$time = time_col[[1]]
 
          datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
          rawData = rawData %>% 
@@ -66,12 +66,15 @@ unify.datetime = function(rawData){
                                          format = datetimeformat))
       }
    }
-
-   # # add hour of day and date of year
-   # rawData$dTime = convertTimeToDeci(as.character(rawData$time))
-   # rawData$doy <- strftime(rawData$datetime, format = "%j")
    
-   return(data.frame(rawData))
+   # add hour of day and date of year
+   rawData$dTime = convertTimeToDeci(as.character(rawData$time))
+   rawData$doy <- as.numeric(strftime(rawData$datetime, format = "%j"))
+   
+   # Reorder columns
+   rawData = data.frame(rawData) %>% 
+      relocate(datetime, date, time, doy, dTime)
+   return(rawData)
 }
 
 #' Reads temperature differences from processed ICT-data file.
@@ -153,15 +156,21 @@ get.delta.from.temp.depth <- function(rawData, position){
 
    delta.temp <- data.frame(
                      datetime = rawData[, "datetime"],
+                     time = rawData[, "time"],
+                     doy = rawData[, "doy"],
+                     dTime = rawData[, "dTime"],
                      dTas = t_side[, 1] - t_low[, 1],
                      dTsa = t_up[, 1] - t_side[, 1],
                      dTSym = t_up[, 1] - t_low[, 1]
                   )
+   colnames(delta.temp) = c("datetime", "time", "doy", "dTime",
+                            "dTas", "dTsa", "dTSym")
    
    delta.temp = cbind(delta.temp, 
                       "dTsym.dTas" = delta.temp[, "dTSym"] / 
                delta.temp[, "dTas"],
                "timestep" = c(1:nrow(delta.temp)))
+
    return(delta.temp)
 }
 
@@ -179,11 +188,7 @@ get.delta.from.temp = function(rawData, positions){
                         lapply(positions, function(x)
       cbind(position = x, 
             get.delta.from.temp.depth(rawData = rawData, position = x))))
-   
-   # add hour of day and date of year
-   delta.temp$dTime = convertTimeToDeci(as.character(rawData$time))
-   delta.temp$doy <- strftime(rawData$datetime, format = "%j")
-   
+
    return(delta.temp)
 }
 
@@ -208,10 +213,15 @@ get.delta.temp.depth = function(rawData, position){
    }
    delta.temp <- data.frame(
       datetime = rawData[, "datetime"],
+      time = rawData[, "time"],
+      doy = rawData[, "doy"],
+      dTime = rawData[, "dTime"],
       dTas = asym,
       dTSym = sym
    )
-
+   colnames(delta.temp) = c("datetime", "time", "doy", "dTime",
+                            "dTas", "dTSym")
+   
    delta.temp = cbind(delta.temp, 
                       "dTsa" = delta.temp[, "dTSym"] - 
                          delta.temp[, "dTas"],
@@ -233,10 +243,6 @@ get.delta.temp = function(rawData, positions){
               cbind(position = x, 
                     get.delta.temp.depth(rawData = rawData, 
                                          position = x))))
-   
-   delta.temp$dTime = convertTimeToDeci(as.character(rawData$time))
-   delta.temp$doy <- strftime(rawData$datetime, format = "%j")
-   
    return(delta.temp)
 }
 
@@ -249,7 +255,7 @@ convertTimeToDeci <- function(time){
    dt = sapply(strsplit(time,":"),
                function(x) {
                   x <- as.numeric(x)
-                  x[1]+x[2]/60
+                  x[1]+x[2]/60+x[3]/3600
                })
    return(dt)
 }
@@ -471,38 +477,37 @@ remove.outlier <- function(data, data.vector){
 #' @param ui.input: UI-input
 #' @return data.frame
 get.filteredData <- function(data, ui.input){
-   
    data$doy <- as.numeric(data$doy)
-   
    # filter by day/ doy and day time
    minDoy = as.numeric(strftime(ui.input$daterange[1], format = "%j"))
    maxDoy = as.numeric(strftime(ui.input$daterange[2], format = "%j"))
-   
+
    data = data %>%
       filter(doy >= minDoy) %>%
       filter(doy <= maxDoy)
-   
+
    start = ui.input$timerangeStart
    end = ui.input$timerangeEnd
-   
    if (start < end){
       data = data %>% 
          filter(dTime >= start & dTime <= end) 
+
    } else {
       data = data %>% 
          filter(dTime >= start | dTime <= end) 
+
    }
-   
+
    # remove outlier
    if (ui.input$removeOutlier){
       data = remove.outlier(data, ui.input$filterPlot_X)
    }
-   
+
    # remove na-values
    if (ui.input$removeNA){
       data = data[complete.cases(data), ]
    }
-   
+
    # filter temperature filters by range
    dTSymMin = ifelse(is.na(ui.input$dTSymMin), -Inf, ui.input$dTSymMin)
    dTSymMax = ifelse(is.na(ui.input$dTSymMax), Inf, ui.input$dTSymMax)
@@ -522,13 +527,14 @@ get.filteredData <- function(data, ui.input){
    data = data %>%
       filter(dTsym.dTas >= dTsym.dTasMin) %>%
       filter(dTsym.dTas <= dTsym.dTasMax)
-   
+
    # filter by sensor positions
    if (ui.input$sensorFilter != ""){
       sensorFilter = as.numeric(unlist(strsplit(ui.input$sensorFilter,",")))
       data = data %>%
          filter(position %in% sensorFilter)
    }
+
    return(data)
 }
 
