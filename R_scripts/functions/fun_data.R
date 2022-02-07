@@ -50,13 +50,15 @@ unify.datetime = function(rawData){
       if (all(c(tolower("time"), tolower("date")) %in% tolower(names(rawData)))){
          print("Add datetime based on date and time")
          
-         # Define columns with lower case names for further processing
-         rawData$date = rawData[grepl("(?i)date", colnames(rawData))]
-         rawData$time = rawData[grepl("(?i)time", colnames(rawData))]
+         date_col = rawData[grepl("(?i)date", colnames(rawData))]
+         time_col = rawData[grepl("(?i)time", colnames(rawData))]
          # Remove upper case columns if exist
          rawData[, names(date_col)] = NULL
          rawData[, names(time_col)] = NULL
-         
+         # Define columns with lower case names for further processing
+         rawData$date = date_col
+         rawData$time = time_col
+
          datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
          rawData = rawData %>% 
             rowwise() %>% 
