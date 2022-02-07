@@ -777,6 +777,7 @@ shinyServer(function(input, output, session) {
                !is.null(input$sf_facet_col_nums) |
                input$sf_style != "sf_grouped" | 
                input$sf_grouped_go |
+               input$setData |
                click() != 0 |
                sapWoodDepth() != 0)
     })
