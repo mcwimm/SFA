@@ -60,7 +60,7 @@ settingsOutput = function(){
                        ),
                        
                        numericInput("ThermalDiffusivity", 
-                                    "Thermal diffusivity (cm/s)",
+                                    HTML("Thermal diffusivity (cm<sup>2</sup> s <sup>-1</sup>)"),
                                     value = 0.0025),
                        
                        h4("Sensor properties"),
