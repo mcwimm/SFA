@@ -705,7 +705,14 @@ shinyServer(function(input, output, session) {
       appendix = input$kPositionSelect
       if (input$kMethod == "regression"){
         appendix = method_name_reg(ui.input = input)
-        #ToDO remove signs
+        # Replace characters in file name 
+        print(appendix)
+        appendix = str_replace_all(appendix, pattern = ",", replacement = "_")
+        print(appendix)
+        appendix = str_replace_all(appendix, pattern = ":", replacement = "_")
+        print(appendix)
+        appendix = str_replace_all(appendix, pattern = " ", replacement = "")
+        print(appendix)
       }
       save.figure(path = projectPath(),
                   name = paste("k-diagram_sensor", "_", appendix, sep = ""),
