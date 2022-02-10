@@ -73,6 +73,7 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "T" = paste("Temperature (\u00B0", "C)", sep = ""),
                "doy" = "Day of year",
                "dTime" = "Time (h)",
+               "datetime" = "",
                "position" = "Thermometer position",
                "SFI" = "Sap Flow Index (\u00B0 C)",
                "SF" = expression(paste("Sap Flow rate (kg \u22C5 ",
@@ -226,7 +227,8 @@ get.customizedPlotSettings = function(ui.input){
       scales = ui.input$rawPlot_scales,
       facet = ui.input$rawPlot.facet,
       no.cols = ui.input$rawPlot.columns,
-      all.dT = ui.input$rawPlot_gathered
+      all.dT = ui.input$rawPlot_gathered,
+      draw_lines = ui.input$rawPlot_lines
    ))
 }
 
@@ -244,7 +246,8 @@ plot.customTemperature <- function(data, ui.input.processed){
    scales = ui.input.processed$scales
    facet = ui.input.processed$facet
    no.cols = ui.input.processed$no.cols
-
+   draw_lines = ui.input.processed$draw_lines
+   
    if (!ui.input.processed$all.dT){
       x = data[, x.col]
       y = data[, y.col]
@@ -276,6 +279,10 @@ plot.customTemperature <- function(data, ui.input.processed){
       if (length(unique(shape)) > 6){
          p = p +
             scale_shape_manual(values = c(1:length(unique(shape))))
+      }
+      if (draw_lines){
+         p = p +
+            geom_line()
       }
    } else {
       p = data %>% 

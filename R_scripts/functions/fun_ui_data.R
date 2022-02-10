@@ -242,9 +242,10 @@ dataViewOutput = function(){
              )
           ),
           tags$hr(),
-          
           checkboxInput("rawPlot_gathered", "Plot all temperature differences over time", F),
           
+          tags$hr(),
+          checkboxInput("rawPlot_lines", "Draw lines", F),
           
           actButton("renderPlot", "Render figure", "update")
       
