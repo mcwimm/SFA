@@ -31,7 +31,8 @@ add.k2data = function(data, values){
    return(data)
 }
 
-#' Sap flow density
+#' Sap flow per section and density
+#' Calculated with positive or negative formula (see Nadezhdina & Nadezhdin, 2017)
 #' @param method: character
 #' @param data: data.frame, long-format
 #' @param sapWoodDepth: numeric
@@ -43,9 +44,17 @@ get.sapFlowDensity <- function(method = "HFD", data,
    Zax = ui.input$Zax
    Ztg = ui.input$Ztg
    
-   if (method == "HFD") {
-      data$SFS = 3600 * Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
-         Zax / Ztg
+   if (method == "HFD"){
+      # Eq. 1 in NNadezhdina & Nadezhdin, 2017
+      if (ui.input$sf_formula == "Positive"){
+         data$SFS = 3600 * Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
+            Zax / Ztg
+      }
+      # Eq. 2 in Nadezhdina & Nadezhdin, 2017
+      if (ui.input$sf_formula == "Negative"){
+         data$SFS = -3600 * Dst * (-data[, "k"] + data[, "dTas"]) / data[, "dTsa"] *
+            Zax / Ztg
+      }
       if (sapWoodDepth != 0){
          data$SFDsw = NA
          data$SFDsw = data$SFS / sapWoodDepth

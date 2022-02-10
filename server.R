@@ -784,6 +784,8 @@ shinyServer(function(input, output, session) {
                !is.null(input$sf_facet_column) |
                !is.null(input$sf_facet_col_nums) |
                input$sf_style != "sf_grouped" | 
+               input$sf_formula == "Negative" | 
+               input$sf_formula == "Positve" | 
                input$sf_grouped_go |
                input$setData |
                click() != 0 |
@@ -817,7 +819,7 @@ shinyServer(function(input, output, session) {
     #' (Sap Flow > Sap Flow Density > Figures > Diurnal pattern)
     observeEvent(input$save.sapFlowMetricPlot, {
       save.figure(path = projectPath(),
-                  name = input$sf_y_axis, 
+                  name = paste(input$sf_y_axis, input$sf_formula, sep = "_"), 
                   plotObject = sapFlowMetricPlot(), 
                   ui.input = input)
     })
@@ -827,7 +829,7 @@ shinyServer(function(input, output, session) {
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowMetrics, {
       save.csv(path = projectPath(), 
-               name = input$sf_y_axis,
+               name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
                csvObject = sapFlowDens(), 
                ui.input = input)
     })
@@ -863,7 +865,7 @@ shinyServer(function(input, output, session) {
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowMetric.RadialProfile, {
       save.figure(path = projectPath(),
-                  name = paste(input$sf_y_axis, "r-profil", sep = "_"),
+                  name = paste(input$sf_y_axis, input$sf_formula, "r-profil", sep = "_"),
                   plotObject = sapFlowMetricPlot.RadialProfile(), 
                   ui.input = input)
       

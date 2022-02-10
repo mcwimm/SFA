@@ -112,7 +112,13 @@ sfDensityOutput <- function(){
                 p("* provide the name of each group and the corresponding thermocouple 
                   positions separated by ':', list theromocouples separated by ',' 
                   and groups separated by ';', i.e. 'name: 2, 4'.")
-             )
+             ),
+             
+             tags$hr(),
+             radioButtons("sf_formula", "SFS-Formula (Nadezhdina & Nadezhdin, 2017)",
+                          choiceNames = list("Positive", "Negative"),
+                          choiceValues = list("Positive", "Negative"),
+                           inline = TRUE)
          ),
          box(title = "Figures",
              collapsible = T, width = 8,
