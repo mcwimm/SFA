@@ -3,17 +3,28 @@
 #' @param UI-input: file, file-args, method, etc.
 #' @return data.frame
 get.rawData = function(input){
+   an.error.occured = F
    if (input$inputType == "HFD_raw"){
       # print("HFD_raw")
-      return(get.temperatures.ICT(input$file1$datapath,
-                                  sep = input$sep,
-                                  skip = input$skip))
+      tryCatch( { rawData  = get.temperatures.ICT(input$file1$datapath,
+                                                  sep = input$sep,
+                                                  skip = input$skip) },
+                error = function(e) {an.error.occured <<- TRUE})
+      print(an.error.occured)
+      
    }
    if (input$inputType == "HFD_delta"){
       # print("HFD_delta")
-      return(get.temp.differences.ICT(input$file1$datapath,
-                                      sep = input$sep,
-                                      skip = input$skip))
+      tryCatch( { rawData  = get.temp.differences.ICT(input$file1$datapath,
+                                                      sep = input$sep,
+                                                      skip = input$skip) },
+                error = function(e) {an.error.occured <<- TRUE})
+      
+   }
+   if (an.error.occured){
+      return(data.frame())
+   } else {
+      return(rawData)
    }
 }
 

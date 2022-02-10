@@ -302,8 +302,16 @@ shinyServer(function(input, output, session) {
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
     output$raw.wide <- DT::renderDataTable({
-      return(rawData() %>% 
+      rawData = rawData()
+      if ("dTime" %in% colnames(rawData)){
+        return(rawData %>% 
                mutate(dTime = round(dTime, 2)))
+      } else {
+        m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
+        return(datatable(m) %>%
+                 formatStyle(1, color = 'red', backgroundColor = 'orange', fontWeight = 'bold'))
+      }
+      
     }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with raw data, long-format 
