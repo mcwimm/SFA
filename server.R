@@ -551,11 +551,8 @@ shinyServer(function(input, output, session) {
       if (click == 1){
         emptyKvalues()
       }
-      if (input$dTimeFilter & input$kMethod == "regression"){
-        method_name = paste("regression", " (",
-                            input$kRegressionTime.start, " - ",
-                            input$kRegressionTime.end, ")",
-                            sep = "")
+      if (input$kMethod == "regression"){
+        method_name = method_name_reg(ui.input = input)
       } else {
         method_name = gsub(".", "-", input$kMethod, fixed = TRUE)
       }
@@ -706,22 +703,20 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > Control plots) 
     observeEvent(input$save.kPlots, {
       appendix = input$kPositionSelect
-      if (input$dTimeFilter & input$kMethod == "regression"){
-        appendix = paste(appendix, "time",
-                          input$kRegressionTime.start,
-                          input$kRegressionTime.end, 
-                          sep = "_")
+      if (input$kMethod == "regression"){
+        appendix = method_name_reg(ui.input = input)
+        #ToDO remove signs
       }
       save.figure(path = projectPath(),
-                  name = paste("k-diagram_sensor", appendix, sep = "_"),
+                  name = paste("k-diagram_sensor", "_", appendix, sep = ""),
                   plotObject = kplot1(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-1_sensor", appendix, sep = "_"),
+                  name = paste("k-control-1_sensor", "_", appendix, sep = ""),
                   plotObject = kplot2(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-2_sensor", appendix, sep = "_"),
+                  name = paste("k-control-2_sensor", "_", appendix, sep = ""),
                   plotObject = kplot3(),
                   ui.input = input)
       
