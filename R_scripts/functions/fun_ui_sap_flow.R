@@ -63,7 +63,7 @@ sdDescriptionOutput <- function(){
 sfDensityOutput <- function(){
    return(list(
       fluidRow(
-         box(title = "Figure settings",
+         box(title = "Settings",
              collapsible = T, width = 4,
              status = "warning",
              
@@ -116,7 +116,7 @@ sfDensityOutput <- function(){
          ),
          box(title = "Figures",
              collapsible = T, width = 8,
-             status = "info",
+             status = "success",
              tabsetPanel(
                 tabPanel("Diurnal pattern", br(),
                          output.figure("sapFlowMetric"),
@@ -159,7 +159,7 @@ sfRateOutput <- function(){
             column(width = 8,
                    box(title = "Figures",
                        collapsible = T, width = NULL,
-                       status = "info",
+                       status = "success",
                        
                        tabsetPanel(
                           tabPanel("Diurnal pattern", br(),
@@ -184,7 +184,7 @@ sfRateOutput <- function(){
                        p("Note: Incomplete data sets (e.g. half a day) might lead to an over- or underestimation."),
                        collapsible = T,
                        width = NULL,
-                       status = "info",
+                       status = "success",
                        output.table("TWUtable"),
                        actButton("save.TWUCsv", "Save csv", "saveCsv")
                    ))

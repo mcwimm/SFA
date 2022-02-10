@@ -12,7 +12,7 @@ themes <- list("Bw" = theme_bw(),
 settingsOutput = function(){
    return(
       fluidRow(
-         column(8,
+         column(7,
                 fluidRow(
                    box(title = "Project",
                        status = "warning", solidHeader = F, #height = 300,
@@ -74,10 +74,10 @@ settingsOutput = function(){
                        )
                    )
                 )),
-         column(4,
+         column(5,
                 fluidRow(
-                   box(title = "Output",
-                       status = "info", solidHeader = F, 
+                   box(title = "File output",
+                       status = "warning", solidHeader = F, 
                        collapsible = T, width = 12,
                        p(em("(Optional inputs)")),
                        selectInput("figFor", "Figure format",
@@ -88,10 +88,10 @@ settingsOutput = function(){
                        textInput("figTitle", "Figure title", 
                                  placeholder = "e.g. tree species"),
                        textInput("fileAppend", "File Appendix", 
-                                 placeholder = "e.g. summer"),
-                       
-                       br(),
-                       h4("Visualization"),
+                                 placeholder = "e.g. summer")),
+                   box(title = "Visualization",
+                       status = "warning", solidHeader = F, 
+                       collapsible = T, width = 12,
                        selectInput("figTheme", "Figure theme (ggplot)",
                                    choices = names(themes),
                                    selected = themes["Light"]),

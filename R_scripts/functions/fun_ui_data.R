@@ -7,22 +7,6 @@ dataUplOutput = function(){
    return(
       fluidRow(
          column(6,
-                box(title = "Description",
-                    collapsible = T, width = "100%",
-                    status = "info",
-                    includeMarkdown("./man/des_data.md")),
-                box(title = "Preview data",
-                    collapsible = T, width = "100%",
-                    status = "info",
-                    
-                    tabsetPanel(
-                       tabPanel("wide", br(),
-                                output.table("raw.wide")),
-                       tabPanel("long", br(),
-                                actButton("save_dat_upl", "Save csv", "saveCsv"),
-                                br(),
-                                output.table("raw.long"))))),
-         column(6,
                 box(title = "Upload file",
                     collapsible = T, width = "100%",
                     status = "warning",
@@ -33,7 +17,23 @@ dataUplOutput = function(){
                     status = "warning",
                     box.dat_upl.depths()
                     )
-                )
+                ),
+         column(6,
+                box(title = "Description", collapsed = T,
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    includeMarkdown("./man/des_data.md")),
+                box(title = "Preview data",
+                    collapsible = T, width = "100%",
+                    status = "success",
+                    
+                    tabsetPanel(
+                       tabPanel("wide", br(),
+                                output.table("raw.wide")),
+                       tabPanel("long", br(),
+                                actButton("save_dat_upl", "Save csv", "saveCsv"),
+                                br(),
+                                output.table("raw.long")))))
       ))
 }
 
@@ -148,7 +148,7 @@ dataFilterOutput = function(){
          column(8,
                 box(title = "Figures",
                     collapsible = T, width = "100%",
-                    status = "info",
+                    status = "success",
                     box.filter.figures(),
                     actButton("save_dat_filter", "Save csv", "saveCsv"),
                     actButton("save_dat_filter_fig", "Save figure", "saveFigure")),
@@ -251,7 +251,7 @@ dataViewOutput = function(){
       ),
       box(title = "Figure",
           collapsible = T, width = 8,
-          status = "info",
+          status = "success",
           output.figure("custumPlot"),
           actButton("save.custumPlot", "Save figure", "saveFigure"))
    ))   

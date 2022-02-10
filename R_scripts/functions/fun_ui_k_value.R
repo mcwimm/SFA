@@ -114,8 +114,9 @@ kValueOutput <- function(){
          ),
          box(title = "Control plots",
              collapsible = T,
-             status = "info",
-             radioButtons("k1Plot_scales", "Scales", c("free" = F, "fixed" = T), inline=T),
+             status = "success",
+             radioButtons("k1Plot_scales", "Scales", 
+                          c("free" = F, "fixed" = T), inline=T),
              
              
              uiOutput("xRangeSlider"),
