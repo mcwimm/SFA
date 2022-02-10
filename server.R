@@ -494,6 +494,8 @@ shinyServer(function(input, output, session) {
           filter(position == input$kPositionSelect)
       data = get.time.filtered.data(data = data,
                                     ui.input = input)
+      data = get.dTratio.filtered.data(data = data,
+                                    ui.input = input)
       return(clean.data.iteration(data))
     })
     
