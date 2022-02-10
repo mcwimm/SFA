@@ -40,6 +40,25 @@ get.kByMethodAll <- function(data, ui.input){
                 "no.flow" = get.zeroflowKvalues(data)))
 }
 
+
+method_name_reg = function(ui.input){
+   method_name = "regression, dTas"
+   if (ui.input$kRegUseBoth){
+      method_name = paste(method_name, "-dTs-a", sep = "")
+   }
+   if (ui.input$dTimeFilter){
+      method_name = paste(method_name, ", time: ",
+                          ui.input$kRegressionTime.start, " - ",
+                          ui.input$kRegressionTime.end,
+                          sep = "")
+   }
+   if (ui.input$kRegXFilter){
+      method_name = paste(method_name, ", dTsym:dTas: ",
+                          ui.input$kRegXFilter.max, sep = "")
+   }
+   return(method_name)
+}
+
 #' K table helper
 #' @param data: data.frame, long-format
 #' @param method: character, method to estimate k
@@ -49,13 +68,7 @@ get.kByMethodAll <- function(data, ui.input){
 fill.k.table = function(method, k.data, ui.input, reactive.value){
    # Define method name
    if (method == "regression"){
-      method_name = "auto. regression"
-      if (ui.input$dTimeFilter){
-         method_name = paste(method_name, " (",
-                             ui.input$kRegressionTime.start, " - ",
-                             ui.input$kRegressionTime.end, ")",
-                             sep = "")
-      }
+      method_name = method_name_reg(ui.input)
    }
    if (method == "no.flow"){
       method_name = "No-flow"
@@ -94,7 +107,9 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
    # Filter 0-trend data points by time, if filter is enables
    data = get.time.filtered.data(data = data,
                                  ui.input = ui.input)
-
+   # Filter by max. dTsym-dTas ratio, if filter is enables
+   data = get.dTratio.filtered.data(data = data,
+                                    ui.input = ui.input)
    # Iterate through data
    data.adj = clean.data.iteration(data)
    
@@ -109,7 +124,14 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
                    R.kAs = data.adj[[2]][[2]],
                    kSa = data.adj[[3]][[1]],
                    R.kSa = data.adj[[3]][[2]])
-   df$k = mean(c(abs(df$kAs), abs(df$kSa)))
+   
+   # Set K depending on user input
+   # Use mean of regressions with dTas AND dTsa
+   if (ui.input$kRegUseBoth){
+      df$k = mean(c(abs(df$kAs), abs(df$kSa)))
+   } else { # Use only dTas
+      df$k = df$kAs
+   }
    return(df)
 }
 
@@ -143,6 +165,18 @@ get.time.filtered.data = function(data, ui.input){
             filter(dTime >= ui.input$kRegressionTime.start |
                       dTime <= ui.input$kRegressionTime.end) 
       }
+   }
+   return(data)
+}
+
+#' dTsym/dTas filter
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input 
+#' @return data.frame
+get.dTratio.filtered.data = function(data, ui.input){
+   if (ui.input$kRegXFilter){
+      data = data %>% 
+         filter(dTsym.dTas <= ui.input$kRegXFilter.max) 
    }
    return(data)
 }

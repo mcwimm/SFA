@@ -47,6 +47,10 @@ kValueOutput <- function(){
                 numericInput("kManual", "Enter k manually", value = 1.11)
              ),
              
+             p(strong("Regression: filter options")),
+             
+             checkboxInput("kRegUseBoth", HTML("Use <i>dTas</i> and <i>dTs-a</i> for regression (instead of solely <i>dTas</i>)"), value = F),
+            
              checkboxInput("dTimeFilter", "Custom no-flow time (regression)", F),
              conditionalPanel(
                 condition = "input.dTimeFilter == true",
@@ -57,6 +61,15 @@ kValueOutput <- function(){
                    column(6, numericInput("kRegressionTime.end", 
                                           label = "End (0-24 h)",
                                           value = 6))
+                )
+             ),
+             checkboxInput("kRegXFilter", HTML("Custom max. <i>dTsym dTas <sup>-1</sup></i>  (regression)"), F),
+             conditionalPanel(
+                condition = "input.kRegXFilter == true",
+                fluidRow(
+                   column(6, numericInput("kRegXFilter.max",
+                                          label = HTML("max. <i>dTsym dTas <sup>-1</sup></i>"),
+                                          value = 1.5))
                 )
              ),
              
