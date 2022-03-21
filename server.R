@@ -704,16 +704,17 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save.kPlots, {
       appendix = input$kPositionSelect
       if (input$kMethod == "regression"){
-        appendix = method_name_reg(ui.input = input)
-        # Replace characters in file name 
-        print(appendix)
-        appendix = str_replace_all(appendix, pattern = ",", replacement = "_")
-        print(appendix)
-        appendix = str_replace_all(appendix, pattern = ":", replacement = "_")
-        print(appendix)
-        appendix = str_replace_all(appendix, pattern = " ", replacement = "")
-        print(appendix)
+        appendix = paste(appendix, method_name_reg(ui.input = input), sep = "_")
+      } else {
+        appendix = paste(appendix, input$kMethod, sep = "_")
       }
+
+      # Replace characters in file name 
+      appendix = str_replace_all(appendix, pattern = ",", replacement = "_")
+      appendix = str_replace_all(appendix, pattern = ":", replacement = "_")
+      appendix = str_replace_all(appendix, pattern = " ", replacement = "")
+      appendix = str_replace_all(appendix, pattern = "\\.", replacement = "_")
+      
       save.figure(path = projectPath(),
                   name = paste("k-diagram_sensor", "_", appendix, sep = ""),
                   plotObject = kplot1(),
