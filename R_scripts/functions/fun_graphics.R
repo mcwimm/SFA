@@ -839,7 +839,7 @@ plot.twu.radialprofile = function(data, ui.input){
       data$sfM1 = data$Aring * data$SFDsw
    }
    if ("sfM3" %in% groups){
-      data$sfM3 = data$Cring * data$SFS
+      data$sfM3 = data$Cring * data$SFS * 1 / length(unique(data$position))
    }
    auc.data = data %>% 
       gather(., Method, sf_i, groups) %>% 
