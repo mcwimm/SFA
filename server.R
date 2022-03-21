@@ -10,7 +10,7 @@ shinyServer(function(input, output, session) {
     volumes = getVolumes()
     
     #' Variable holding possible root directories
-    roots = c('working directory' = ".",
+    roots = c('working directory' = getwd(),
               system = volumes())
     
     #' Shiny function to 'to navigate the filesystem'
