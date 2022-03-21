@@ -601,7 +601,14 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
                         ui.input = ui.input, 
                         radial.profile = radial.profile)
    } else {
-      p = plot.emptyMessage(message = "Wood properties are missing.")
+      if (ui.input$sf_y_axis == ""){
+         p = plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+      } else {
+         p = plot.emptyMessage(message = "WARNING: information is missing, 
+                                          e.g. number of negative-flow
+                                          thresholds != number of positions, ....")
+      }
+      
    }
    return(p)
 }

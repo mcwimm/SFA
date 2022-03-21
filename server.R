@@ -89,7 +89,7 @@ shinyServer(function(input, output, session) {
     
     #' Function to render all ggplots with defined theme
     output$theme_output <- renderUI({ 
-      req(input$figTheme)
+      #req(input$figTheme)
       theme_set(plot_theme())
       NULL
     })
@@ -788,10 +788,11 @@ shinyServer(function(input, output, session) {
                !is.null(input$sf_facet_column) |
                !is.null(input$sf_facet_col_nums) |
                input$sf_style != "sf_grouped" | 
-               input$sf_formula == "Negative" | 
                input$sf_formula == "Positve" | 
                input$sf_grouped_go |
+               input$sf_negative_go |
                input$setData |
+               input$FilterApply |
                click() != 0 |
                sapWoodDepth() != 0)
     })

@@ -52,14 +52,85 @@ get.sapFlowDensity <- function(method = "HFD", data,
       }
       # Eq. 2 in Nadezhdina & Nadezhdin, 2017
       if (ui.input$sf_formula == "Negative"){
-         data$SFS = -3600 * Dst * (-data[, "k"] + data[, "dTas"]) / data[, "dTsa"] *
-            Zax / Ztg
+         data = get.negativeSFS(data, ui.input)
       }
       if (sapWoodDepth != 0){
          data$SFDsw = NA
          data$SFDsw = data$SFS / sapWoodDepth
       }
    }
+   return(data)
+}
+
+
+#' Helpfer function to calculate sap flow per section with negative formula
+#' 3 options are available: default threshold, i.e. 0°C, manual defined threshold
+#' applied to all thermometer positions, individual manual threshold for each
+#' positions
+#' @param data: data.frame, long-format
+#' @param ui.input: UI-input
+#' @return data.frame
+get.negativeSFS = function(data, ui.input){
+   Dst = ui.input$ThermalDiffusivity
+   Zax = ui.input$Zax
+   Ztg = ui.input$Ztg
+   
+   
+   # Use default threshold of 0°C
+   if (ui.input$sf_formula_threshold == ""){
+      print("Apply default threshold")
+      data = data %>%
+         mutate(neg_SFS_threshold = 0,
+                SFS = ifelse(dTSym >= 0, 3600 * Dst * (k + dTsa) /
+                                dTas * Zax / Ztg,
+                             -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
+   } else {
+      # Use manual threshold
+      
+      # remove white spaces
+      sf_formula_threshold = gsub(" ", "", ui.input$sf_formula_threshold, fixed = TRUE)
+      # get individual values
+      sf_formula_threshold = strsplit(sf_formula_threshold, ",")[[1]]
+
+      no_thresholds = length(sf_formula_threshold)
+      print(paste("Number of threshods ", no_thresholds))
+      # Apply threshold to all positions
+      if (no_thresholds == 1){
+         threshold = as.numeric(sf_formula_threshold)
+         print(paste("Apply threshold to all positions: ", threshold))
+         data = data %>%
+            mutate(neg_SFS_threshold = threshold,
+                   SFS = ifelse(dTSym >= threshold, 3600 * Dst * (k + dTsa) /
+                                   dTas * Zax / Ztg,
+                                -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
+      } else {
+         no_positions = length(unique(data$position))
+         # Apply threshold to each position separately
+         if (no_thresholds != no_positions){
+            print("ERROR: Number of thresholds provided differs from the number of thermometer positions.")
+         } else {
+            sf_formula_thresholds = as.numeric(sf_formula_threshold)
+
+            new_data = data.frame()
+            positions = sort(unique(data$position))
+            for (i in 1:no_positions){
+               pos = positions[i]
+               threshold = as.numeric(sf_formula_threshold[i])
+               print(paste("Apply threshold ", threshold, " to position ", pos, "."))
+               
+               d = data %>%
+                  filter(position == pos) %>% 
+                  mutate(neg_SFS_threshold = threshold,
+                         SFS = ifelse(dTSym >= threshold, 3600 * Dst * (k + dTsa) /
+                                         dTas * Zax / Ztg,
+                                      -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
+               new_data = rbind(new_data, d)
+            }
+            data = new_data
+         }
+      }
+   }
+   print(summary(data$SFS))
    return(data)
 }
 

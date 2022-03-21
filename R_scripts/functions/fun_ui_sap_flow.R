@@ -118,7 +118,16 @@ sfDensityOutput <- function(){
              radioButtons("sf_formula", "SFS-Formula (Nadezhdina & Nadezhdin, 2017)",
                           choiceNames = list("Positive", "Negative"),
                           choiceValues = list("Positive", "Negative"),
-                           inline = TRUE)
+                           inline = TRUE),
+             p(em("Default threshold for negative formula is SFI = 0\u00b0C.")),
+             conditionalPanel(
+                condition = "input.sf_formula == 'Negative'",
+                textInput("sf_formula_threshold", "Manual threshold(s)*",
+                          placeholder = "0, -0.1, -0.1"),
+                p(em("*Enter either one threshold that will be applied to all thermometer positions, or one threshold for each position separated by comma (order: position 1, position 2, ...position n).")),
+                actButton("sf_negative_go", "Render plot",
+                          "update"),
+             )
          ),
          box(title = "Figures",
              collapsible = T, width = 8,
