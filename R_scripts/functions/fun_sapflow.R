@@ -271,7 +271,6 @@ get.treeWaterUseByMethod = function(data, ui.input){
    
    groups = groups[,1]
    
-   # Credits for AUC: Victor Klos (https://stackoverflow.com/a/30280873)
    data = data %>% 
       gather(., Method, SFrate, groups) %>% 
       mutate(Method = ifelse(Method == "sfM1", "Method 1",
@@ -283,9 +282,14 @@ get.treeWaterUseByMethod = function(data, ui.input){
       distinct(datetime, doy, dTime, Method, SFrate, Balance) %>% 
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
-      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
+      mutate(roll_mean = (SFrate + lag(SFrate))/2,
+             delta_x = dTime - lag(dTime),
+             trapezoid = delta_x * roll_mean) %>% 
+      distinct(auc = sum(trapezoid, na.rm = T)) %>% 
+      # Credits for AUC below: Victor Klos (https://stackoverflow.com/a/30280873)
+      # distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>%  
       rename('tree water use' = 'auc',
-             "Day of year" = "doy") %>%  
+             "Day of year" = "doy") %>%   ungroup() %>% 
       spread(., Balance, 'tree water use') %>% 
       mutate_if(is.numeric, round, 2)
 
