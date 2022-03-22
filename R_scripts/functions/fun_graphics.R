@@ -669,7 +669,7 @@ plot.sf.facets = function(data, ui.input, radial.profile = FALSE){
          geom_boxplot(aes(col = factor(get(col.col)))) +
          labs(y = labels[[y.col]],
               x = labels[["position"]],
-              col = labels[["position"]]) 
+              col = labels[[col.col]]) 
    } else {
       p = data %>%
          ggplot(aes(x = dTime, y = get(y.col))) +
