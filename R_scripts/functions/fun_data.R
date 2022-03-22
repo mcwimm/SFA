@@ -13,7 +13,7 @@ get.rawData = function(input){
       print(an.error.occured)
       
    }
-   if (input$inputType == "HFD_delta"){
+   if (input$inputType == "HFD_delta" | input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
       # print("HFD_delta")
       tryCatch( { rawData  = get.temp.differences.ICT(input$file1$datapath,
                                                       sep = input$sep,
@@ -21,6 +21,7 @@ get.rawData = function(input){
                 error = function(e) {an.error.occured <<- TRUE})
       
    }
+
    if (an.error.occured){
       return(data.frame())
    } else {
@@ -124,6 +125,10 @@ get.datetime.format = function(date, time=""){
    if (!is.na(as.POSIXct(x = paste(date, time), 
                          format="%d/%m/%Y %H:%M"))){
       return("%d/%m/%Y %H:%M")
+   }
+   if (!is.na(as.POSIXct(x = paste(date, time), 
+                         format="%Y-%m-%d %H:%M:%S"))){
+      return("%Y-%m-%d %H:%M:%S")
    }
 }
 
@@ -281,20 +286,25 @@ convertTimeToDeci <- function(time){
 #' @return vector
 get.positionsFromRawData = function(dataSource, input){
 
-   if (input$inputType == "HFD_raw"){
-      reg = "(?i)Asym"
-   }
-   
-   if (input$inputType == "HFD_delta"){
-      reg = "(?i)dTSym"
-   }
-   
-   if (input$positionManual){
-      positions = as.numeric(unlist(strsplit(input$positionInput,",")))
+   if (any(grepl("(?i)pos", colnames(dataSource)))){
+      positions = unique(dataSource[, grepl("(?i)pos", colnames(dataSource))])
    } else {
-      positions = c(1:ncol(dataSource[, grepl(reg, 
-                                          colnames(dataSource))]))
+      if (input$inputType == "HFD_raw"){
+         reg = "(?i)Asym"
+      }
+      
+      if (input$inputType == "HFD_delta"){
+         reg = "(?i)dTSym"
+      }
+      
+      if (input$positionManual){
+         positions = as.numeric(unlist(strsplit(input$positionInput,",")))
+      } else {
+         positions = c(1:ncol(dataSource[, grepl(reg, 
+                                                 colnames(dataSource))]))
+      }
    }
+
    
    return(positions)
 }

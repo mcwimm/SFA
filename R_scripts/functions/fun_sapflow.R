@@ -28,6 +28,7 @@ add.k2data = function(data, values){
    # Add k-value to data set by position
    data = merge(data, kValues[, c("position", "k")], by = "position")
    data = data[!is.na(data$datetime), ]
+
    return(data)
 }
 
@@ -130,7 +131,6 @@ get.negativeSFS = function(data, ui.input){
          }
       }
    }
-   print(summary(data$SFS))
    return(data)
 }
 
@@ -237,19 +237,26 @@ get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
    methods <- list("treeScaleSimple1" = ui.input$treeScaleSimple1,
                    "treeScaleSimple2" = ui.input$treeScaleSimple2,
                    "treeScaleSimple3" = ui.input$treeScaleSimple3)
+   if (ui.input$inputType == "HFD_processed_read"){
+      data = data
+   } else {
+      # remove columns if in write mode
+      if(ui.input$inputType == "HFD_processed_write"){
+         data[, c("depth", "Aring", "R", "Cring")] = NULL
+      }
+      data = data %>% 
+         merge(., depths, by = "position")
+      for (m in c(1:length(methods))){
+         if (methods[[m]]){
+            method = names(methods)[m]
+            data = get.sapFlowByMethod(data = data,
+                                       method = method, 
+                                       swd = sapWoodDepth) 
+            
+         } 
+      }        
+   }
    
-   data = data %>% 
-      merge(., depths, by = "position")
-   
-   for (m in c(1:length(methods))){
-      if (methods[[m]]){
-         method = names(methods)[m]
-         data = get.sapFlowByMethod(data = data,
-                                    method = method, 
-                                    swd = sapWoodDepth) 
-         
-      } 
-   }        
    return(data)
 }
 

@@ -1,3 +1,6 @@
+# Define file upload limit, now 15 MB
+options(shiny.maxRequestSize = 15*1024^2)
+
 shinyServer(function(input, output, session) {
   
     ########################
@@ -170,6 +173,9 @@ shinyServer(function(input, output, session) {
       if (input$inputType == "HFD_delta"){
         d = get.delta.temp(data, positions)
       }
+      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
+        d = data
+      }
       return(d)
     })
   
@@ -325,11 +331,21 @@ shinyServer(function(input, output, session) {
     #' sensor position, depth, area and circumference of ring
     #' (Data > Upload > Sensor settings)
     output$depth.table <- DT::renderDataTable({
-      return(depths() %>%
-               mutate_at(vars(3, 4, 5), round, 1) %>%
-               select(-R) %>%
-               `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                        "Circ. (cm)")))
+      if (input$inputType == "HFD_processed_read" & "Aring" %in% colnames(rawData())){
+        return(rawData() %>% 
+                 distinct(position, R, Aring, Cring) %>% 
+                 select(position, R, Aring, Cring) %>% 
+                 mutate_at(vars(2,3, 4), round, 1)%>%
+                 `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                                 "Circ. (cm)")))
+      } else {
+        return(depths() %>%
+                 mutate_at(vars(3, 4, 5), round, 1) %>%
+                 select(-R) %>%
+                 `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                                 "Circ. (cm)")))
+      }
+
     }, options = list(scrollX = TRUE, searching = F))
     
     
@@ -528,6 +544,10 @@ shinyServer(function(input, output, session) {
     click <- reactive(({
       click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
         input$setKfromZeroFlow[1]
+      # check if values$kvalues is filled due to upload of processed data
+      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write" & !is.null(values$kvalues)){
+        click = click + 1
+      }
     }))
     
     #### Store and display selected k-values ####
@@ -541,6 +561,12 @@ shinyServer(function(input, output, session) {
       values$kvalues <-  data.frame(position = positions(),  
                                     method = rep(NA),
                                     k = rep(NA))
+      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
+          values$kvalues <-  deltaTempLong() %>%
+            mutate(method = "HFD_processed") %>% 
+            distinct(position, method, k) %>% 
+            select(position, method, k)
+      }
     })
     
     #' Eventlistener to set/ store k-value as reactive value
@@ -743,12 +769,23 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding sap flow density
     #' based on k-values
     sapFlowDens <- reactive({
-      data = add.k2data(data = deltaTempLong(),
-                        values = values)
-      return(get.sapFlowDensity(method = "HFD",
-                                data = data,
-                                sapWoodDepth = sapWoodDepth(),
-                                ui.input = input))
+      data = deltaTempLong()
+      
+      # Only calculate SFD if not in read mode
+      if (input$inputType == "HFD_processed_read" & !is.null(values$kvalues)){
+        return(data)
+      } else {
+        if (input$inputType == "HFD_processed_write"){
+          # if processed file is uploaded delete existing k values
+          data$k = NULL
+        }
+        data = add.k2data(data = data,
+                          values = values)
+        return(get.sapFlowDensity(method = "HFD",
+                                  data = data,
+                                  sapWoodDepth = sapWoodDepth(),
+                                  ui.input = input))
+        }
     })
     
     #' Reactive variable holding distances between
@@ -887,12 +924,13 @@ shinyServer(function(input, output, session) {
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
-        if (sapWoodDepth() == 0){
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        } else {
+        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
           plot.sapFlowRate(data = sapFlow(), 
                            ui.input = input)
-        }}
+        } else {
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        }
+      }
     })
     
     #' Eventlistener to show figure of sap flow rate
@@ -927,12 +965,13 @@ shinyServer(function(input, output, session) {
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
-        if (sapWoodDepth() == 0){
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        } else {
+        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
           plot.sapFlowDay(data = sapFlow(), 
                           ui.input = input)
-        }}
+        } else {
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        }
+      }
     })
     
     #' Eventlistener to show figure of daily water balance
@@ -958,12 +997,13 @@ shinyServer(function(input, output, session) {
       if (click() == 0 && is.null(input$file2)){
         plot.emptyMessage(message = "No k-values have been set yet.")
       } else {
-        if (sapWoodDepth() == 0){
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        } else {
+        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
           plot.twu.radialprofile(data = sapFlow(), 
                                  ui.input = input)
-        }}
+        } else {
+          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+        }
+      }
     })
     
     #' Eventlistener to show figure of daily water balance
@@ -986,10 +1026,10 @@ shinyServer(function(input, output, session) {
     
     #' UI-Table with daily tree water use
     output$TWUtable <- DT::renderDataTable({ 
-      if (sapWoodDepth() == 0){
-        data.frame('.' = "Wood properties are missing (see 'Project settings')")
-      } else {
+      if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
         treeWaterUse()
+      } else {
+        data.frame('.' = "Wood properties are missing (see 'Project settings')")
       }
     }, options = list(scrollX = TRUE, dom = 't'))
     

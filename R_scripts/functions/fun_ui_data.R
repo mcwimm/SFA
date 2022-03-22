@@ -65,7 +65,9 @@ box.dat_upl.upload = function(){
       
       selectInput("inputType", "Input file type",
                   c("Raw" = "HFD_raw", 
-                    "Delta" = "HFD_delta")),
+                    "Delta" = "HFD_delta",
+                    "Processed read" = "HFD_processed_read",
+                    "Processed write" = "HFD_processed_write")),
       numericInput("skip", "Skip:", min = 0, max = 100, 10),
 
       # Input: Checkbox if file has header ----

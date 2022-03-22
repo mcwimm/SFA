@@ -5,7 +5,7 @@ Calculated based on the area of each circular ring (method 1), sapwood area (met
 
 Method 1: SF<sub>i</sub> = SFD<sub>i</sub>  * A<sub>i</sub> 
 
-Method 2: SF = SFD&#772 * A<sub>sw</sub> 
+Method 2: SF = <span style="text-decoration:overline">SFD</span> * A<sub>sw</sub> 
 
 Method 1: SF<sub>i</sub> = SFS<sub>i</sub>  * C<sub>i</sub> / n
 
