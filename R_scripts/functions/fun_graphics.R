@@ -338,7 +338,7 @@ plot.nighttime <- function(data.complete){
 #' @param data.adj: data.frame, long-format, data per position selected for regression
 #' @param ui.input: UI-input
 #' @return ggplot-object
-plot.kEst1 <- function(data.complete, data.adj, ui.input){
+plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
    fixedScales = ui.input$k1Plot_scales
@@ -382,7 +382,12 @@ plot.kEst1 <- function(data.complete, data.adj, ui.input){
                                                          sep = "~~~~")),
                               label.y.npc = c("top", "bottom")) +
         labs(caption = "* Black cross (x): data point used for regression")
-   } 
+   } else {
+      p = p +
+         geom_point(data.frame(k = c(k, -k)),
+                    mapping=aes(x = 0, y = k),
+                    size = 4, col = "red", shape = 8)
+   }
 
    
    if (fixedScales){

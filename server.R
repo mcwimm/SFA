@@ -681,6 +681,7 @@ shinyServer(function(input, output, session) {
       suppressWarnings(print(
         plot.kEst1(data.complete = deltaTempLong.depth(),
                    data.adj = cleanedDataAndKvalues()[[1]],
+                   k = kValue(),
                    ui.input = input)
       ))
     })
