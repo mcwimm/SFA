@@ -173,7 +173,8 @@ shinyServer(function(input, output, session) {
       if (input$inputType == "HFD_delta"){
         d = get.delta.temp(data, positions)
       }
-      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
+      if (input$inputType == "HFD_processed_read" |
+          input$inputType == "HFD_processed_write"){
         d = data
       }
       return(d)
@@ -315,7 +316,9 @@ shinyServer(function(input, output, session) {
       } else {
         m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
         return(datatable(m) %>%
-                 formatStyle(1, color = 'red', backgroundColor = 'orange', fontWeight = 'bold'))
+                 formatStyle(1, color = 'red', 
+                             backgroundColor = 'orange', 
+                             fontWeight = 'bold'))
       }
       
     }, options = list(scrollX = TRUE, searching = F))
@@ -545,7 +548,9 @@ shinyServer(function(input, output, session) {
       click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
         input$setKfromZeroFlow[1]
       # check if values$kvalues is filled due to upload of processed data
-      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write" & !is.null(values$kvalues)){
+      if ((input$inputType == "HFD_processed_read" | 
+           input$inputType == "HFD_processed_write") & 
+          !is.null(values$kvalues)){
         click = click + 1
       }
     }))
@@ -561,11 +566,12 @@ shinyServer(function(input, output, session) {
       values$kvalues <-  data.frame(position = positions(),  
                                     method = rep(NA),
                                     k = rep(NA))
-      if (input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
+      if (input$inputType == "HFD_processed_read" | 
+          input$inputType == "HFD_processed_write"){
           values$kvalues <-  deltaTempLong() %>%
-            mutate(method = "HFD_processed") %>% 
-            distinct(position, method, k) %>% 
-            select(position, method, k)
+                                mutate(method = "HFD_processed") %>% 
+                                distinct(position, method, k) %>% 
+                                select(position, method, k)
       }
     })
     
@@ -839,17 +845,17 @@ shinyServer(function(input, output, session) {
     #' If group be thermocouple checkbox is activated evaluation stops 
     #' until button is pressed
     sapFlowMetricPlot <- eventReactive(triggerSfPlotUpdate(), {
-        if (input$sf_y_axis == "SFI"){
-          plot.sf.helper(data = deltaTempLong(),
-                      ui.input = input)
+      if (input$sf_y_axis == "SFI"){
+        plot.sf.helper(data = deltaTempLong(),
+                    ui.input = input)
+      } else {
+        if (click() == 0 && is.null(input$file2)){
+          plot.emptyMessage(message = "No k-values have been set yet.")
         } else {
-          if (click() == 0 && is.null(input$file2)){
-            plot.emptyMessage(message = "No k-values have been set yet.")
-          } else {
-            plot.sf.helper(data = sapFlowDens(),
-                        ui.input = input)
-          }
+          plot.sf.helper(data = sapFlowDens(),
+                      ui.input = input)
         }
+      }
     })
     
     #' Eventlistener to show figure of sap flow density
@@ -908,7 +914,8 @@ shinyServer(function(input, output, session) {
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowMetric.RadialProfile, {
       save.figure(path = projectPath(),
-                  name = paste(input$sf_y_axis, input$sf_formula, "r-profil", sep = "_"),
+                  name = paste(input$sf_y_axis, input$sf_formula, 
+                               "r-profil", sep = "_"),
                   plotObject = sapFlowMetricPlot.RadialProfile(), 
                   ui.input = input)
       

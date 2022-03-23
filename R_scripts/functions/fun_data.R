@@ -13,7 +13,9 @@ get.rawData = function(input){
       print(an.error.occured)
       
    }
-   if (input$inputType == "HFD_delta" | input$inputType == "HFD_processed_read" | input$inputType == "HFD_processed_write"){
+   if (input$inputType == "HFD_delta" |
+       input$inputType == "HFD_processed_read" |
+       input$inputType == "HFD_processed_write"){
       # print("HFD_delta")
       tryCatch( { rawData  = get.temp.differences.ICT(input$file1$datapath,
                                                       sep = input$sep,
@@ -371,8 +373,7 @@ add.Props2DepthsHelper = function(depths, rxy, swd){
    depths[nrow(depths), "R"] = depths[nrow(depths), "depth"] - sensor_distance / 2
 
    depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"]
-   # print(depths)
-   
+
    return(depths)
 }
 
