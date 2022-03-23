@@ -106,29 +106,27 @@ get.negativeSFS = function(data, ui.input){
                                 -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
       } else {
          no_positions = length(unique(data$position))
-         # Apply threshold to each position separately
-         if (no_thresholds != no_positions){
-            print("ERROR: Number of thresholds provided differs from the number of thermometer positions.")
-         } else {
-            sf_formula_thresholds = as.numeric(sf_formula_threshold)
 
-            new_data = data.frame()
-            positions = sort(unique(data$position))
-            for (i in 1:no_positions){
-               pos = positions[i]
-               threshold = as.numeric(sf_formula_threshold[i])
-               print(paste("Apply threshold ", threshold, " to position ", pos, "."))
-               
-               d = data %>%
-                  filter(position == pos) %>% 
-                  mutate(neg_SFS_threshold = threshold,
-                         SFS = ifelse(dTSym >= threshold, 3600 * Dst * (k + dTsa) /
-                                         dTas * Zax / Ztg,
-                                      -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
-               new_data = rbind(new_data, d)
-            }
-            data = new_data
+         sf_formula_thresholds = as.numeric(sf_formula_threshold)
+
+         new_data = data.frame()
+         positions = sort(unique(data$position))
+         for (i in 1:no_thresholds){
+            pos = positions[i]
+            threshold = as.numeric(sf_formula_threshold[i])
+            print(paste("Apply threshold ", threshold, " to position ", pos, "."))
+            
+            d = data %>%
+               filter(position == pos) %>% 
+               mutate(neg_SFS_threshold = threshold,
+                      SFS = ifelse(dTSym >= threshold, 3600 * Dst * (k + dTsa) /
+                                      dTas * Zax / Ztg,
+                                   -3600 * Dst * (-k + dTas) / dTsa * Zax / Ztg))
+            new_data = rbind(new_data, d)
+
          }
+         data = new_data
+         
       }
    }
    return(data)
