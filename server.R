@@ -308,7 +308,7 @@ shinyServer(function(input, output, session) {
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
-    output$raw.wide <- DT::renderDataTable({
+    output$raw.wide <- DT::renderDataTable(DT::datatable({
       rawData = rawData()
       if ("dTime" %in% colnames(rawData)){
         return(rawData %>% 
@@ -321,7 +321,7 @@ shinyServer(function(input, output, session) {
                              fontWeight = 'bold'))
       }
       
-    }, options = list(scrollX = TRUE, searching = F))
+    }, options = list(scrollX = TRUE, searching = F)))
     
     #' UI Table with raw data, long-format 
     #' (Data > Upload > Preview data)
@@ -544,7 +544,7 @@ shinyServer(function(input, output, session) {
     
     #' Reactive variable holding a helper to check 
     #' if any k-values have been set
-    click <- reactive(({
+    click <- reactive({
       click = input$setK[1] + input$setKfromCsv[1] + input$setKfromRegression[1] +
         input$setKfromZeroFlow[1]
       # check if values$kvalues is filled due to upload of processed data
@@ -553,7 +553,8 @@ shinyServer(function(input, output, session) {
           !is.null(values$kvalues)){
         click = click + 1
       }
-    }))
+      return(click)
+    })
     
     #### Store and display selected k-values ####
     
