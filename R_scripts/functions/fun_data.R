@@ -287,8 +287,10 @@ convertTimeToDeci <- function(time){
 #' @param input: UI-input
 #' @return vector
 get.positionsFromRawData = function(dataSource, input){
-
-   if (any(grepl("(?i)pos", colnames(dataSource)))){
+   # Check if processed data are used and if they contain a column with positions
+   cond1 = grepl("processed", input$inputType)
+   cond2 = any(grepl("(?i)position", colnames(dataSource)))
+   if (cond1 & cond2){
       positions = unique(dataSource[, grepl("(?i)pos", colnames(dataSource))])
    } else {
       if (input$inputType == "HFD_raw"){
@@ -306,7 +308,6 @@ get.positionsFromRawData = function(dataSource, input){
                                                  colnames(dataSource))]))
       }
    }
-
    
    return(positions)
 }
@@ -345,7 +346,6 @@ get.depths <- function(depthManual = F, inputType,
       }
       
       df = df[df$position %in% positions, ]
-      
    }
    
    return(df)

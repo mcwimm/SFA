@@ -334,7 +334,17 @@ shinyServer(function(input, output, session) {
     #' sensor position, depth, area and circumference of ring
     #' (Data > Upload > Sensor settings)
     output$depth.table <- DT::renderDataTable({
-      if (input$inputType == "HFD_processed_read" & "Aring" %in% colnames(rawData())){
+      rawData = rawData()
+      
+      # Conditions to determine whether processed data contains relevant
+      # wood properties
+      # If true, show them
+      cond1 = input$inputType == "HFD_processed_read"
+      cond2 = input$inputType == "HFD_processed_write" & 
+        sapWoodDepth() == 0
+      cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
+
+      if ((cond1 | cond2) & cond3){
         return(rawData() %>% 
                  distinct(position, R, Aring, Cring) %>% 
                  select(position, R, Aring, Cring) %>% 
