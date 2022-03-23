@@ -7,12 +7,17 @@ sdDescriptionOutput <- function(){
    return(
       fluidRow(
          column(6,
-                box(title = "Sap Flow Index", width = "100%",
+                box(title = "Sap Flow Metrics", width = "100%",
                     collapsible = T, status = "info",
-                    includeMarkdown("./man/des_sf_index.md")),
-                box(title = "Sap Flow",
-                    collapsible = T, status = "info", width = "100%",
-                    includeMarkdown("./man/des_sf.md")),
+                    includeMarkdown("./man/des_sf_metrics.md"))
+         ),
+         
+         
+         column(6,
+                box(title = "Tree water use", width = "100%",
+                    collapsible = T, status = "info",
+                    includeMarkdown("./man/des_sf_twu.md")),
+                
                 box(title = "References",
                     collapsible = T, status = "info", width = "100%",
                     p(strong("Sap flow index:"), 
@@ -23,33 +28,18 @@ sdDescriptionOutput <- function(){
                       HTML('&nbsp;'),
                       a("Nadezhdina (1999)", 
                         href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
-                    p(strong("Sap flow density:"), 
+                    p(strong("Sap flow per section and density:"), 
                       HTML('&nbsp;'),
                       a("Nadezhdina (2018)", 
-                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ""))#,
-                # HTML('&nbsp;'),
-                # a("Author", href="", target="_blank")),
-                # p(strong("Sap flow:"), 
-                #   HTML('&nbsp;'),
-                #   a("Author", href="", target="_blank"), ",",
-                #   HTML('&nbsp;'),
-                #   a("Author", href="", target="_blank")),
-                # p(strong("Tree water use:"), 
-                #   HTML('&nbsp;'),
-                #   a("Author", href="", target="_blank"), ",",
-                #   HTML('&nbsp;'),
-                #   a("Author", href="", target="_blank")))
-         ),
-         
-         
-         column(6,
-                box(title = "Sap Flow Density", width = "100%",
-                    collapsible = T, status = "info",
-                    includeMarkdown("./man/des_sf_density.md")),
+                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ""),
+                    p(strong("Sap flow and tree water use:"), 
+                      HTML('&nbsp;'),
+                      a("Nadezhdina (2018)", 
+                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
+                      HTML('&nbsp;'),
+                      a("Nadezhdina (2012)", 
+                        href="https://https://www.actahort.org/books/951/951_13.htm", target="_blank"), ""))
                 
-                box(title = "Tree water use", width = "100%",
-                    collapsible = T, status = "info",
-                    includeMarkdown("./man/des_sf_twu.md"))
          )
          
       )
@@ -188,6 +178,7 @@ sfRateOutput <- function(){
                                              "Save figure", "saveFigure")),
                           tabPanel("Radial profile", br(),
                                    p("Note: radial profile is not available for scaling method 2."),
+                                   p("Each point represents one day."),
                                    output.figure("TWUradialprofile"),
                                    actButton("save.TWUradialprofile",
                                              "Save figure", "saveFigure")))
