@@ -601,19 +601,13 @@ add.group.mean = function(data, y.col){
 
 plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
    data$SFI = data$dTSym
+
    if (ui.input$sf_y_axis %in% colnames(data)){
       p = plot.sf.function(data = data,
                         ui.input = ui.input, 
                         radial.profile = radial.profile)
    } else {
-      if (ui.input$sf_y_axis == ""){
-         p = plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-      } else {
-         p = plot.emptyMessage(message = "WARNING: information is missing, 
-                                          e.g. number of negative-flow
-                                          thresholds != number of positions, ....")
-      }
-      
+      p = plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
    }
    return(p)
 }
