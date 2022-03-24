@@ -219,10 +219,12 @@ dataViewOutput = function(){
              column(6, selectInput("rawPlot.col", "Color",
                                    choices = c("day time" = "dTime",
                                                "doy" = "doy",
-                                               "position" = "position"))),
+                                               "position" = "position",
+                                               "none" = "none"))),
              column(6, selectInput("rawPlot.shape", "Shape",
                                    choices = c("position" = "position",
-                                               "doy" = "doy")))
+                                               "doy" = "doy",
+                                               "none" = "none")))
           ),
           
           checkboxInput("rawPlot_facetWrap", "Facet wrap", F),

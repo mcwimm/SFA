@@ -251,9 +251,9 @@ plot.customTemperature <- function(data, ui.input.processed){
    if (!ui.input.processed$all.dT){
       x = data[, x.col]
       y = data[, y.col]
-      col = data[, col.col]
-      shape = data[, shape.col]
-      
+      col = try(data[, col.col])
+      shape = try(data[, shape.col])
+
       p = data %>% 
          ggplot(., aes(x = x, y = y, shape = factor(shape))) +
          labs(x = labels[x.col][[1]],
@@ -261,16 +261,28 @@ plot.customTemperature <- function(data, ui.input.processed){
               col = labels[col.col][[1]],
               shape = labels[shape.col][[1]]) 
       
+      if (shape.col == "none"){
+         p = p + 
+            guides(shape = F)
+      }
+
       if (col.col == "dTime"){
+         print("dTime")
          p = p +
             geom_point(aes(col = col)) +
             scale_color_gradient2(low = gradientcolors()[2], 
                                   high = gradientcolors()[2], 
                                   mid = gradientcolors()[1],
                                   midpoint = 12)
+      } else if (col.col == "none"){
+         print("none")
          
-         
+         p = p + 
+            geom_point(col = "black") +
+            guides(col = F)
       } else {
+         print("else")
+         
          p = p +
             geom_point(aes(col = factor(col))) +
             scale_color_manual(values = fillcolors(length(unique(col))))
