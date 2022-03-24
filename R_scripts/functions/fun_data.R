@@ -10,7 +10,7 @@ get.rawData = function(input){
                                                   sep = input$sep,
                                                   skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
-      print(an.error.occured)
+      # print(an.error.occured)
       
    }
    if (input$inputType == "HFD_delta" |
@@ -46,7 +46,7 @@ get.temperatures.ICT = function(file, sep, skip){
       col = grep("Exter", colnames(rawData) )[1]
       rawData = rawData[, c(1:col)]
       
-      rawData = unify.datetime(rawData)
+      rawData = suppressWarnings(unify.datetime(rawData))
    }
    
    return(rawData)
@@ -101,7 +101,7 @@ get.temp.differences.ICT = function(file, sep, skip){
                        header = TRUE, sep = sep, 
                        fileEncoding="latin1",
                        skip = skip)
-   rawData = unify.datetime(rawData)
+   rawData = suppressWarnings(unify.datetime(rawData))
 
    return(rawData)
 }
@@ -157,15 +157,14 @@ get.delta.from.temp.depth <- function(rawData, position){
    reg.L <- paste(position, "\\S*(?i)L", sep=".")
    reg.S <- paste(position, "\\S*(?i)S", sep=".")
    
-   t_up <- matrix(as.numeric(raw_temperatures[, grepl(reg.U,
-                                               colnames(raw_temperatures))]))
+   t_up <- matrix(suppressWarnings(as.numeric(raw_temperatures[, grepl(reg.U,
+                                               colnames(raw_temperatures))])))
    
-   t_low <- matrix(as.numeric(raw_temperatures[, grepl(reg.L,
-                                                colnames(raw_temperatures))]))
+   t_low <- matrix(suppressWarnings(as.numeric(raw_temperatures[, grepl(reg.L,
+                                                colnames(raw_temperatures))])))
    
-   t_side <- matrix(as.numeric(raw_temperatures[, grepl(reg.S,
-                                                 colnames(raw_temperatures))]))
-   
+   t_side <- matrix(suppressWarnings(as.numeric(raw_temperatures[, grepl(reg.S,
+                                                 colnames(raw_temperatures))])))
 
    if ((ncol(t_up) != 1) | (ncol(t_low) != 1) | (ncol(t_side) != 1)){
       print(paste("There is more than one temperature dataset for position ", position,
