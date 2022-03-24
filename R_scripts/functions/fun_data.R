@@ -323,10 +323,15 @@ get.positionsFromRawData = function(dataSource, input){
 #' @return data.frame
 get.depths <- function(depthManual = F, inputType,
                        positions, rxy, depthInput, sensor_distance){
+   number_pos = length(positions)
    if (depthManual){
       df = data.frame(position = positions,
                       depth = as.numeric(unlist(strsplit(depthInput, ","))))
-   } else {
+   } else if (rxy == 0){
+      print("Rxy is 0")
+      df = data.frame(position = c(1:number_pos),
+                      depth = rep(rxy, number_pos))
+      } else {
       # distance between outer stem ring and first sensor is 2 cm
       if (inputType == "HFD8-50"){ # sensorLength = 6.2
          df = data.frame(position = c(1:8),
@@ -339,9 +344,10 @@ get.depths <- function(depthManual = F, inputType,
                                      (rxy-2-7), by = -1))
       }
       if (inputType == "Manual"){ # sensorLength = unknown
-         df = data.frame(position = c(1:8),
+         df = data.frame(position = c(1:number_pos),
                          depth = seq((rxy-2), 
-                                     (rxy-2-(7*sensor_distance)), by = -sensor_distance))
+                                     (rxy-2-((number_pos-1)*sensor_distance)), 
+                                     by = -sensor_distance))
       }
       
       df = df[df$position %in% positions, ]
