@@ -328,25 +328,23 @@ get.depths <- function(depthManual = F, inputType,
       df = data.frame(position = positions,
                       depth = as.numeric(unlist(strsplit(depthInput, ","))))
    } else if (rxy == 0){
-      print("Rxy is 0")
       df = data.frame(position = c(1:number_pos),
                       depth = rep(rxy, number_pos))
       } else {
-      # distance between outer stem ring and first sensor is 2 cm
+      # distance between sensor cap and first thermometer is 2 cm
       if (inputType == "HFD8-50"){ # sensorLength = 6.2
          df = data.frame(position = c(1:8),
-                         depth = seq((rxy-2), (rxy-2-3.5), by = -0.5))
-         
+                         depth = seq(rxy, (rxy-3.5), by = -0.5))
       }
       if (inputType == "HFD8-100"){ # sensorLength = 9.7
          df = data.frame(position = c(1:8),
-                         depth = seq((rxy-2), 
-                                     (rxy-2-7), by = -1))
+                         depth = seq(rxy, (rxy-7), by = -1))
+
       }
       if (inputType == "Manual"){ # sensorLength = unknown
          df = data.frame(position = c(1:number_pos),
-                         depth = seq((rxy-2), 
-                                     (rxy-2-((number_pos-1)*sensor_distance)), 
+                         depth = seq(rxy, 
+                                     (rxy-((number_pos-1)*sensor_distance)), 
                                      by = -sensor_distance))
       }
       
@@ -364,13 +362,13 @@ get.depths <- function(depthManual = F, inputType,
 #' @return data.frame
 add.Props2DepthsHelper = function(depths, rxy, swd){
 
-   #depths = depths %>% arrange(desc(depth))
+   # depths = depths %>% arrange((position)) #desc
    depths = depths %>% 
       mutate(Aring = pi*(depth^2 - lead(depth)^2),
              R = (depth + lead(depth)) / 2,
              Cring = 2*pi * R)
    
-   sensor_distance = abs(depths[1, "R"] - depths[2, "R"])
+   sensor_distance = abs(depths[1, "depth"] - depths[2, "depth"]) 
    last_ring_outer = pi * depths[nrow(depths), "depth"]^2
    last_ring_inner = pi * (depths[nrow(depths), "depth"]-sensor_distance)^2 
    
@@ -394,22 +392,22 @@ add.Props2Depths = function(depths, rxy, swd){
                                       rxy = rxy,
                                       swd = swd)
    } else {
-      depths = bind_rows(
-         depths[depths[, "depth"] > 0,] %>% add.Props2DepthsHelper(., rxy, 0),
-         depths[depths[, "depth"] == 0,] %>% 
-            mutate(Aring = 0,
-                   R = 0,
-                   Cring = 0),
-         
-         depths[depths[, "depth"] < 0,] %>% 
-            mutate(depth_helper = depth,
-                  depth = abs(depth)) %>% 
-            arrange(desc(depth)) %>% 
-            add.Props2DepthsHelper(., rxy, 0) %>% 
-            mutate(depth = depth_helper) %>% 
-            select(-depth_helper) %>% 
-            arrange(position)
-      )
+      pos = depths[depths[, "depth"] > 0,] %>%
+         add.Props2DepthsHelper(., rxy, 0)
+      neu = depths[depths[, "depth"] == 0,] %>%
+         mutate(Aring = 0,
+                R = 0,
+                Cring = 0)
+      neg = depths[depths[, "depth"] < 0,] %>%
+         mutate(depth_helper = depth,
+                depth = abs(depth)) %>% 
+         arrange(desc(depth)) %>% 
+         add.Props2DepthsHelper(., rxy, 0) %>% 
+         mutate(depth = depth_helper) %>% 
+         select(-depth_helper) %>% 
+         arrange(position)
+      
+      depths = bind_rows(pos, neu, neg)
    }
    return(depths)
 }
@@ -471,6 +469,7 @@ update.depths = function(ui.input, positions, sensor_distance, swd){
                        rxy = rxy,
                        depth = ui.input$depthInput,
                        sensor_distance = sensor_distance)
+
    # Àdd area and circumference of circular ring
    depths = add.Props2Depths(depths = depths, 
                              rxy = rxy,
