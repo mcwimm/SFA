@@ -306,28 +306,38 @@ shinyServer(function(input, output, session) {
     
     #### Table outputs #####
 
+    tab.with.file.upload.message = function(){
+      m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
+      return(datatable(m) %>%
+        formatStyle(1, color = 'red',
+                    backgroundColor = 'orange',
+                    fontWeight = 'bold'))
+    }
+
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
-    output$raw.wide <- DT::renderDataTable(DT::datatable({
+    output$raw.wide <- DT::renderDataTable({
       rawData = rawData()
       if ("dTime" %in% colnames(rawData)){
-        return(rawData %>% 
-               mutate(dTime = round(dTime, 2)))
+        rawDataTable = rawData %>% 
+               mutate(dTime = round(dTime, 2))
       } else {
-        m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
-        return(datatable(m) %>%
-                 formatStyle(1, color = 'red', 
-                             backgroundColor = 'orange', 
-                             fontWeight = 'bold'))
+        rawDataTable = tab.with.file.upload.message()
       }
-      
-    }, options = list(scrollX = TRUE, searching = F)))
+      return(rawDataTable)
+    }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with raw data, long-format 
     #' (Data > Upload > Preview data)
     output$raw.long <- DT::renderDataTable({
-      return(deltaTempLongNoFilter() %>% 
-               mutate_if(is.numeric, round, 3))
+      an.error.occured = FALSE
+      tryCatch( { tab  = deltaTempLongNoFilter() %>% 
+                            mutate_if(is.numeric, round, 3) },
+                error = function(e) {an.error.occured <<- TRUE})
+      if (an.error.occured){
+        tab = tab.with.file.upload.message()
+      }
+      return(tab)
     }, options = list(scrollX = TRUE, searching = F))
     
     #' UI Table with sensor data, i.e.
