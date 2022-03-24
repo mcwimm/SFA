@@ -74,7 +74,7 @@ numericInputRow <- function(inputId, label, value = ""){
 menuOutput = function(){
    return(list(
       menuItem("About", tabName = "about", icon = icon("th")),
-      menuItem("Project settings", tabName = "sett", icon = icon("circle-notch")),
+      menuItem("Project Settings", tabName = "sett", icon = icon("circle-notch")),
       menuItem("Data", tabName = "data", icon = icon("circle-notch"),
                menuSubItem("Upload", tabName = "dat_upl"), 
                menuSubItem("Filter", tabName = "dat_filter"),
@@ -85,7 +85,7 @@ menuOutput = function(){
       menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "sf_des"), 
                menuSubItem("Sap Flow Metrics", tabName = "sf_metrics"),
-               menuSubItem("Tree water use", tabName = "sf_flow"))
+               menuSubItem("Tree Water Use", tabName = "sf_flow"))
       ))
 }
 

@@ -87,7 +87,7 @@ settingsOutput = function(){
                        
                        textInput("figTitle", "Figure title", 
                                  placeholder = "e.g. tree species"),
-                       textInput("fileAppend", "File Appendix", 
+                       textInput("fileAppend", "File appendix", 
                                  placeholder = "e.g. summer")),
                    box(title = "Visualization",
                        status = "warning", solidHeader = F, 
