@@ -259,42 +259,60 @@ plot.customTemperature <- function(data, ui.input.processed){
          labs(x = labels[x.col][[1]],
               y = labels[y.col][[1]],
               col = labels[col.col][[1]],
-              shape = labels[shape.col][[1]]) 
+              shape = labels[shape.col][[1]],
+              linetype = labels[shape.col][[1]]) 
       
-      if (shape.col == "none"){
-         p = p + 
-            guides(shape = F)
-      }
-
-      if (col.col == "dTime"){
-         print("dTime")
-         p = p +
-            geom_point(aes(col = col)) +
-            scale_color_gradient2(low = gradientcolors()[2], 
-                                  high = gradientcolors()[2], 
-                                  mid = gradientcolors()[1],
-                                  midpoint = 12)
-      } else if (col.col == "none"){
-         print("none")
-         
-         p = p + 
-            geom_point(col = "black") +
-            guides(col = F)
-      } else {
-         print("else")
-         
-         p = p +
-            geom_point(aes(col = factor(col))) +
-            scale_color_manual(values = fillcolors(length(unique(col))))
-      }
-      
-      if (length(unique(shape)) > 6){
-         p = p +
-            scale_shape_manual(values = c(1:length(unique(shape))))
-      }
       if (draw_lines){
-         p = p +
-            geom_line()
+         if (shape.col == "none"){
+            p = p + 
+               guides(linetype = F)
+         }
+         if (col.col == "dTime"){
+            p = plot.emptyMessage("Error: Settings not possible.
+                                  Day time can not be selected as color in line mode.")
+         } else if (col.col == "none"){
+            p = p + 
+               geom_line(col = "black", aes(linetype = factor(shape))) +
+               guides(col = F)
+         } else {
+            p = p +
+               geom_line(aes(col = factor(col), linetype = factor(shape))) +
+               scale_color_manual(values = fillcolors(length(unique(col))))
+         }
+         
+         if (length(unique(shape)) > 6){
+            p = p +
+               scale_shape_manual(values = c(1:length(unique(shape))))
+         }
+         
+         
+      } else {
+         if (shape.col == "none"){
+            p = p + 
+               guides(shape = F)
+         }
+         
+         if (col.col == "dTime"){
+            p = p +
+               geom_point(aes(col = col)) +
+               scale_color_gradient2(low = gradientcolors()[2], 
+                                     high = gradientcolors()[2], 
+                                     mid = gradientcolors()[1],
+                                     midpoint = 12)
+         } else if (col.col == "none"){
+            p = p + 
+               geom_point(col = "black") +
+               guides(col = F)
+         } else {
+            p = p +
+               geom_point(aes(col = factor(col))) +
+               scale_color_manual(values = fillcolors(length(unique(col))))
+         }
+         
+         if (length(unique(shape)) > 6){
+            p = p +
+               scale_shape_manual(values = c(1:length(unique(shape))))
+         }
       }
    } else {
       p = data %>% 
