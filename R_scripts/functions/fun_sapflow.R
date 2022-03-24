@@ -161,7 +161,7 @@ treeScaleSimple1 <- function(data, swd) {
    # Calculate sap flow rate per time step over alls depths in kg/h
    data = data %>%
       group_by(datetime) %>%
-      mutate(sfM1 = sum(SFdepth) / 1000) %>%
+      mutate(sfM1 = sum(SFdepth, na.rm = T) / 1000) %>%
       ungroup()
    return(data)
 }
