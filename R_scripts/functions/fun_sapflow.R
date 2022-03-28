@@ -41,15 +41,15 @@ add.k2data = function(data, values){
 #' @return data.frame
 get.sapFlowDensity <- function(method = "HFD", data, 
                                sapWoodDepth, ui.input){
-   Dst = ui.input$ThermalDiffusivity
-   Zax = ui.input$Zax
-   Ztg = ui.input$Ztg
+   data$Dst = ui.input$ThermalDiffusivity
+   data$Zax = ui.input$Zax
+   data$Ztg = ui.input$Ztg
    
    if (method == "HFD"){
       # Eq. 1 in NNadezhdina & Nadezhdin, 2017
       if (ui.input$sf_formula == "Positive"){
-         data$SFS = 3600 * Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
-            Zax / Ztg
+         data$SFS = 3600 * data$Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
+            data$Zax / data$Ztg
       }
       # Eq. 2 in Nadezhdina & Nadezhdin, 2017
       if (ui.input$sf_formula == "Negative"){
@@ -72,11 +72,6 @@ get.sapFlowDensity <- function(method = "HFD", data,
 #' @param ui.input: UI-input
 #' @return data.frame
 get.negativeSFS = function(data, ui.input){
-   Dst = ui.input$ThermalDiffusivity
-   Zax = ui.input$Zax
-   Ztg = ui.input$Ztg
-   
-   
    # Use default threshold of 0°C
    if (ui.input$sf_formula_threshold == ""){
       print("Apply default threshold")
