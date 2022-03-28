@@ -1054,13 +1054,14 @@ shinyServer(function(input, output, session) {
     #### Table ####
     
     #' UI-Table with daily tree water use
-    output$TWUtable <- DT::renderDataTable({ 
+    output$TWUtable <- DT::renderDataTable({ #hier
       if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
         treeWaterUse()
       } else {
         data.frame('.' = "Wood properties are missing (see 'Project settings')")
       }
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, , options = list(scrollX = TRUE, searching = F)) #dom = 't')
+    
     
     #' Eventlistener to save daily tree water use as csv
     #' (Sap Flow > Sap Flow > Tree water use)

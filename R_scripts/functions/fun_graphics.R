@@ -894,7 +894,7 @@ plot.twu.radialprofile = function(data, ui.input){
        guides(col = F) +
        labs(x = "Thermometer position",
            y = expression(Tree~water~use~(kg~d^{-1}))) +
-      facet_wrap(~Method, ncol = 3, scales = "free") 
+      facet_wrap(~Method, ncol = 3, scales = "fixed") 
    
    return(p)
 }
