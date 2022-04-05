@@ -841,7 +841,9 @@ plot.sapFlowDay = function(data, ui.input){
       filter(complete.cases(.)) %>% 
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
-      distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2)
+      # distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2)
+      mutate(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
+      unique(.)
    
    return(auc.data %>% 
       ggplot(., aes(x = factor(doy), fill = Method, y = auc)) +
@@ -882,7 +884,9 @@ plot.twu.radialprofile = function(data, ui.input){
       filter(complete.cases(.)) %>% 
       group_by(doy, Date, Method, position) %>% 
       arrange(dTime) %>% 
-      distinct(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) 
+      #distinct(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) 
+      mutate(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) %>% 
+      unique(.)
    
    N = length(unique(auc.data$position))
    

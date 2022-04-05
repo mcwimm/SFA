@@ -279,13 +279,18 @@ get.treeWaterUseByMethod = function(data, ui.input){
              Balance = ifelse(SFrate >= 0, "Positive", "Negative")) %>% 
       mutate(Balance = factor(Balance, levels = c("Positive", "Negative"))) %>% 
       filter(complete.cases(.)) %>% 
-      distinct(datetime, doy, dTime, Method, SFrate, Balance) %>% 
+      # distinct(datetime, doy, dTime, Method, SFrate, Balance) %>%
+      select(datetime, doy, dTime, Method, SFrate, Balance) %>% 
+      unique(.) %>% 
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
       mutate(roll_mean = (SFrate + lag(SFrate))/2,
              delta_x = dTime - lag(dTime),
              trapezoid = delta_x * roll_mean) %>% 
-      distinct(auc = sum(trapezoid, na.rm = T)) %>% 
+      # distinct(auc = sum(trapezoid, na.rm = T)) %>%
+      mutate(auc = sum(trapezoid, na.rm = T)) %>%
+      select(doy, Method, Balance, auc) %>% 
+      unique(.) %>% 
       # Credits for AUC below: Victor Klos (https://stackoverflow.com/a/30280873)
       # distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>%  
       rename('tree water use' = 'auc',

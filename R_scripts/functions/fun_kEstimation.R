@@ -301,8 +301,11 @@ get.zeroflowKvalues <- function(data){
       mutate(abs = abs((dTsym.dTas))) %>% 
       mutate(min_distance = min(abs, na.rm = T)) %>% 
       filter(abs == min_distance) %>% 
-      select(position, abs, min_distance, dTas) %>% 
-      distinct(position, min_distance, k = median(dTas)) %>% 
+      # select(position, abs, min_distance, dTas) %>% 
+      # distinct(position, min_distance, k = median(dTas)) %>% 
+      mutate(k = median(dTas)) %>% 
+      select(position, min_distance, k) %>% 
+      unique(.) %>% 
       rename("distance y-axis" = min_distance)
    return(zeroFlowK)
 }
