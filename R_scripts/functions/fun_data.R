@@ -674,16 +674,16 @@ save.figure = function(path, name, plotObject, ui.input){
       file = paste(file, as.numeric(Sys.time()), sep = "_")
    }
    
+   filename = paste(file, format, sep = ".")
    if (format == "rdata"){
-      res = try(save(plotObject, file = paste(file, format, sep = ".")))
+      res = try(save(plotObject, file = filename))
    } else {
-      res = try(ggsave(plotObject, filename = paste(file, format,
-                                                    sep = "."),
+      res = try(ggsave(plotObject, filename = filename,
                        width = 12, height = 6, dpi = 900))
    }
-   
-   if (is.null(res) || res){
-      showNotification(noti_note, 
+
+   if (is.null(res) || (res == filename)){
+      showNotification(noti_note,
                        type = noti_type)
    } else {
       showNotification("Error: File not saved!",

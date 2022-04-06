@@ -65,7 +65,7 @@ get.gradientcolors = function(ui.input){
 
 #' Labels
 #' @description Helper variable to get uniform labels.
-labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
+labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
                "dTas" = "dTas",
                "dTsa" = "dTsa",
                "dTSym" = "dTSym",
@@ -76,12 +76,12 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u22C5", dTas^-1)),
                "datetime" = "",
                "position" = "Thermometer position",
                "SFI" = "Sap Flow Index (\u00B0 C)",
-               "SF" = expression(paste("Sap Flow Rate (kg \u22C5 ",
+               "SF" = expression(paste("Sap Flow Rate (kg \u00b7 ",
                                        h^-1, ")")),
-               "SFS" = expression(paste("Sap Flow per Section (g \u22C5 ",
-                                        cm^-1, "\u22C5", h^-1, ")")),
-               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u22C5",
-                                          cm^-2, "\u22C5", h^-1, ")")))
+               "SFS" = expression(paste("Sap Flow per Section (g \u00b7 ",
+                                        cm^-1, "\u00b7", h^-1, ")")),
+               "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u00b7",
+                                          cm^-2, "\u00b7 ", h^-1, ")")))
 
 
 ######### labels working for PDF but not in shiny
