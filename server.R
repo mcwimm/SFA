@@ -45,13 +45,6 @@ shinyServer(function(input, output, session) {
         return(input$figTitle)
     })
     
-    #' Reactive variable holding the name appended to files
-    #' If not defined in the UI it returns "", i.e. nothing 
-    #' is appended
-    fileAppendix <- reactive({
-      return(input$fileAppend) 
-    })
-    
     #' Reactive variable holding ggplot theme
     #' Can be defined in UI
     plot_theme <- reactive({
@@ -1054,7 +1047,7 @@ shinyServer(function(input, output, session) {
     #### Table ####
     
     #' UI-Table with daily tree water use
-    output$TWUtable <- DT::renderDataTable({ #hier
+    output$TWUtable <- DT::renderDataTable({
       if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
         treeWaterUse()
       } else {
