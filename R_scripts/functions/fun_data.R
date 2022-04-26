@@ -632,6 +632,22 @@ update.filter.ui = function(ui.output, ui.input){
 }
 ########### SAVE #############
 
+#' Get name added to file
+get.fileAppendix = function(ui.input){
+   if (ui.input$fileAppend == "manual"){
+      return(ui.input$fileAppendName)
+   } else if (ui.input$fileAppend == "inputName"){
+      if (!is.null(ui.input$file1$datapath)) {
+         # Extract file name (additionally remove file extension using sub)
+         return(sub(".csv$", "", basename(ui.input$file1$name)))
+      } else {
+         return("default")
+      }
+   } else {
+      return("")
+   }
+}
+
 
 #' Save figure
 #' @description Handler to save ggplots as as jpg, svg or pdf
@@ -642,7 +658,7 @@ update.filter.ui = function(ui.output, ui.input){
 #' @param format: file format
 #' @param prjName: project name, added as title to plot
 save.figure = function(path, name, plotObject, ui.input){
-   fileAppendix = ui.input$fileAppend
+   fileAppendix = get.fileAppendix(ui.input) 
    format = ui.input$figFor
    
    plotObject = plotObject +
@@ -699,7 +715,7 @@ save.figure = function(path, name, plotObject, ui.input){
 #' @param csvObject: object to be saved, i.e. data.frame
 #' @param fileAppendix: character to be appended to file name
 save.csv = function(path, name, csvObject, ui.input){
-   fileAppendix = ui.input$fileAppend
+   fileAppendix = get.fileAppendix(ui.input) 
    
    if (fileAppendix != ""){
       fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)

@@ -87,8 +87,14 @@ settingsOutput = function(){
                        
                        textInput("figTitle", "Figure title", 
                                  placeholder = "e.g. tree species"),
-                       textInput("fileAppend", "File appendix", 
-                                 placeholder = "e.g. summer")),
+                       radioButtons("fileAppend", "Name appended to file",
+                                    choices = c("Input file name" = "inputName",
+                                                "Manual" = "manual",
+                                                "None" = "none")),
+                       conditionalPanel(condition = "input.fileAppend == `manual`",
+                                        textInput("fileAppendName", "File appendix",
+                                                  placeholder = "e.g. summer"))),
+            
                    box(title = "Visualization",
                        status = "warning", solidHeader = F, 
                        collapsible = T, width = 12,
