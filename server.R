@@ -892,9 +892,14 @@ shinyServer(function(input, output, session) {
     #' vertical profile
     #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
     observeEvent(input$save.sapFlowMetrics, {
+      if (is.null(values$kvalues)){
+        d = deltaTempLong()
+      } else {
+        d = sapFlowDens()
+      }
       save.csv(path = projectPath(), 
                name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
-               csvObject = sapFlowDens(), 
+               csvObject = d, 
                ui.input = input)
     })
     
