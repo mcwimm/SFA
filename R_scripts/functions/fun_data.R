@@ -632,7 +632,42 @@ update.filter.ui = function(ui.output, ui.input){
 }
 ########### SAVE #############
 
-#' Get name added to file
+get.notifications = function(ui.input, path){
+   # Check if project directory is defined
+   # If not show warning and set path to root directory
+   if (!isTruthy(ui.input$folder)){
+      noti_note = "No project selected. File saved in root directory."
+      noti_type = "warning"
+      
+   } else {
+      noti_note = "File saved successfully!"
+      noti_type = "message"
+   }
+   return(list(noti_note, noti_type))
+}
+
+get.filename = function(path, name, format, ui.input){
+   format = paste(".", format, sep = "")
+   fileAppendix = get.fileAppendix(ui.input)
+   # Add appendix to file name and replace whitespace
+   if (fileAppendix != ""){
+      fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
+      name = paste(fileAppendix, name, sep = "_")
+   }
+   
+   # Check if file already exists, if yes append unique number
+   # based on system time
+   if (file.exists(paste(path, "/", name, format, sep = ""))){
+      unique_number = gsub("\\.", "", as.numeric(Sys.time()))
+      name = paste(name, unique_number, sep = "_")
+   }
+   
+   filename = paste(path, "/", name, format, sep = "")
+   return(filename)
+}
+
+
+#' Get string/name added to file
 get.fileAppendix = function(ui.input){
    if (ui.input$fileAppend == "manual"){
       return(ui.input$fileAppendName)
@@ -641,13 +676,12 @@ get.fileAppendix = function(ui.input){
          # Extract file name (additionally remove file extension using sub)
          return(sub(".csv$", "", basename(ui.input$file1$name)))
       } else {
-         return("default")
+         return("DefaultFile")
       }
    } else {
       return("")
    }
 }
-
 
 #' Save figure
 #' @description Handler to save ggplots as as jpg, svg or pdf
@@ -658,39 +692,20 @@ get.fileAppendix = function(ui.input){
 #' @param format: file format
 #' @param prjName: project name, added as title to plot
 save.figure = function(path, name, plotObject, ui.input){
-   fileAppendix = get.fileAppendix(ui.input) 
-   format = ui.input$figFor
-   
    plotObject = plotObject +
          ggtitle(ui.input$figTitle) +
       theme(text=element_text(size = 14))
    
-   # Add appendix to file name and replace whitespace
-   if (fileAppendix != ""){
-      fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
-      name = paste(name, fileAppendix, sep = "_")
+   format = ui.input$figFor
+   nots = get.notifications(ui.input)
+   if (nots[[2]] == "message"){
+      path = paste(path, "graphics", sep = "/")
    }
+   filename = get.filename(path = path,
+                           name = name,
+                           format = format, 
+                           ui.input = ui.input)
    
-   # Check if project directory is defined
-   # If not show warning and set path to root directory
-   if (!isTruthy(ui.input$folder)){
-      file = paste(path, name, sep = "/")
-      noti_note = "No project selected. File saved in root directory."
-      noti_type = "warning"
-      
-   } else {
-      file = paste(path, "graphics", name, sep = "/")
-      noti_note = "File saved successfully!"
-      noti_type = "message"
-   }
-
-   # Check if file already exists, if yes append unique number
-   # based on system time
-   if (file.exists(paste(file, format, sep = "."))){
-      file = paste(file, as.numeric(Sys.time()), sep = "_")
-   }
-   
-   filename = paste(file, format, sep = ".")
    if (format == "rdata"){
       res = try(save(plotObject, file = filename))
    } else {
@@ -699,8 +714,8 @@ save.figure = function(path, name, plotObject, ui.input){
    }
 
    if (is.null(res) || (res == filename)){
-      showNotification(noti_note,
-                       type = noti_type)
+      showNotification(nots[[1]],
+                       type = nots[[2]])
    } else {
       showNotification("Error: File not saved!",
                        type = "error")
@@ -715,34 +730,19 @@ save.figure = function(path, name, plotObject, ui.input){
 #' @param csvObject: object to be saved, i.e. data.frame
 #' @param fileAppendix: character to be appended to file name
 save.csv = function(path, name, csvObject, ui.input){
-   fileAppendix = get.fileAppendix(ui.input) 
-   
-   if (fileAppendix != ""){
-      fileAppendix = gsub(" ", "_", fileAppendix, fixed = TRUE)
-      name = paste(name, "_", fileAppendix, ".csv", sep = "")
-   } else {
-      name = paste(name, ".csv", sep = "")
+   # Gets list(noti_note, noti_type, path)
+   nots = get.notifications(ui.input)
+   if (nots[[2]] == "message"){
+      path = paste(path, "csv-files", sep = "/")
    }
-   
-   # Check if project directory is defined
-   # If not show warning and set path to root directory
-   if (!isTruthy(ui.input$folder)){
-      file = paste(path, name, sep = "/")
-      noti_note = "No project selected. File saved in root directory."
-      noti_type = "warning"
-      
-   } else {
-      file = paste(path, "csv-files", name, sep = "/")
-      noti_note = "File saved successfully!"
-      noti_type = "message"
-   }
+   filename = get.filename(path, name, "csv", ui.input)
    
    res = try(write.csv(csvObject, 
-                       file = file,
+                       file = filename,
                        row.names = FALSE))
    if (is.null(res)){
-      showNotification(noti_note, 
-                       type = noti_type)
+      showNotification(nots[[1]], 
+                       type = nots[[2]])
    } else {
       showNotification("Error: File not saved!",
                        type = "error")
