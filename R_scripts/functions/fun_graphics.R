@@ -748,6 +748,28 @@ plot.sf.groups = function(data, ui.input, radial.profile = FALSE){
    return(p)
 }
 
+# Neg. formula control plot
+plot.sf.neg.control = function(data, ui.input){
+   scales = ui.input$sf_facet_scales
+   facet.col.no = ui.input$sf_facet_col_nums
+   
+   return(
+      data %>% 
+         gather(., key, value, SFS, SFSpos) %>% 
+         mutate(key = factor(key, 
+                             levels = c("SFS", "SFSpos"),
+                             labels = c("... with correction",
+                                        "... without correction"))) %>% 
+         ggplot(., aes(x = datetime, y = value, col = key, linetype = key)) +
+         geom_hline(yintercept = 0, col = "#696969") +
+         geom_line(size = .8) +
+         scale_color_manual(values = c("red", "black")) +
+         facet_wrap(~position, ncol = facet.col.no,
+                    scales = scales) +
+         theme(axis.title.x = element_blank()) +
+         labs(col = "Formula",
+              linetype = "Formula"))
+}
 
 #' Empty diagram
 #' @param message: message to be shown

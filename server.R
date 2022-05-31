@@ -941,6 +941,41 @@ shinyServer(function(input, output, session) {
       
     })
 
+    ##### Sap Flow Metrics Negative Formula Control Plot #####
+    
+    #' Reactive variable holding figure of sap flow metrics
+    #' radial profile, represented as boxplots
+    sapFlowMetricPlot.NegControl = eventReactive(triggerSfPlotUpdate(), {
+      if (input$sf_formula == "Negative" & input$sf_y_axis == "SFS"){
+        plot.sf.neg.control(data = sapFlowDens(),
+                            ui.input = input)
+      } else {
+        if (click() == 0 && is.null(input$file2)){
+          plot.emptyMessage(message = "No k-values have been set yet.")
+        } else {
+          plot.emptyMessage(message = "This figure is only available for SFS (not SFI or SFD) when negative SFS-formula is applied.")
+          
+        }
+      }
+    })
+    
+    #' Eventlistener to show figure of sap flow density
+    #' vertical profile
+    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    output$sapFlowMetric.NegControl <- renderPlot({
+      sapFlowMetricPlot.NegControl()
+    })
+    
+    #' Eventlistener to save sap flow density plot
+    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    observeEvent(input$save.sapFlowMetric.NegControl, {
+      save.figure(path = projectPath(),
+                  name = "SFS_Negative_control",
+                  plotObject = sapFlowMetricPlot.NegControl(), 
+                  ui.input = input)
+      
+    })
+    
     
     ##### Sap Flow Rate #####
     ###### Diurnal Pattern ######

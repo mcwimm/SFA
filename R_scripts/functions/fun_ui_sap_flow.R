@@ -137,6 +137,11 @@ sfDensityOutput <- function(){
                          output.figure("sapFlowMetric.RadialProfile"),
                          actButton("save.sapFlowMetric.RadialProfile",
                                    "Save figure", 
+                                   "saveFigure")),
+                tabPanel("Negative formula control plot", br(), #hier
+                         output.figure("sapFlowMetric.NegControl"),
+                         actButton("save.sapFlowMetric.NegControl",
+                                   "Save figure", 
                                    "saveFigure"))
              ))
          )))

@@ -46,10 +46,12 @@ get.sapFlowDensity <- function(method = "HFD", data,
    data$Ztg = ui.input$Ztg
    
    if (method == "HFD"){
+      # Positive SFS is always stored for further processing
+      data$SFSpos = 3600 * data$Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
+         data$Zax / data$Ztg
       # Eq. 1 in NNadezhdina & Nadezhdin, 2017
       if (ui.input$sf_formula == "Positive"){
-         data$SFS = 3600 * data$Dst * (data[, "k"] + data[, "dTsa"]) / data[, "dTas"] *
-            data$Zax / data$Ztg
+         data$SFS = data$SFSpos
       }
       # Eq. 2 in Nadezhdina & Nadezhdin, 2017
       if (ui.input$sf_formula == "Negative"){
