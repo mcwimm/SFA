@@ -505,30 +505,38 @@ remove.outlier <- function(data, data.vector, data.group, group.value){
    return(data.sub)
 }
 
+
 #' Filter
+#' 'replace_na(TRUE)' in filter function avoids removing NA-rows of the
+#' variable under consideration
 #' @description Function to filter uploaded data set
 #' @param data: data.frame with long-format data
 #' @param ui.input: UI-input
 #' @return data.frame
 get.filteredData <- function(data, ui.input){
+   # remove na-values
+   if (ui.input$removeNA){
+      data = data[complete.cases(data), ]
+   }
+
    data$doy <- as.numeric(data$doy)
    # filter by day/ doy and day time
    minDoy = as.numeric(strftime(ui.input$daterange[1], format = "%j"))
    maxDoy = as.numeric(strftime(ui.input$daterange[2], format = "%j"))
-
+   
    data = data %>%
-      filter(doy >= minDoy) %>%
-      filter(doy <= maxDoy)
+      filter((doy >= minDoy) %>% replace_na(TRUE)) %>%
+      filter((doy <= maxDoy) %>% replace_na(TRUE)) 
 
    start = ui.input$timerangeStart
    end = ui.input$timerangeEnd
    if (start < end){
       data = data %>% 
-         filter(dTime >= start & dTime <= end) 
+         filter((dTime >= start & dTime <= end) %>% replace_na(TRUE)) 
 
    } else {
       data = data %>% 
-         filter(dTime >= start | dTime <= end) 
+         filter((dTime >= start | dTime <= end) %>% replace_na(TRUE))
 
    }
 
@@ -556,22 +564,22 @@ get.filteredData <- function(data, ui.input){
    dTsym.dTasMax = ifelse(is.na(ui.input$dTsym.dTasMax), Inf, ui.input$dTsym.dTasMax)
    
    data = data %>%
-      filter(dTSym >= dTSymMin) %>%
-      filter(dTSym <= dTSymMax)
+      filter((dTSym >= dTSymMin) %>% replace_na(TRUE)) %>%
+      filter((dTSym <= dTSymMax) %>% replace_na(TRUE))
    
    data = data %>%
-      filter(dTas >= dTasMin) %>%
-      filter(dTas <= dTasMax)
+      filter((dTas >= dTasMin) %>% replace_na(TRUE)) %>%
+      filter((dTas <= dTasMax) %>% replace_na(TRUE))
    
    data = data %>%
-      filter(dTsym.dTas >= dTsym.dTasMin) %>%
-      filter(dTsym.dTas <= dTsym.dTasMax)
+      filter((dTsym.dTas >= dTsym.dTasMin) %>% replace_na(TRUE)) %>%
+      filter((dTsym.dTas <= dTsym.dTasMax) %>% replace_na(TRUE))
 
    # filter by sensor positions
    if (ui.input$sensorFilter != ""){
       sensorFilter = as.numeric(unlist(strsplit(ui.input$sensorFilter,",")))
       data = data %>%
-         filter(position %in% sensorFilter)
+         filter((position %in% sensorFilter) %>% replace_na(TRUE))
    }
 
    return(data)
@@ -588,6 +596,8 @@ update.filter.ui = function(ui.output, ui.input){
       req(ui.input$LoadFilter)
       
       tagList(
+         checkboxInput("removeNA", "Remove NA-rows", T),
+         
          # Date and time range
          h4(strong("Time filters")),
          
@@ -624,7 +634,6 @@ update.filter.ui = function(ui.output, ui.input){
          
          # General filters
          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
-         checkboxInput("removeNA", "Remove NA-rows", F),
          
          # Sensor filters
          h4(strong("Sensor positions")),

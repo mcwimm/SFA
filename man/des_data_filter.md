@@ -1,3 +1,6 @@
+**Remove NA**
+- Removes _all_ rows containing NA values (default filter)
+
 **Time filters**
 
 - Select the range of dates and times included
@@ -13,7 +16,8 @@
    + IQR = Q<sub>75%</sub> - Q<sub>25%</sub>  
    + Lower bound: Q<sub>25%</sub> - 1.5 * IQR   
    + Upper bound: Q<sub>75%</sub> + 1.5 * IQR 
-   
+   + Note: removes NA rows if present in selected 'Variable' and 'Color/ Group'
+
 **Sensor positions**
 
 - Specify sensor positions to be used in the analysis
