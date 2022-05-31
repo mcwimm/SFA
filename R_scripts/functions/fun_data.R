@@ -485,16 +485,24 @@ update.depths = function(ui.input, positions, sensor_distance, swd){
 #' @param data: data.frame with long-format data
 #' @param data.vector: character indicating column name of selected variable
 #' @return data.frame
-remove.outlier <- function(data, data.vector){
-   d = data[, data.vector]
+remove.outlier <- function(data, data.vector, data.group, group.value){
+   data.sub = data
+   if (data.group != "none"){
+      data.sub = data %>% 
+         filter(get(data.group) == group.value)
+   }
+   
+   d = data.sub %>% 
+      select(data.vector) %>% unlist(.)
+   
    Q <- quantile(d, probs=c(.25, .75), na.rm = T)
-   iqr <- IQR(d, na.rm = T)
+   iqr <- IQR(d, na.rm = T) # = Q[2]-Q[1]
    up <-  Q[2] + 1.5 * iqr # Upper Range  
    low <- Q[1] - 1.5 * iqr # Lower Range
-
-   data <- subset(data, data[, data.vector] > low & 
-                     data[, data.vector] < up)
-   return(data)
+   
+   data.sub <- subset(data.sub, data.sub[, data.vector] > low & 
+                         data.sub[, data.vector] < up)
+   return(data.sub)
 }
 
 #' Filter
@@ -525,13 +533,18 @@ get.filteredData <- function(data, ui.input){
    }
 
    # remove outlier
-   if (ui.input$removeOutlier){
-      data = remove.outlier(data, ui.input$filterPlot_X)
-   }
-
-   # remove na-values
-   if (ui.input$removeNA){
-      data = data[complete.cases(data), ]
+   if (ui.input$removeOutlier){ #hier
+      data.vector = ui.input$filterPlot_X   
+      
+      # Grouping variable = Color
+      data.group = ui.input$filterPlot_col
+      # Set number of groups = 1 if grouping variable does not
+      # exist in data
+      group.values = if(data.group %in% colnames(data)) unique(data[, data.group]) else 1
+      
+      data = do.call(rbind,
+                  lapply(group.values, function(x)
+                     remove.outlier(data, data.vector, data.group, x)))
    }
 
    # filter temperature filters by range
