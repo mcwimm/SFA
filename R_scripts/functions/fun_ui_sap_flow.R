@@ -30,15 +30,18 @@ sdDescriptionOutput <- function(){
                         href="https://academic.oup.com/treephys/article/19/13/885/1623199", target="_blank")),
                     p(strong("Sap flow per section and density:"), 
                       HTML('&nbsp;'),
+                      a("Nadezhdina & Nadezhdin (2017)", 
+                        href="https://doi.org/10.1016/j.envexpbot.2017.04.005", target="_blank"), ", ",
+                      HTML('&nbsp;'),
                       a("Nadezhdina (2018)", 
                         href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ""),
                     p(strong("Sap flow and tree water use:"), 
                       HTML('&nbsp;'),
                       a("Nadezhdina (2018)", 
-                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ",",
+                        href="https://iforest.sisef.org/abstract/?id=ifor2381-011", target="_blank"), ", ",
                       HTML('&nbsp;'),
                       a("Nadezhdina (2012)", 
-                        href="https://https://www.actahort.org/books/951/951_13.htm", target="_blank"), ""))
+                        href="https://www.actahort.org/books/951/951_13.htm", target="_blank"), ""))
                 
          )
          

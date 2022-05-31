@@ -181,7 +181,6 @@ box.filter.figures = function(){
                                choices = c("dTsym.dTas" = "dTsym.dTas",
                                            "dTas" = "dTas",
                                            "dTsa" = "dTsa",
-                                           "dTSym" = "dTSym"))),
          column(4, selectInput("filterPlot_col", "Color",
                                choices = c("doy" = "doy",
                                            "none" = "none",

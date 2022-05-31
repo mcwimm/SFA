@@ -367,7 +367,7 @@ shinyServer(function(input, output, session) {
     
     #### Text output ####
 
-    #' UI Test output of remaining data points after filtering
+    #' UI Text output of remaining data points after filtering
     #' (Data > Filter > Subset data)    
     output$dataPoints <- renderText({
       filtered_data = deltaTempLong()
