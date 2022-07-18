@@ -45,6 +45,9 @@ shinyServer(function(input, output, session) {
         return(input$figTitle)
     })
     
+    #' Set default theme
+    theme_set(theme_bw())
+    
     #' Reactive variable holding ggplot theme
     #' Can be defined in UI
     plot_theme <- reactive({
