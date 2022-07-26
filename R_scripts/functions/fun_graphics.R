@@ -5,7 +5,7 @@
 #' @return factor
 get.labelledFacets = function(data, facet.col){
    facet = as.integer(data[, facet.col]) 
-   facet.factor <- c(unique(facet))
+   facet.factor <- sort(c(unique(facet)))
    labs = unlist(lapply(facet.factor, function(x) paste(facet.col, ": ", x, sep = "")))
    # Exclude = NULL includes NA as factor
    return(factor(facet, labels = labs, exclude = NULL))
@@ -424,7 +424,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
       p = p +
          xlim(xRange[1], xRange[2])
    }
-   if (fullrange){
+   if (kMethod == "regression" & fullrange){
       p = p +
          stat_smooth(ad, method = "lm", 
                      mapping=aes(x = dTsym.dTas, y = value, group = temp),
@@ -670,6 +670,7 @@ plot.sf.basic = function(data, ui.input, radial.profile = FALSE){
          ggplot(., aes(x = datetime, y = get(y.col))) +
          geom_line(aes(col = factor(position))) +
          labs(y = labels[[y.col]],
+              x = "",
               col = labels[["position"]])
    }
    N = length(unique(data$position))
@@ -689,7 +690,6 @@ plot.sf.facets = function(data, ui.input, radial.profile = FALSE){
    data = data[complete.cases(data[, facet.col]), ]
    # Get facets based on column name
    facet = get.labelledFacets(data, facet.col)
-   
    col.col = ifelse(facet.col == "position", "doy", "position")
    
    if (radial.profile){
