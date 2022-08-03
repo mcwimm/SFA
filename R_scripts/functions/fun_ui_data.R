@@ -86,11 +86,10 @@ box.dat_upl.depths = function(){
         "Here, optional settings on thermometer positions and the resulting stem
         radius can be defined. Therefore, information on wood properties (see
         'Project Settings') and thermometer distances are required. Based on the thermometer
-        position the area and circumference
+        position, the area and circumference
         of the circular ring, which are required to calculate sap flow rates,
         are estimated."),
-      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark) 
-      if not defined otherwise."),
+      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark)."),
       fluidRow(
          column(4, checkboxInput("positionManual", "Manual position input",
                                  F)),
