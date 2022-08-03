@@ -3,6 +3,7 @@
 
 path = "./R_scripts/functions/"
 filenames = list.files(path)
+filenames = filenames[1:4]
 output_directory = "./man/"
 ############ apply to one function file
 
@@ -11,6 +12,9 @@ filename = filenames[1]
 d <- document::document(paste(path, filename, sep = ""), 
                         check_package = FALSE)
 
+############
+d <- document::document(file_name = "./R_scripts/functions/fun_data.R", 
+                        check_package = FALSE)
 
 ####### copy pdf files from temp directory to ./man
 file.copy(d[["pdf_path"]], output_directory)

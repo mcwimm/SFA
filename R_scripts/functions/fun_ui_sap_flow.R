@@ -186,7 +186,7 @@ sfRateOutput <- function(){
                                              "Save figure", "saveFigure")),
                           tabPanel("Radial profile", br(),
                                    p("Note: radial profile is not available for scaling method 2."),
-                                   p("Each point represents one day."),
+                                   #p("Each point represents one day."),
                                    output.figure("TWUradialprofile"),
                                    actButton("save.TWUradialprofile",
                                              "Save figure", "saveFigure")))

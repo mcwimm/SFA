@@ -26,10 +26,17 @@ get.fillcolors = function(ui.input){
       cols = ui.input$fillColors
       cols_split = strsplit(cols, ",")[[1]]
       col = c()
-      for (i in 1:length(cols_split)){
-         # remove white spaces
-         c = gsub(" ", "", cols_split[i], fixed = TRUE)
-         col = append(col, c)
+      if (length(cols_split) == 1){
+         print(cols_split[1])
+         col <- RColorBrewer::brewer.pal(n = 100,
+                                         name = cols_split[1])
+         print(col)
+      } else {
+         for (i in 1:length(cols_split)){
+            # remove white spaces
+            c = gsub(" ", "", cols_split[i], fixed = TRUE)
+            col = append(col, c)
+         }
       }
    }
    return(col)
@@ -915,7 +922,7 @@ plot.twu.radialprofile = function(data, ui.input){
    p = auc.data %>% 
        ggplot(., aes(x = position, y = auc/1000, col = factor(position))) +
        geom_boxplot(fill = NA) +
-       geom_jitter() +
+       # geom_jitter() +
        scale_color_manual(values = fillcolors(N)) +
        guides(col = F) +
        labs(x = "Thermometer position",
