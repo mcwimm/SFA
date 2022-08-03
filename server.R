@@ -143,11 +143,11 @@ shinyServer(function(input, output, session) {
     #' If no data set is defined, use default data set
     rawData <- reactive({
       if (is.null(input$file1)){
-        defaultData = "./data/default_rawdata.csv"
+        defaultData = "./data/default_Avicennia_g.csv"
         print("Default data")
         data = get.temperatures.ICT(defaultData,
-                                    sep = ",",
-                                    skip = 10)
+                                    sep = ";",
+                                    skip = 0)
       } else {
         data = get.rawData(input)
       }
