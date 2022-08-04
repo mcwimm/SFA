@@ -6,7 +6,7 @@ get.rawData = function(input){
    an.error.occured = F
    if (input$inputType == "HFD_raw"){
       # print("HFD_raw")
-      tryCatch( { rawData  = get.temperatures.ICT(input$file1$datapath,
+      tryCatch( { rawData  = get.temperatures.HFD(input$file1$datapath,
                                                   sep = input$sep,
                                                   skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
@@ -17,7 +17,7 @@ get.rawData = function(input){
        input$inputType == "HFD_processed_read" |
        input$inputType == "HFD_processed_write"){
       # print("HFD_delta")
-      tryCatch( { rawData  = get.temp.differences.ICT(input$file1$datapath,
+      tryCatch( { rawData  = get.temp.differences.HFD(input$file1$datapath,
                                                       sep = input$sep,
                                                       skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
@@ -31,12 +31,12 @@ get.rawData = function(input){
    }
 }
 
-#' Reads raw temperatures from ICT-data file.
+#' Reads raw temperatures from HFD-data file.
 #' @param file: uploaded file
 #' @param sep: symbol to use as separator
 #' @param skip: number of rows to skip
 #' @return data.frame
-get.temperatures.ICT = function(file, sep, skip){
+get.temperatures.HFD = function(file, sep, skip){
    rawData <- read.csv(file,
                        header = TRUE, sep = sep, 
                        fileEncoding="latin1",
@@ -91,12 +91,12 @@ unify.datetime = function(rawData){
    return(rawData)
 }
 
-#' Reads temperature differences from processed ICT-data file.
+#' Reads temperature differences from processed HFD-data file.
 #' @param file: uploaded file
 #' @param sep: symbol to use as separator
 #' @param skip: number of rows to skip
 #' @return data.frame
-get.temp.differences.ICT = function(file, sep, skip){
+get.temp.differences.HFD = function(file, sep, skip){
    rawData <- read.csv(file,
                        header = TRUE, sep = sep, 
                        fileEncoding="latin1",

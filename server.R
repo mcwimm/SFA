@@ -193,7 +193,7 @@ shinyServer(function(input, output, session) {
       if (is.null(input$file1)){
         defaultData = "./data/default_Avicennia_g.csv"
         print("Default data")
-        data = get.temperatures.ICT(defaultData,
+        data = get.temperatures.HFD(defaultData,
                                     sep = ";",
                                     skip = 0)
       } else {
