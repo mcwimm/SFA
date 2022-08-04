@@ -360,7 +360,7 @@ shinyServer(function(input, output, session) {
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
-    output$raw.wide <- DT::renderDataTable({
+    output$raw.wide <- DT::renderDataTable(rownames = FALSE, {
       rawData = rawData()
       if ("dTime" %in% colnames(rawData)){
         rawDataTable = rawData %>% 
@@ -373,7 +373,7 @@ shinyServer(function(input, output, session) {
     
     #' UI Table with raw data, long-format 
     #' (Data > Upload > Preview data)
-    output$raw.long <- DT::renderDataTable({
+    output$raw.long <- DT::renderDataTable(rownames = FALSE, {
       an.error.occured = FALSE
       tryCatch( { tab  = deltaTempLongNoFilter() %>% 
                             mutate_if(is.numeric, round, 3) },
@@ -674,25 +674,25 @@ shinyServer(function(input, output, session) {
     
     #' UI table output of selected k-values
     #' (K-value > Estimation > K-value estimation > Selected)
-    output$kSelected <- DT::renderDataTable({  
+    output$kSelected <- DT::renderDataTable(rownames = FALSE, {  
       return(values$kvalues)
     }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
-    output$kRegression <- DT::renderDataTable({  
+    output$kRegression <- DT::renderDataTable(rownames = FALSE, {  
       return(kComplete()$regression  %>% round(., 2))
     }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Zero-flow)
-    output$kZeroFlow <- DT::renderDataTable({
+    output$kZeroFlow <- DT::renderDataTable(rownames = FALSE, {
       return(kComplete()$no.flow %>% round(., 2))
     }, options = list(scrollX = TRUE, dom = 't'))
 
     #' UI table output of uploaded k-values
     #' (K-value > Estimation > K-value estimation > Read csv)
-    output$uploadedKvalues <- DT::renderDataTable({ 
+    output$uploadedKvalues <- DT::renderDataTable(rownames = FALSE, { 
       return(kFromCsv())
     }, options = list(scrollX = TRUE, dom = 't'))
   
@@ -1106,13 +1106,13 @@ shinyServer(function(input, output, session) {
     #### Table ####
     
     #' UI-Table with daily tree water use
-    output$TWUtable <- DT::renderDataTable({
+    output$TWUtable <- DT::renderDataTable(rownames = FALSE, {
       if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
         treeWaterUse()
       } else {
         data.frame('.' = "Wood properties are missing (see 'Project settings')")
       }
-    }, , options = list(scrollX = TRUE, searching = F)) #dom = 't')
+    }, options = list(scrollX = TRUE, searching = F)) #dom = 't')
     
     
     #' Eventlistener to save daily tree water use as csv
