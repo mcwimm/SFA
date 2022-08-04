@@ -872,8 +872,9 @@ plot.sapFlowDay = function(data, ui.input){
       arrange(dTime) %>% 
       # distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2)
       mutate(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
+      select(doy, Method, Balance, auc) %>% 
       unique(.)
-   
+   print(paste("AUC water balance: ", nrow(auc.data)))
    return(auc.data %>% 
       ggplot(., aes(x = factor(doy), fill = Method, y = auc)) +
          geom_bar(position="dodge", stat="identity", 
@@ -903,26 +904,27 @@ plot.twu.radialprofile = function(data, ui.input){
    }
    auc.data = data %>% 
       gather(., Method, sf_i, groups) %>% 
-      mutate(Date = as.Date(as.character(datetime)),
-             Balance = ifelse(sf_i >= 0, "Positive", "Negative"),
+      mutate(Balance = ifelse(sf_i >= 0, "Positive", "Negative"),
              Method = ifelse(Method == "sfM1", "Method 1",
                                     ifelse(Method == "sfM2", "Method 2",
                                            "Method 3"))) %>%  
-      # mutate(Balance = factor(Balance,
-      #                         levels = c("Positive", "Negative"))) %>% 
+      mutate(Balance = factor(Balance,
+                              levels = c("Positive", "Negative"))) %>%
       filter(complete.cases(.)) %>% 
-      group_by(doy, Date, Method, position) %>% 
+      group_by(doy, Method, position) %>% 
       arrange(dTime) %>% 
       #distinct(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) 
       mutate(auc = sum(diff(dTime) * (head(sf_i,-1)+tail(sf_i,-1)))/2) %>% 
-      unique(.)
+      select(doy, Method, position, auc) %>% 
+      unique(.) %>% data.frame(.)
    
+   print(paste("AUC radial profile: ", nrow(auc.data)))
    N = length(unique(auc.data$position))
    
    p = auc.data %>% 
        ggplot(., aes(x = position, y = auc/1000, col = factor(position))) +
        geom_boxplot(fill = NA) +
-       # geom_jitter() +
+       geom_jitter() +
        scale_color_manual(values = fillcolors(N)) +
        guides(col = F) +
        labs(x = "Thermometer position",

@@ -153,21 +153,20 @@ treeScaleSimple1 <- function(data, swd) {
 #' @param data: data.frame, long-format
 #' @param sapWoodDepth: numeric
 #' @return data.frame
-treeScaleSimple2 <- function(data, swd) {
+treeScaleSimple2 <- function(data, swd, ui.input) {
    depths = unique(data$depth)
    
    # Calculate mean sap flow per section and divide it by sap wood depth
    data = data %>%
       group_by(datetime) %>%
-      mutate(SFS_mean = mean(SFS, na.rm = T),
-             SFD_mean = mean(SFS_mean, na.rm = T) / swd) %>% 
+      mutate(SFD_mean = mean(SFDsw, na.rm = T)) %>% 
       ungroup()
    
    # Calculate sap wood area, which is the difference in total stem area (A_rxy) and
    # heart wood area
-   A_rxy = pi * max(abs(depths))^2
-   A_hw = pi * (max(abs(depths)) - swd)^2
-
+   rxy = get.rxy(ui.input = ui.input)
+   A_rxy = pi * rxy^2
+   A_hw = pi * (rxy - swd)^2
    data$SWDarea = A_rxy - A_hw
 
    # Calculate sap flow rate per time step over alls depths in kg/h
@@ -194,13 +193,13 @@ treeScaleSimple3 <- function(data, swd) {
 #' @param sapWoodDepth: numeric
 #' @param method: character
 #' @return data.frame
-get.sapFlowByMethod <- function(data, method, swd) {
+get.sapFlowByMethod <- function(data, method, swd, ui.input) {
    if (method == "treeScaleSimple1") {
       return(treeScaleSimple1(data, swd))
    }
    
    if (method == "treeScaleSimple2") {
-      return(treeScaleSimple2(data, swd))
+      return(treeScaleSimple2(data, swd, ui.input))
    }
    
    if (method == "treeScaleSimple3") {
@@ -232,7 +231,8 @@ get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
             method = names(methods)[m]
             data = get.sapFlowByMethod(data = data,
                                        method = method, 
-                                       swd = sapWoodDepth) 
+                                       swd = sapWoodDepth, 
+                                       ui.input = ui.input) 
             
          } 
       }        
