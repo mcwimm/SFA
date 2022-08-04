@@ -37,41 +37,43 @@ settingsOutput = function(){
                        status = "warning",
                        collapsible = T, width = 12,
                        h4("Wood properties"),
-                       
+                       fluidRow(
+                          column(4, numericInput("stemCircumference", 
+                                                 "Stem circumference (cm)",
+                                                 value = 0.0)),
+                          column(4, numericInput("stemDiameter", 
+                                                 "Stem diameter (cm)",
+                                                 value = 0.0)),
+                          column(4, numericInput("barkThickness", 
+                                                 "Bark thickness (cm)",
+                                                 value = 0.0))
+                       ),
+
                        fluidRow(
                           column(4, numericInput("sapWoodDepth", 
                                                  "Sap wood depth (cm)",
                                                  value = 0.0)),
                           column(4, numericInput("heartWoodDepth", 
                                                  "Heart wood depth (cm)",
-                                                 value = 0.0)),
-                          column(4, numericInput("barkThickness", 
-                                                 "Bark thickness (cm)",
                                                  value = 0.0))
                        ),
                        
+                       
                        fluidRow(
-                          column(6, numericInput("stemCircumference", 
-                                                 "Stem circumference (cm)",
-                                                 value = 0.0)),
-                          column(6, numericInput("stemDiameter", 
-                                                 "Stem diameter (cm)",
-                                                 value = 0.0))
+                          column(4, checkboxInput("swExact", "Use exact sap-/ heartwood values*",
+                                                  F)),
+                          column(6, p("* If enabled wood attributes, i.e. R, Aring, Cring, are calculated using 
+                            the sum of sapwood and heartwood depth"))
                        ),
+                       
+                       
                        
                        numericInput("ThermalDiffusivity", 
                                     HTML("Thermal diffusivity (cm<sup>2</sup> s <sup>-1</sup>)"),
                                     value = 0.0025),
                        
-                       h4("Sensor properties"),
-                       fluidRow(
-                          column(6, numericInput("Zax", 
-                                                 "Axial sensor distance Zax (mm)",
-                                                 value = 15)),
-                          column(6, numericInput("Ztg", 
-                                                 "Tangential sensor distance Ztg (mm)",
-                                                 value = 5))
-                       )
+
+                       box.settings_sensor()
                    )
                 )),
          column(5,
@@ -111,4 +113,73 @@ settingsOutput = function(){
           )))
       )
    )
+}
+
+
+box.settings_sensor = function(){
+   return(list(
+      h4("Sensor properties"),
+      fluidRow(
+         column(6, numericInput("dist2first", 
+                                "Distance to first thermometer (mm)",
+                                value = 20)),
+         column(6, numericInput("spacer", 
+                                "Length of spacer (mm, distance sensor head to stem)",
+                                value = 0))
+      ),
+      fluidRow(
+         column(6, numericInput("Zax", 
+                                "Axial sensor distance Zax (mm)",
+                                value = 15)),
+         column(6, numericInput("Ztg", 
+                                "Tangential sensor distance Ztg (mm)",
+                                value = 5))
+      ),
+
+      selectInput("sensorType", "Sensor type",
+                  choices = c("HFD8-50", "HFD8-100", "Manual"),
+                  selected = "HFD8-100"),
+      
+      
+      conditionalPanel(
+         condition = "input.sensorType == 'Manual'",
+         numericInput("distInput", "Distance between thermometers (cm)",
+                      value = 1),
+         fluidRow(
+            column(4, checkboxInput("positionManual", "Manual position input",
+                                    F)),
+            column(4, checkboxInput("depthManual", "Manual depth input",
+                                    F))
+         ),
+         conditionalPanel(
+            condition = "input.positionManual == true",
+            textInput("positionInput", "Thermometer positions",
+                      placeholder = "Thermometer positions as vector (comma delimited): 1, 2, 3")),
+         
+         conditionalPanel(
+            condition = "input.depthManual == true",
+            textInput("depthInput", "Thermometer depths",
+                      placeholder = "Thermometer depths (cm) as vector (comma delimited): 
+                   10, 8, 7.5")),
+         ),
+      
+      p(strong("<Note>"), 
+        "The following table shows estimated depth of thermometers as distance to the center (`Sensor R`) 
+        as well as the area and circumference of the cirular ring, assuming the thermometers are centered 
+        in the respective ring. Based on the values shown here, sap flow per section can be scaled to
+        sap flow density or total tree water use."),
+      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark)."),
+      
+      output.table("depth.table"),
+      
+      p("* negative values for 'Sensor R' indicate that the thermometer is longer than 
+        tree radius (diameter / 2 - barkthickness) and the respective thermometer positions are on the opposite side of the tree. "),
+      p("** negative values for 'Area' indicate that the thermometers are located in the heartwood. Please adjust wood properties."),
+      actButton("save.sensor_props", "Save csv", "saveCsv"),
+      
+      br(),
+      p(strong("Schematic representation of an HFD sensor and its placement in the stem")),
+      img(src='stemProfile.png', width = "100%")
+      
+   ))
 }

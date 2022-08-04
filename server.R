@@ -132,6 +132,54 @@ shinyServer(function(input, output, session) {
       })
     })
     
+    #### Depths table ####
+    
+    #' Table with sensor data, i.e.
+    #' sensor position, depth, area and circumference of ring
+    #' (Data > Upload > Sensor settings)
+    get.depths.table <- reactive({
+       rawData = rawData()
+       
+       # Conditions to determine whether processed data contains relevant
+       # wood properties
+       # If true, show them
+       cond1 = input$inputType == "HFD_processed_read"
+       cond2 = input$inputType == "HFD_processed_write" & 
+          sapWoodDepth() == 0
+       cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
+       
+       if ((cond1 | cond2) & cond3){
+          return(rawData %>% 
+                    distinct(position, R, Aring, Cring) %>% 
+                    select(position, R, Aring, Cring) %>% 
+                    mutate_at(vars(2,3, 4), round, 1)%>%
+                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                                    "Circ. (cm)")))
+       } else {
+          return(depths() %>%
+                    select(-R) %>%
+                    mutate_at(vars(2), round, 2) %>%
+                    mutate_at(vars(3, 4), round, 1) %>%
+                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
+                                    "Circ. (cm)")))
+       }
+    })
+
+    #' UI depths table
+    output$depth.table <- DT::renderDataTable(rownames = FALSE, {
+       return(get.depths.table())
+    }, options = list(scrollX = TRUE, searching = F))
+    
+    
+    #' Eventlistener to save sensor depth table
+    #' (Project Settings > Measuring environment)
+    observeEvent(input$save.sensor_props, {
+       save.csv(path = projectPath(), 
+                name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
+                csvObject = get.depths.table(), 
+                ui.input = input)
+    })
+    
     
     ############
     ### DATA ###
@@ -229,7 +277,7 @@ shinyServer(function(input, output, session) {
       }
       return(update.depths(ui.input = input,
                            positions = positions(),
-                           sensor_distance = sensor.dist(),
+                           thermo_distance = sensor.dist(),
                            swd = sapWoodDepth()))
     })
     
@@ -335,38 +383,6 @@ shinyServer(function(input, output, session) {
       }
       return(tab)
     }, options = list(scrollX = TRUE, searching = F))
-    
-    #' UI Table with sensor data, i.e.
-    #' sensor position, depth, area and circumference of ring
-    #' (Data > Upload > Sensor settings)
-    output$depth.table <- DT::renderDataTable({
-      rawData = rawData()
-      
-      # Conditions to determine whether processed data contains relevant
-      # wood properties
-      # If true, show them
-      cond1 = input$inputType == "HFD_processed_read"
-      cond2 = input$inputType == "HFD_processed_write" & 
-        sapWoodDepth() == 0
-      cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
-
-      if ((cond1 | cond2) & cond3){
-        return(rawData() %>% 
-                 distinct(position, R, Aring, Cring) %>% 
-                 select(position, R, Aring, Cring) %>% 
-                 mutate_at(vars(2,3, 4), round, 1)%>%
-                 `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                 "Circ. (cm)")))
-      } else {
-        return(depths() %>%
-                 mutate_at(vars(3, 4, 5), round, 1) %>%
-                 select(-R) %>%
-                 `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                 "Circ. (cm)")))
-      }
-
-    }, options = list(scrollX = TRUE, searching = F))
-    
     
     #### Text output ####
 
@@ -815,7 +831,7 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding distances between
     #' sensors
     sensor.dist <- reactive({
-      return(get.sensorDistance(ui.input = input))
+      return(get.thermometer.distance(ui.input = input))
     })
     
     #' Reactive variable holding sap flow rates
