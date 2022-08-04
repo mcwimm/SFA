@@ -124,8 +124,8 @@ box.filter.figures = function(){
                                            "dTsym" = "dTSym"))),
          column(4, selectInput("filterPlot_col", "Color/ Group",
                                choices = c("doy" = "doy",
-                                           "none" = "none",
-                                           "position" = "position"))),
+                                           "position" = "position",
+                                           "none" = "none"))),
          column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
       ),
       
@@ -161,7 +161,7 @@ dataViewOutput = function(){
                                                "doy" = "doy",
                                                "position" = "position",
                                                "none" = "none"))),
-             column(6, selectInput("rawPlot.shape", "Shape",
+             column(6, selectInput("rawPlot.shape", "Shape/ group",
                                    choices = c("position" = "position",
                                                "doy" = "doy",
                                                "none" = "none")))

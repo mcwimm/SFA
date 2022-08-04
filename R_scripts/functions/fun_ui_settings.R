@@ -108,7 +108,9 @@ settingsOutput = function(){
                                  placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
                        textInput("gradientColors", "Colors for gradient color scale**",
                                  placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00'),
-                       p("**Two colors representing low and high values."),
+                       p("* Colors can be either hex colors or a RColorBrewer palette, 
+                         e.g. 'Blues'"),
+                       p("** Two colors representing low and high values."),
                        
           )))
       )

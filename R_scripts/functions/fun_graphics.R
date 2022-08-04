@@ -220,6 +220,14 @@ plot.histogram <- function(data, ui.input){
 
 ######## TEMPERATURES ########
 
+#' Returns min, mean and max Doy
+#' to build color legend (breaks)
+get.doy.legend = function(data.complete){
+   myfuns <- list(min, mean, max)
+   day_legend <- unlist(lapply(myfuns, function(f) round(f(data.complete$doy), 0)))
+   
+}
+
 #' Customized diagram settings
 #' @description Get UI-settings to render plot
 #' @param ui.input: UI-input
@@ -255,90 +263,100 @@ plot.customTemperature <- function(data, ui.input.processed){
    no.cols = ui.input.processed$no.cols
    draw_lines = ui.input.processed$draw_lines
    
-   if (!ui.input.processed$all.dT){
-      x = data[, x.col]
-      y = data[, y.col]
-      col = try(data[, col.col])
-      shape = try(data[, shape.col])
-
-      p = data %>% 
-         ggplot(., aes(x = x, y = y, shape = factor(shape))) +
-         labs(x = labels[x.col][[1]],
-              y = labels[y.col][[1]],
-              col = labels[col.col][[1]],
-              shape = labels[shape.col][[1]],
-              linetype = labels[shape.col][[1]]) 
-      
-      if (draw_lines){
-         if (shape.col == "none"){
-            p = p + 
-               guides(linetype = F)
-         }
-         if (col.col == "dTime"){
-            p = plot.emptyMessage("Error: Settings not possible.
-                                  Day time can not be selected as color in line mode.")
-         } else if (col.col == "none"){
-            p = p + 
-               geom_line(col = "black", aes(linetype = factor(shape))) +
-               guides(col = F)
-         } else {
-            p = p +
-               geom_line(aes(col = factor(col), linetype = factor(shape))) +
-               scale_color_manual(values = fillcolors(length(unique(col))))
-         }
-         
-         if (length(unique(shape)) > 6){
-            p = p +
-               scale_shape_manual(values = c(1:length(unique(shape))))
-         }
-         
-         
-      } else {
-         if (shape.col == "none"){
-            p = p + 
-               guides(shape = F)
-         }
-         
-         if (col.col == "dTime"){
-            p = p +
-               geom_point(aes(col = col)) +
-               scale_color_gradient2(low = gradientcolors()[2], 
-                                     high = gradientcolors()[2], 
-                                     mid = gradientcolors()[1],
-                                     midpoint = 12)
-         } else if (col.col == "none"){
-            p = p + 
-               geom_point(col = "black") +
-               guides(col = F)
-         } else {
-            p = p +
-               geom_point(aes(col = factor(col))) +
-               scale_color_manual(values = fillcolors(length(unique(col))))
-         }
-         
-         if (length(unique(shape)) > 6){
-            p = p +
-               scale_shape_manual(values = c(1:length(unique(shape))))
-         }
-      }
+   if (draw_lines & col.col == "dTime"){
+      p = plot.emptyMessage("Error: Settings not possible.
+                     Day time can not be selected 
+                     as color in line mode.")
    } else {
-      p = data %>% 
-         gather(., key, value, dTas, dTSym, dTsym.dTas) %>% 
-         ggplot(., aes(x = datetime, y = value,
-                       col = key, group = key)) +
-         geom_line() +
-         labs(x = labels["datetime"][[1]],
-              y = labels["dT"][[1]],
-              col = labels["dT"][[1]]) 
+      if (!ui.input.processed$all.dT){
+         x = data[, x.col]
+         y = data[, y.col]
+         col = try(data[, col.col])
+         shape = try(data[, shape.col])
+   
+         p = data %>% 
+            ggplot(., aes(x = x, y = y, shape = factor(shape))) +
+            labs(x = labels[x.col][[1]],
+                 y = labels[y.col][[1]],
+                 col = labels[col.col][[1]],
+                 shape = labels[shape.col][[1]],
+                 linetype = labels[shape.col][[1]]) 
+         
+         if (draw_lines){
+            if (shape.col == "none"){
+               p = p + 
+                  guides(linetype = F)
+            }
+            if (col.col == "none"){
+               p = p + 
+                  geom_line(col = "black", aes(linetype = factor(shape))) +
+                  guides(col = F)
+            } else {
+               p = p +
+                  geom_line(aes(col = factor(col), linetype = factor(shape))) +
+                  scale_color_manual(values = fillcolors(length(unique(col))))
+            }
+            
+            if (length(unique(shape)) > 6){
+               p = p +
+                  scale_shape_manual(values = c(1:length(unique(shape))))
+            }
+            
+            
+         } else {
+            if (shape.col == "none"){
+               p = p + 
+                  guides(shape = F)
+            }
+            
+            if (col.col == "dTime"){
+               p = p +
+                  geom_point(aes(col = col)) +
+                  scale_color_gradient2(low = gradientcolors()[2], 
+                                        high = gradientcolors()[2], 
+                                        mid = gradientcolors()[1],
+                                        midpoint = 12)
+            } else if (col.col == "none"){
+               p = p + 
+                  geom_point(col = "black") +
+                  guides(col = F)
+            } else if (col.col == "position"){
+               p = p +
+                  geom_point(aes(col = factor(col))) +
+                  scale_color_manual(values = fillcolors(length(unique(col))))
+            } else {
+               p = p +
+                  geom_point(aes(col = col)) +
+                  scale_color_gradient(low = gradientcolors()[1], 
+                                       high = gradientcolors()[2],
+                                       breaks = get.doy.legend(data))
+            }
+            
+            if (length(unique(shape)) > 6){
+               p = p +
+                  scale_shape_manual(values = c(1:length(unique(shape))))
+            }
+         }
+      } else {
+         p = data %>% 
+            gather(., key, value, dTas, dTSym, dTsym.dTas) %>% 
+            ggplot(., aes(x = datetime, y = value,
+                          col = key, group = key)) +
+            geom_line() +
+            scale_color_manual(values = fillcolors(3)) +
+            labs(x = labels["datetime"][[1]],
+                 y = labels["dT"][[1]],
+                 col = labels["dT"][[1]]) 
+      }
+      
+      if (facetWrap){
+         facet = get.labelledFacets(data, facet) #facet.col
+         p = p +
+            facet_wrap(~ (facet), scales = scales,
+                       ncol = no.cols)
+      }
    }
    
-   if (facetWrap){
-      facet = get.labelledFacets(data, facet) #facet.col
-      p = p +
-         facet_wrap(~ (facet), scales = scales,
-                    ncol = no.cols)
-   }
-
    return(p)
 }
 
@@ -353,16 +371,21 @@ get.intersection <- function(data, y.col, x.col1, x.col2){
    return(c(x, y))
 }
 
+
 #' Diurnal dTsym.dTas diagram
 #' @description Shows diurnal pattern of dTsym.dTas to determine low-flow times
 #' @param data: data.frame, long-format
 #' @return ggplot-object
 plot.nighttime <- function(data.complete){
+
    return(ggplot(data.complete, aes(x = dTime, y = dTsym.dTas,
                              col = doy, group = doy)) +
       # ylim(0, max(data.complete$dTsym.dTas)) +
       geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
       geom_line() +
+      scale_color_gradient(low = gradientcolors()[1], 
+                           high = gradientcolors()[2],
+                           breaks = get.doy.legend(data.complete)) +
       labs(x = labels["dTime"][[1]], 
            y = labels["dTsym.dTas"][[1]],
            col = labels["doy"][[1]]) 
@@ -924,7 +947,7 @@ plot.twu.radialprofile = function(data, ui.input){
    p = auc.data %>% 
        ggplot(., aes(x = position, y = auc/1000, col = factor(position))) +
        geom_boxplot(fill = NA) +
-       # geom_jitter() +
+       geom_jitter() +
        scale_color_manual(values = fillcolors(N)) +
        guides(col = F) +
        labs(x = "Thermometer position",
