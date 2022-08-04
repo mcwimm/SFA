@@ -129,20 +129,6 @@ get.negativeSFS = function(data, ui.input){
    return(data)
 }
 
-#' Sensor distance
-#' @param ui.input: UI-input
-#' @return numeric
-get.sensorDistance <- function(ui.input){
-   if (ui.input$sensorType == "HFD8-50"){
-      return(0.5)
-   }
-   if (ui.input$sensorType == "HFD8-100"){
-      return(1)
-   }
-   if (ui.input$sensorType == "Manual"){
-      return(ui.input$distInput)
-   }
-}
 
 
 #### Scale tree-level ####

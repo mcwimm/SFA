@@ -311,6 +311,21 @@ get.positionsFromRawData = function(dataSource, input){
    return(positions)
 }
 
+#' Distance between thermometers
+#' @param ui.input: UI-input
+#' @return numeric
+get.thermometer.distance <- function(ui.input){
+   if (ui.input$sensorType == "HFD8-50"){
+      return(0.5)
+   }
+   if (ui.input$sensorType == "HFD8-100"){
+      return(1)
+   }
+   if (ui.input$sensorType == "Manual"){
+      return(ui.input$distInput)
+   }
+}
+
 
 #' Sensor positions relative to stem center
 #' @description Position of each sensor as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
@@ -319,33 +334,33 @@ get.positionsFromRawData = function(dataSource, input){
 #' @param positions: vector with sensor positions
 #' @param rxy: numeric indicating distance between stem center and outer sap wood
 #' @param depthInput: character string indicating manual sensor depths
-#' @param sensor_distance: numeric indicating distance between sensors
+#' @param thermo_distance: numeric indicating distance between thermometers
 #' @return data.frame
 get.depths <- function(depthManual = F, inputType,
-                       positions, rxy, depthInput, sensor_distance){
+                       positions, r1, depthInput, thermo_distance){
    number_pos = length(positions)
    if (depthManual){
       df = data.frame(position = positions,
                       depth = as.numeric(unlist(strsplit(depthInput, ","))))
-   } else if (rxy == 0){
+   } else if (r1 == 0){
       df = data.frame(position = c(1:number_pos),
-                      depth = rep(rxy, number_pos))
+                      depth = rep(r1, number_pos))
       } else {
       # distance between sensor cap and first thermometer is 2 cm
       if (inputType == "HFD8-50"){ # sensorLength = 6.2
          df = data.frame(position = c(1:8),
-                         depth = seq(rxy, (rxy-3.5), by = -0.5))
+                         depth = seq(r1, (r1-3.5), by = -thermo_distance))
       }
       if (inputType == "HFD8-100"){ # sensorLength = 9.7
          df = data.frame(position = c(1:8),
-                         depth = seq(rxy, (rxy-7), by = -1))
+                         depth = seq(r1, (r1-7), by = -thermo_distance))
 
       }
       if (inputType == "Manual"){ # sensorLength = unknown
          df = data.frame(position = c(1:number_pos),
-                         depth = seq(rxy, 
-                                     (rxy-((number_pos-1)*sensor_distance)), 
-                                     by = -sensor_distance))
+                         depth = seq(r1, 
+                                     (r1-((number_pos-1)*thermo_distance)), 
+                                     by = -thermo_distance))
       }
       
       df = df[df$position %in% positions, ]
@@ -357,25 +372,18 @@ get.depths <- function(depthManual = F, inputType,
 
 #' Get area and circumference of circular ring to dataframe with positions and depths
 #' @param depths: vector indicating sensor depths
-#' @param rxy: numeric indicating distance between stem center and outer sapwood
-#' @param swd: numeric indicating sapwooddepth in cm
+#' @param thermo_distance: numeric indicating distance between thermometers, cm
 #' @return data.frame
-add.Props2DepthsHelper = function(depths, rxy, swd){
-
-   # depths = depths %>% arrange((position)) #desc
+add.Props2DepthsHelper = function(depths){
+   thermo_distance = abs(depths[1, "depth"] - depths[2, "depth"]) 
+   
    depths = depths %>% 
-      mutate(Aring = pi*(depth^2 - lead(depth)^2),
-             R = (depth + lead(depth)) / 2,
-             Cring = 2*pi * R)
-   
-   sensor_distance = abs(depths[1, "depth"] - depths[2, "depth"]) 
-   last_ring_outer = pi * depths[nrow(depths), "depth"]^2
-   last_ring_inner = pi * (depths[nrow(depths), "depth"]-sensor_distance)^2 
-   
-   depths[nrow(depths), "Aring"] = last_ring_outer - last_ring_inner
-   depths[nrow(depths), "R"] = depths[nrow(depths), "depth"] - sensor_distance / 2
-
-   depths[nrow(depths), "Cring"] = 2*pi*depths[nrow(depths), "R"]
+      mutate(r_outer = depth + thermo_distance/2,
+             r_inner = depth - thermo_distance/2,
+             Aring = pi*(r_outer^2 - r_inner^2),
+             R = depth,
+             Cring = 2*pi * R) %>% 
+      select(-c(r_outer, r_inner))
 
    return(depths)
 }
@@ -383,17 +391,15 @@ add.Props2DepthsHelper = function(depths, rxy, swd){
 #' Function to create data.frame with sensor information and corresponding 
 #' areas and circumferences
 #' @param depths: vector indicating sensor depths
-#' @param rxy: numeric indicating distance between stem center and outer sapwood
+#' @param r1: numeric indicating distance between stem center and first thermometer
 #' @param swd: numeric indicating sapwooddepth in cm
 #' @return data.frame
-add.Props2Depths = function(depths, rxy, swd){
+add.Props2Depths = function(depths, swd){
    if (all(depths$depth > 0)){
-      depths = add.Props2DepthsHelper(depths = depths, 
-                                      rxy = rxy,
-                                      swd = swd)
+      depths = add.Props2DepthsHelper(depths = depths)
    } else {
       pos = depths[depths[, "depth"] > 0,] %>%
-         add.Props2DepthsHelper(., rxy, 0)
+         add.Props2DepthsHelper(.)
       neu = depths[depths[, "depth"] == 0,] %>%
          mutate(Aring = 0,
                 R = 0,
@@ -402,7 +408,7 @@ add.Props2Depths = function(depths, rxy, swd){
          mutate(depth_helper = depth,
                 depth = abs(depth)) %>% 
          arrange(desc(depth)) %>% 
-         add.Props2DepthsHelper(., rxy, 0) %>% 
+         add.Props2DepthsHelper(.) %>% 
          mutate(depth = depth_helper) %>% 
          select(-depth_helper) %>% 
          arrange(position)
@@ -449,32 +455,53 @@ update.positions = function(data, ui.input, reactive.value){
    return(list(reactive.value, positions))
 }
 
+
+get.rxy = function(ui.input){ #hier
+   # Calculate the distance Rxy from the stem center to the inner bark
+   # Prioritize information on sap wood depth over dbh
+   if (ui.input$swExact){
+      rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
+   } else {
+      if (ui.input$stemDiameter != 0){
+         rxy = ui.input$stemDiameter / 2 - ui.input$barkThickness
+      } else {
+         rxy = ui.input$stemCircumference / (2*pi) - ui.input$barkThickness
+      }
+   }
+   return(rxy)
+}
+
+get.r1 = function(rxy, ui.input){
+   r1 = 0
+   if (rxy != 0){
+      r1 = rxy - (ui.input$dist2first - ui.input$spacer)/10
+   }
+   return(r1)
+}
+
+
 #' Update sensor depths
 #' @param ui.input: UI-inputs
 #' @param positions: vector: sensor positions
-#' @param sensor_distance: numeric: distance between sensors, mm
+#' @param thermo_distance: numeric: distance between thermometers, mm
 #' @param swd: numeric: sapwood depth
 #' @return data.frame
-update.depths = function(ui.input, positions, sensor_distance, swd){
-   # Calculate the distance Rxy from the stem center to the inner bark
-   # Prioritize information on sap wood depth over dbh
-   if (ui.input$sapWoodDepth != 0){
-      rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
-   } else {
-      rxy = ui.input$stemDiameter / 2 - ui.input$barkThickness
-   }
+update.depths = function(ui.input, positions, thermo_distance, swd){
+   rxy = get.rxy(ui.input = ui.input)
+   r1 = get.r1(rxy = rxy,
+               ui.input = ui.input)
+   thermo_distance = get.thermometer.distance(ui.input = ui.input)
    depths = get.depths(depthManual = ui.input$depthManual,
                        inputType = ui.input$sensorType,
                        positions = positions,
-                       rxy = rxy,
+                       r1 = r1,
                        depth = ui.input$depthInput,
-                       sensor_distance = sensor_distance)
+                       thermo_distance = thermo_distance)
 
    # Àdd area and circumference of circular ring
    depths = add.Props2Depths(depths = depths, 
-                             rxy = rxy,
                              swd = swd)
-   print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy))
+   print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy, ', r1: ', r1))
    return(depths)
 }
 
@@ -541,7 +568,7 @@ get.filteredData <- function(data, ui.input){
    }
 
    # remove outlier
-   if (ui.input$removeOutlier){ #hier
+   if (ui.input$removeOutlier){
       data.vector = ui.input$filterPlot_X   
       
       # Grouping variable = Color
