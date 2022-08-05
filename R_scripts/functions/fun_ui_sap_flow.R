@@ -159,14 +159,14 @@ sfRateOutput <- function(){
                        collapsible = T, width = NULL,
                        status = "warning",
                        
-                       p(strong("<Note>"), "The estimation of sap flow is based
-                                        wood properties (see 'Project settings') and 
-                         the correct assignment of sensor positions (see 'Data | Upload')."),
+                       p(strong("<Note>"), "The estimation of sap flow is based on
+                                        wood and sensor properties (see 'Project settings').
+                         If tree water use calculated with a specific method is 0, more information are required."),
                        
                        checkboxInput("treeScaleSimple1", 
-                                     "Method 1: Area of circular ring", T),
+                                     "Method 1: Area of circular ring", F),
                        checkboxInput("treeScaleSimple2", 
-                                     "Method 2: Sapwood area", T),
+                                     "Method 2: Sapwood area", F),
                        checkboxInput("treeScaleSimple3", 
                                      "Method 3: Circumference of circular ring", T)
                    )),
