@@ -350,15 +350,11 @@ plot.customTemperature <- function(data, ui.input.processed){
             
          } else {
             if (shape.col == "none"){
-               print("in shape.col none")
-
                p = p + 
                   geom_point(shape = 1) +
                   guides(shape = F)
             }
             if (col.col == "none"){
-               print("in col.col none")
-               
                p = p + 
                   geom_point(col = "black") +
                   guides(col = F)
@@ -377,7 +373,6 @@ plot.customTemperature <- function(data, ui.input.processed){
                   scale_color_manual(values = fillcolors(length(unique(col))))
             } 
             if (col.col == "date"){
-               print("in is.Date")
                p = p +
                   geom_point(aes(col = col)) +
                   scale_color_gradient(low = gradientcolors()[1],
@@ -964,10 +959,9 @@ plot.sapFlowDay = function(data, ui.input){
                                     "Method 3")),
              Balance = ifelse(SFrate >= 0, "Positive", "Negative")) %>% 
       mutate(Balance = factor(Balance, levels = c("Positive", "Negative"))) %>% 
-      filter(complete.cases(.)) %>% 
+      filter(complete.cases(.)) %>%
       group_by(doy, Method, Balance) %>% 
       arrange(dTime) %>% 
-      # distinct(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2)
       mutate(auc = sum(diff(dTime) * (head(SFrate,-1)+tail(SFrate,-1)))/2) %>% 
       select(doy, Method, Balance, auc) %>% 
       unique(.)

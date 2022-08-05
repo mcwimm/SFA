@@ -492,10 +492,9 @@ update.positions = function(data, ui.input, reactive.value){
    return(list(reactive.value, positions))
 }
 
-
+#' Calculate the distance Rxy from the stem center to the inner bark
+#' Prioritize information on sap wood depth over dbh
 get.rxy = function(ui.input){ #hier
-   # Calculate the distance Rxy from the stem center to the inner bark
-   # Prioritize information on sap wood depth over dbh
    if (ui.input$swExact){
       rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
    } else {
@@ -508,6 +507,7 @@ get.rxy = function(ui.input){ #hier
    return(rxy)
 }
 
+#' Calculate distance between center and first thermometer
 get.r1 = function(rxy, ui.input){
    r1 = 0
    if (rxy != 0){
