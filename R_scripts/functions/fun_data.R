@@ -60,6 +60,11 @@ unify.datetime = function(rawData){
                                     format = datetimeformat)
       rawData$date = strftime(rawData$datetime, format="%d.%m.%Y")
       rawData$time = strftime(rawData$datetime, format="%H:%M:%S")
+      
+      dateformat = get.date.format(rawData[1,]$date)
+      rawData$date = as.Date(rawData$date,
+                             format = dateformat)
+      
    } else {
       if (all(c(tolower("time"), tolower("date")) %in% tolower(names(rawData)))){
          print("Add datetime based on date and time")
@@ -74,20 +79,25 @@ unify.datetime = function(rawData){
          rawData$time = time_col[[1]]
 
          datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
+         dateformat = get.date.format(rawData[1,]$date)
+         
          rawData = rawData %>% 
             rowwise() %>% 
             mutate(datetime = as.POSIXct(x = paste(date, time),
-                                         format = datetimeformat))
+                                         format = datetimeformat),
+                   date = as.Date(date,
+                                  format = dateformat))
       }
    }
    
    # add hour of day and date of year
    rawData$dTime = convertTimeToDeci(as.character(rawData$time))
    rawData$doy <- as.numeric(strftime(rawData$datetime, format = "%j"))
-   
+
    # Reorder columns
    rawData = data.frame(rawData) %>% 
       relocate(datetime, date, time, doy, dTime)
+   
    return(rawData)
 }
 
@@ -134,6 +144,32 @@ get.datetime.format = function(date, time=""){
    }
 }
 
+#' Function to convert string to data format
+#' @param date: datetime or date as string
+#' @return datetime object
+get.date.format = function(date){
+   # datetime = rawData[1, c("Date", "Time")]
+   if (!is.na(as.POSIXct(x = date, 
+                         format="%d.%m.%Y"))){
+      return("%d.%m.%Y")
+   }
+   if (!is.na(as.POSIXct(x = date, 
+                         format="%d/%m/%Y"))){
+      return("%d/%m/%Y")
+   }
+   if (!is.na(as.POSIXct(x = date, 
+                         format="%d.%m.%Y"))){
+      return("%d.%m.%Y")
+   }
+   if (!is.na(as.POSIXct(x = date, 
+                         format="%d/%m/%Y"))){
+      return("%d/%m/%Y")
+   }
+   if (!is.na(as.POSIXct(x = date, 
+                         format="%Y-%m-%dS"))){
+      return("%Y-%m-%d")
+   }
+}
 
 #' Symetric and asymetric temperature differences for each needle position.
 #' 
@@ -173,6 +209,7 @@ get.delta.from.temp.depth <- function(rawData, position){
 
    delta.temp <- data.frame(
                      datetime = rawData[, "datetime"],
+                     date = rawData[, "date"],
                      time = rawData[, "time"],
                      doy = rawData[, "doy"],
                      dTime = rawData[, "dTime"],
@@ -180,7 +217,7 @@ get.delta.from.temp.depth <- function(rawData, position){
                      dTsa = t_up[, 1] - t_side[, 1],
                      dTSym = t_up[, 1] - t_low[, 1]
                   )
-   colnames(delta.temp) = c("datetime", "time", "doy", "dTime",
+   colnames(delta.temp) = c("datetime", "date", "time", "doy", "dTime",
                             "dTas", "dTsa", "dTSym")
    
    delta.temp = cbind(delta.temp, 
