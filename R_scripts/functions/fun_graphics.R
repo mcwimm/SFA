@@ -4,11 +4,23 @@
 #' @param facet.col: character, name of facet variable
 #' @return factor
 get.labelledFacets = function(data, facet.col){
-   facet = as.integer(data[, facet.col]) 
-   facet.factor <- sort(c(unique(facet)))
-   labs = unlist(lapply(facet.factor, function(x) paste(facet.col, ": ", x, sep = "")))
+   if (is.Date(data[1, facet.col])){
+      facet = as.character(data[, facet.col]) 
+      facet.factor <- sort(c(unique(facet)))
+      labs = facet.factor
+   } else {
+      facet = as.integer(data[, facet.col]) 
+      facet.factor <- sort(c(unique(facet)))
+      labs = unlist(lapply(facet.factor, function(x) paste(facet.col, ": ", x, sep = "")))
+   }
+
    # Exclude = NULL includes NA as factor
    return(factor(facet, labels = labs, exclude = NULL))
+}
+
+#' Check if value is date format
+is.Date <- function(x) {
+   inherits(x, c("Date", "POSIXt"))
 }
 
 #' Fill colors
@@ -81,6 +93,7 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
                "doy" = "Day of year",
                "dTime" = "Time (h)",
                "datetime" = "",
+               "date" = "Date",
                "position" = "Thermometer position",
                "SFI" = "Sap Flow Index (\u00B0 C)",
                "SF" = expression(paste("Sap Flow Rate (kg \u00b7 ",
@@ -145,19 +158,22 @@ data_summary <- function(x) {
 #' @param ui.input: UI-input
 #' @return ggplot-object
 plot.histogram <- function(data, ui.input){
-   x.col = ui.input$filterPlot_X
+   variable.col = ui.input$filterPlot_X
    fill.col = ui.input$filterPlot_col
    binwidth = ui.input$filterPlot_binwidth
    type = ui.input$filterPlot_type
    facetGrid = ui.input$filterPlot_facetGrid
 
-   x = data[, x.col]
+   variable = data[, variable.col]
 
    if (fill.col != "none"){
-      fill = factor(data[, fill.col])
-      
+      if (fill.col == "position"){
+         fill = factor(data[, fill.col])
+      } else {
+         fill = data[, fill.col]
+      }
       p = data %>% 
-         ggplot(., aes(fill = fill, col = fill)) +
+         ggplot(., aes(fill = fill, col = fill, group = fill)) +
          labs(fill = labels[fill.col][[1]],
               col = labels[fill.col][[1]])
    } else {
@@ -169,48 +185,58 @@ plot.histogram <- function(data, ui.input){
    
    if (type == "hist"){
       p = p +
-         geom_histogram(mapping=aes(x = x), binwidth = binwidth) + #, fill = fill
-         labs(x = labels[x.col][[1]])
+         geom_histogram(mapping=aes(x = variable), 
+                        binwidth = binwidth, col = "white") + #, fill = fill
+         labs(x = labels[variable.col][[1]],
+              fill = labels[fill.col][[1]])
+      
       
    } 
    if (type == "freq"){
       p = p +
-         geom_freqpoly(mapping=aes(x = x), binwidth = binwidth)  +
-         
-         labs(x = labels[x.col][[1]])
+         geom_freqpoly(mapping=aes(x = variable), binwidth = binwidth)  +
+         labs(x = labels[variable.col][[1]],
+              col = labels[fill.col][[1]])
    }
 
+   # Set x axis for violin and boxplot
+   if (fill.col == "none"){
+      x = 0
+   } 
+   if (fill.col == "position"){
+      x = factor(data[, fill.col])
+   }
+   if (fill.col == "date"){
+      x = data[, fill.col]
+   }
    if (type == "boxp"){
-      if (fill.col == "none"){
-         y = 0
-      } else {
-         y = factor(data[, fill.col])
-      }
-      
       p = p +
-         geom_boxplot(mapping=aes(y = x, x = y), alpha = 0.1)  + 
-         labs(y = labels[x.col][[1]]) +
+         geom_boxplot(mapping=aes(x = x, y = variable), alpha = 0.5)  + 
+         labs(y = labels[variable.col][[1]]) +
          theme(axis.title.x=element_blank())
    }
    
    if (type == "violin"){
-      if (fill.col == "none"){
-         y = 0
-      } else {
-         y = factor(data[, fill.col])
-      }
       p = p +
-         geom_violin(mapping=aes(y = x, x = y), alpha = 0.1)  + 
-         stat_summary(mapping=aes(y = x, x = y),
+         geom_violin(mapping=aes(x = x, y = variable), alpha = 0.5)  + 
+         stat_summary(mapping=aes(x = x, y = variable),
                       fun.data=data_summary) +
-         labs(y = labels[x.col][[1]]) +
+         labs(y = labels[variable.col][[1]]) +
          theme(axis.title.x=element_blank())
    }
    
-   
+   if (fill.col == "date"){
+      p = p +
+         scale_color_gradient(low = gradientcolors()[1],
+                              high = gradientcolors()[2],
+                              trans = "date") +
+         scale_fill_gradient(low = gradientcolors()[1],
+                              high = gradientcolors()[2],
+                              trans = "date")
+   }
    if (facetGrid){
       p = p +
-         facet_grid(position ~ doy, labeller = label_both, scales = "free_x")
+         facet_grid(position ~ date, labeller = label_both, scales = "free_x")
    }
    
 
@@ -266,16 +292,20 @@ plot.customTemperature <- function(data, ui.input.processed){
    if (draw_lines & col.col == "dTime"){
       p = plot.emptyMessage("Error: Settings not possible.
                      Day time can not be selected 
-                     as color in line mode.")
+                            as color in line mode.")
    } else {
       if (!ui.input.processed$all.dT){
          x = data[, x.col]
          y = data[, y.col]
-         col = try(data[, col.col])
-         shape = try(data[, shape.col])
+         # Use try() do avoid crash/ error message if col = none
+         # or shape = none is chosen
+         col = try(data[, col.col], silent = T)
+         shape = try(data[, shape.col], silent = T)
    
          p = data %>% 
-            ggplot(., aes(x = x, y = y, shape = factor(shape))) +
+            ggplot(., aes(x = x, y = y, shape = factor(shape),
+                          group = interaction(shape, col),
+                          linetype = factor(shape))) +
             labs(x = labels[x.col][[1]],
                  y = labels[y.col][[1]],
                  col = labels[col.col][[1]],
@@ -289,12 +319,27 @@ plot.customTemperature <- function(data, ui.input.processed){
             }
             if (col.col == "none"){
                p = p + 
-                  geom_line(col = "black", aes(linetype = factor(shape))) +
+                  geom_line(col = "black") +
                   guides(col = F)
-            } else {
+            }
+            if (col.col == "position"){
                p = p +
-                  geom_line(aes(col = factor(col), linetype = factor(shape))) +
+                  geom_line(aes(col = factor(col))) +
                   scale_color_manual(values = fillcolors(length(unique(col))))
+            } 
+            if (col.col == "date"){
+               p = p +
+                  geom_line(aes(col = col)) +
+                  scale_color_gradient(low = gradientcolors()[1],
+                                       high = gradientcolors()[2],
+                                       trans = "date") 
+            } 
+            if (col.col == "doy"){
+               p = p +
+                  geom_line(aes(col = col)) +
+                  scale_color_gradient(low = gradientcolors()[1],
+                                       high = gradientcolors()[2],
+                                       breaks = get.doy.legend(data))
             }
             
             if (length(unique(shape)) > 6){
@@ -305,10 +350,19 @@ plot.customTemperature <- function(data, ui.input.processed){
             
          } else {
             if (shape.col == "none"){
+               print("in shape.col none")
+
                p = p + 
+                  geom_point(shape = 1) +
                   guides(shape = F)
             }
-            
+            if (col.col == "none"){
+               print("in col.col none")
+               
+               p = p + 
+                  geom_point(col = "black") +
+                  guides(col = F)
+            } 
             if (col.col == "dTime"){
                p = p +
                   geom_point(aes(col = col)) +
@@ -316,18 +370,24 @@ plot.customTemperature <- function(data, ui.input.processed){
                                         high = gradientcolors()[2], 
                                         mid = gradientcolors()[1],
                                         midpoint = 12)
-            } else if (col.col == "none"){
-               p = p + 
-                  geom_point(col = "black") +
-                  guides(col = F)
-            } else if (col.col == "position"){
+            } 
+            if (col.col == "position"){
                p = p +
                   geom_point(aes(col = factor(col))) +
                   scale_color_manual(values = fillcolors(length(unique(col))))
-            } else {
+            } 
+            if (col.col == "date"){
+               print("in is.Date")
                p = p +
                   geom_point(aes(col = col)) +
-                  scale_color_gradient(low = gradientcolors()[1], 
+                  scale_color_gradient(low = gradientcolors()[1],
+                                       high = gradientcolors()[2],
+                                       trans = "date")
+            } 
+            if (col.col == "doy"){
+               p = p +
+                  geom_point(aes(col = col)) +
+                  scale_color_gradient(low = gradientcolors()[1],
                                        high = gradientcolors()[2],
                                        breaks = get.doy.legend(data))
             }
@@ -350,7 +410,7 @@ plot.customTemperature <- function(data, ui.input.processed){
       }
       
       if (facetWrap){
-         facet = get.labelledFacets(data, facet) #facet.col
+         facet = get.labelledFacets(data, facet) #facet.col #hier
          p = p +
             facet_wrap(~ (facet), scales = scales,
                        ncol = no.cols)
@@ -379,16 +439,16 @@ get.intersection <- function(data, y.col, x.col1, x.col2){
 plot.nighttime <- function(data.complete){
 
    return(ggplot(data.complete, aes(x = dTime, y = dTsym.dTas,
-                             col = doy, group = doy)) +
+                             col = date, group = date)) +
       # ylim(0, max(data.complete$dTsym.dTas)) +
       geom_hline(yintercept = 0., linetype = "dashed",  col = "#333333") +
       geom_line() +
       scale_color_gradient(low = gradientcolors()[1], 
-                           high = gradientcolors()[2],
-                           breaks = get.doy.legend(data.complete)) +
+                           high = gradientcolors()[2], 
+                           trans = "date") +
       labs(x = labels["dTime"][[1]], 
            y = labels["dTsym.dTas"][[1]],
-           col = labels["doy"][[1]]) 
+           col = labels["date"][[1]]) 
       )
 }
 
@@ -720,27 +780,40 @@ plot.sf.facets = function(data, ui.input, radial.profile = FALSE){
    data = data[complete.cases(data[, facet.col]), ]
    # Get facets based on column name
    facet = get.labelledFacets(data, facet.col)
-   col.col = ifelse(facet.col == "position", "doy", "position")
-   
+   col.col = ifelse(facet.col == "position", "date", "position")
+   if (col.col == "position"){
+      col = factor(data[, col.col])
+   } else {
+      col = data[, col.col]
+   }
+
    if (radial.profile){
       p = data %>% 
-         ggplot(., aes(x = factor(get(col.col)), y = get(y.col))) +
-         geom_boxplot(aes(col = factor(get(col.col)))) +
+         ggplot(., aes(x = col, y = get(y.col))) +
+         geom_boxplot(aes(col = col, group = col)) + 
          labs(y = labels[[y.col]],
               x = labels[["position"]],
               col = labels[[col.col]]) 
    } else {
       p = data %>%
          ggplot(aes(x = dTime, y = get(y.col))) +
-         geom_line(aes(col = factor(get(col.col)))) +
+         geom_line(aes(col = col, group = col)) +
          labs(x = labels["dTime"][[1]],
               y = labels[y.col][[1]],
               col = labels[col.col][[1]])
    }
-
+   
    N = length(unique(data[, col.col]))
+   if (col.col == "date"){
+      p = p +
+         scale_color_gradient(low = gradientcolors()[1],
+                              high = gradientcolors()[2],
+                              trans = "date")
+   } else {
+      p = p  +
+         scale_color_manual(values = fillcolors(N)) 
+   }
    p = p  +
-      scale_color_manual(values = fillcolors(N)) +
       facet_wrap(~ (facet), scales = scales,
                  ncol = facet.col.no)
    return(p)
@@ -798,6 +871,7 @@ plot.sf.neg.control = function(data, ui.input){
                     scales = scales) +
          theme(axis.title.x = element_blank()) +
          labs(col = "Formula",
+              y = labels[["SFS"]],
               linetype = "Formula"))
 }
 

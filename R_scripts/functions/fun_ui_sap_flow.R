@@ -84,6 +84,7 @@ sfDensityOutput <- function(){
                 fluidRow(
                    column(6, selectInput("sf_facet_column", "Facet",
                                          choices = c("doy" = "doy",
+                                                     "date" = "date",
                                                      "position" = "position"))),
                    column(6, numericInput("sf_facet_col_nums",
                                           "No. columns",

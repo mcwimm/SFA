@@ -107,7 +107,7 @@ box.filter.figures = function(){
    return(list(
       fluidRow(
          column(4, checkboxInput("filterPlot_facetGrid", 
-                                 "Facet grid (doy ~ position)", F))
+                                 "Facet grid (position ~ date)", F))
       ),
       
       radioButtons("filterPlot_type", "Diagram type", inline = T,
@@ -123,7 +123,7 @@ box.filter.figures = function(){
                                            "dTsa" = "dTsa",
                                            "dTsym" = "dTSym"))),
          column(4, selectInput("filterPlot_col", "Color/ Group",
-                               choices = c("doy" = "doy",
+                               choices = c("date" = "date",
                                            "position" = "position",
                                            "none" = "none"))),
          column(4, numericInput("filterPlot_binwidth", "Binwidth", value = 0.1))
@@ -158,11 +158,13 @@ dataViewOutput = function(){
           fluidRow(
              column(6, selectInput("rawPlot.col", "Color",
                                    choices = c("day time" = "dTime",
+                                               "date" = "date",
                                                "doy" = "doy",
                                                "position" = "position",
                                                "none" = "none"))),
              column(6, selectInput("rawPlot.shape", "Shape/ group",
                                    choices = c("position" = "position",
+                                               "date" = "date",
                                                "doy" = "doy",
                                                "none" = "none")))
           ),
@@ -180,6 +182,8 @@ dataViewOutput = function(){
              fluidRow(
                 column(6, selectInput("rawPlot.facet", "Facet",
                                       choices = c("position" = "position",
+                                                  "date" = "date",
+                                                  
                                                   "doy" = "doy"))),
                 column(6, numericInput("rawPlot.columns", "No. columns",
                                        value = 3))
