@@ -3,15 +3,7 @@
 #' @param ui.input: UI-input
 #' @return numeric
 get.sapWoodDepth = function(ui.input){
-   if (ui.input$sapWoodDepth == 0){
-      if (ui.input$stemCircumference == 0){
-         swd = ui.input$stemDiameter/2 - ui.input$barkThickness - ui.input$heartWoodDepth
-      } else {
-         swd = ui.input$stemCircumference / (2*pi) - ui.input$barkThickness -
-            ui.input$heartWoodDepth
-      }} else {
-         swd = ui.input$sapWoodDepth
-      }
+   swd = ui.input$sapWoodDepth
    return(swd)
 }
 
