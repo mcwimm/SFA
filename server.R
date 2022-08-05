@@ -810,7 +810,6 @@ shinyServer(function(input, output, session) {
     #' based on k-values
     sapFlowDens <- reactive({
       data = deltaTempLong()
-      
       # Only calculate SFD if not in read mode
       if (input$inputType == "HFD_processed_read" & !is.null(values$kvalues)){
         return(data)
@@ -846,12 +845,14 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding daily tree water 
     #' use in kg per h and kg per day
     #' for selected method
-    treeWaterUse <- reactive({
-      if (click() > 0){
-        get.treeWaterUseByMethod(data = sapFlow(),
-                                 ui.input = input)
-      } else {
-        return(data.frame(x = "No k-values have been set yet."))
+    treeWaterUse <- reactive({ 
+       if (all(is.na(values$kvalues$k))){
+          return(data.frame(x = "No k-values have been set yet."))
+          } else if (get.sapFlowSum() == 0){ 
+             data.frame('.' = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
+             } else {
+                get.treeWaterUseByMethod(data = sapFlow(),
+                                         ui.input = input)
       }
     })
     
@@ -973,9 +974,7 @@ shinyServer(function(input, output, session) {
             plot.emptyMessage(message = "No k-values have been set yet.")
             } else {
                plot.emptyMessage(message = 
-                               "This figure is only available for SFS 
-                  (not SFI or SFD) when negative 
-                  SFS-formula is applied.")
+                               "This figure is only available for SFS \n(not SFI or SFD) when negative \nSFS-formula is applied.")
         }
       }
     })
@@ -1001,19 +1000,30 @@ shinyServer(function(input, output, session) {
     ##### Sap Flow Rate #####
     ###### Diurnal Pattern ######
     
+    get.sapFlowSum = reactive({
+       if (click() > 0){
+          groups = get.selectedMethods(input)
+          sapFlow = sapFlow()
+          return(sum(sapFlow[, groups], na.rm = T))
+       } else {
+          return(0)
+       }
+       
+    })
+    
     #' Reactive variable holding figure of sap flow rate
     #' for selected methods
     sapFlowTreePlot <- reactive({
        if (all(is.na(values$kvalues$k))){
           plot.emptyMessage(message = "No k-values have been set yet.")
           } else {
-             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-                plot.sapFlowRate(data = sapFlow(), 
-                                 ui.input = input)
+             if (get.sapFlowSum() == 0){ 
+                     plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
                 } else {
-                   plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        }
-      }
+                   plot.sapFlowRate(data = sapFlow(), 
+                                    ui.input = input)
+                }
+          }
     })
     
     #' Eventlistener to show figure of sap flow rate
@@ -1048,12 +1058,12 @@ shinyServer(function(input, output, session) {
        if (all(is.na(values$kvalues$k))){
           plot.emptyMessage(message = "No k-values have been set yet.")
           } else {
-             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-             plot.sapFlowDay(data = sapFlow(), 
-                             ui.input = input)
+             if (get.sapFlowSum() == 0){ 
+                plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
              } else {
-             plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        }
+                plot.sapFlowDay(data = sapFlow(),
+                                ui.input = input)
+             } 
       }
     })
     
@@ -1080,12 +1090,12 @@ shinyServer(function(input, output, session) {
        if (all(is.na(values$kvalues$k))){
           plot.emptyMessage(message = "No k-values have been set yet.")
           } else {
-             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-             plot.twu.radialprofile(data = sapFlow(), 
-                                    ui.input = input)
+             if (get.sapFlowSum() == 0){ 
+                plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
              } else {
-                plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
-        }
+                plot.twu.radialprofile(data = sapFlow(), 
+                                       ui.input = input)
+             } 
       }
     })
     
@@ -1109,11 +1119,7 @@ shinyServer(function(input, output, session) {
     
     #' UI-Table with daily tree water use
     output$TWUtable <- DT::renderDataTable(rownames = FALSE, {
-      if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-        treeWaterUse()
-      } else {
-        data.frame('.' = "Wood properties are missing (see 'Project settings')")
-      }
+       treeWaterUse()
     }, options = list(scrollX = TRUE, searching = F)) #dom = 't')
     
     

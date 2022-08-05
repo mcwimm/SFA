@@ -290,9 +290,7 @@ plot.customTemperature <- function(data, ui.input.processed){
    draw_lines = ui.input.processed$draw_lines
    
    if (draw_lines & col.col == "dTime"){
-      p = plot.emptyMessage("Error: Settings not possible.
-                     Day time can not be selected 
-                            as color in line mode.")
+      p = plot.emptyMessage("Error: Settings not possible. \nDay time can not be selected \nas color in line mode.")
    } else {
       if (!ui.input.processed$all.dT){
          x = data[, x.col]
@@ -722,7 +720,7 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
                         ui.input = ui.input, 
                         radial.profile = radial.profile)
    } else {
-      p = plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+      p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Project settings')")
    }
    return(p)
 }
@@ -875,9 +873,12 @@ plot.sf.neg.control = function(data, ui.input){
 #' @return ggplot-object
 plot.emptyMessage = function(message){
    return(p = ggplot() +
-             annotate(geom = "text", x = 5, y = 5, 
+             annotate(geom = "text", x = 0, y = 5, 
                       label = message,
-                      color = "red", size = 8) +
+                      color = "red", size = 6,
+                      hjust = 0) +
+             xlim(c(0, 10)) +
+             ylim(c(0, 10)) +
              theme_void())
 }
 
@@ -951,7 +952,7 @@ plot.sapFlowRate = function(data, ui.input){
 #' @return ggplot-object
 plot.sapFlowDay = function(data, ui.input){
    groups = get.selectedMethods(ui.input)
-   
+
    auc.data = data %>% 
       gather(., Method, SFrate, groups) %>% 
       mutate(Method = ifelse(Method == "sfM1", "Method 1",
