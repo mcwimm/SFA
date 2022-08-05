@@ -883,9 +883,9 @@ shinyServer(function(input, output, session) {
         plot.sf.helper(data = deltaTempLong(),
                     ui.input = input)
       } else {
-        if (click() == 0 && is.null(input$file2)){
-          plot.emptyMessage(message = "No k-values have been set yet.")
-        } else {
+         if (all(is.na(values$kvalues$k))){
+            plot.emptyMessage(message = "No k-values have been set yet.")
+         } else {
           plot.sf.helper(data = sapFlowDens(),
                       ui.input = input)
         }
@@ -932,13 +932,13 @@ shinyServer(function(input, output, session) {
                     ui.input = input,
                     radial.profile = TRUE)
       } else {
-        if (click() == 0 && is.null(input$file2)){
-          plot.emptyMessage(message = "No k-values have been set yet.")
-        } else {
-          plot.sf.helper(data = sapFlowDens(),
-                      ui.input = input,
-                      radial.profile = TRUE)
-        }
+         if (all(is.na(values$kvalues$k))){
+            plot.emptyMessage(message = "No k-values have been set yet.")
+            } else {
+            plot.sf.helper(data = sapFlowDens(),
+                           ui.input = input,
+                           radial.profile = TRUE)
+            }
       }
     })
     
@@ -969,11 +969,13 @@ shinyServer(function(input, output, session) {
         plot.sf.neg.control(data = sapFlowDens(),
                             ui.input = input)
       } else {
-        if (click() == 0 && is.null(input$file2)){
-          plot.emptyMessage(message = "No k-values have been set yet.")
-        } else {
-          plot.emptyMessage(message = "This figure is only available for SFS (not SFI or SFD) when negative SFS-formula is applied.")
-          
+         if (all(is.na(values$kvalues$k))){
+            plot.emptyMessage(message = "No k-values have been set yet.")
+            } else {
+               plot.emptyMessage(message = 
+                               "This figure is only available for SFS 
+                  (not SFI or SFD) when negative 
+                  SFS-formula is applied.")
         }
       }
     })
@@ -1002,14 +1004,14 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of sap flow rate
     #' for selected methods
     sapFlowTreePlot <- reactive({
-      if (click() == 0 && is.null(input$file2)){
-        plot.emptyMessage(message = "No k-values have been set yet.")
-      } else {
-        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-          plot.sapFlowRate(data = sapFlow(), 
-                           ui.input = input)
-        } else {
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+       if (all(is.na(values$kvalues$k))){
+          plot.emptyMessage(message = "No k-values have been set yet.")
+          } else {
+             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
+                plot.sapFlowRate(data = sapFlow(), 
+                                 ui.input = input)
+                } else {
+                   plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
         }
       }
     })
@@ -1043,14 +1045,14 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
     TWUbarplot <- reactive({
-      if (click() == 0 && is.null(input$file2)){
-        plot.emptyMessage(message = "No k-values have been set yet.")
-      } else {
-        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-          plot.sapFlowDay(data = sapFlow(), 
-                          ui.input = input)
-        } else {
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+       if (all(is.na(values$kvalues$k))){
+          plot.emptyMessage(message = "No k-values have been set yet.")
+          } else {
+             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
+             plot.sapFlowDay(data = sapFlow(), 
+                             ui.input = input)
+             } else {
+             plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
         }
       }
     })
@@ -1075,14 +1077,14 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
     TWUradialprofilePlot <- reactive({
-      if (click() == 0 && is.null(input$file2)){
-        plot.emptyMessage(message = "No k-values have been set yet.")
-      } else {
-        if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
-          plot.twu.radialprofile(data = sapFlow(), 
-                                 ui.input = input)
-        } else {
-          plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
+       if (all(is.na(values$kvalues$k))){
+          plot.emptyMessage(message = "No k-values have been set yet.")
+          } else {
+             if (sapWoodDepth() != 0 | input$inputType == "HFD_processed_read"){
+             plot.twu.radialprofile(data = sapFlow(), 
+                                    ui.input = input)
+             } else {
+                plot.emptyMessage(message = "Wood properties are missing (see 'Project settings')")
         }
       }
     })
