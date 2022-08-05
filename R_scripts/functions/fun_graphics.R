@@ -29,19 +29,18 @@ is.Date <- function(x) {
 #' @return vector
 get.fillcolors = function(ui.input){
    # If no colors are defined use default set
-   if (ui.input$fillColors == ""){
-      print("Discrete color scheme: default")
-      col = c("#d8b365", "#260C7D", "#5ab4ac", "#7D410C", 
-              "#007D06", '#999999','#E69F00', '#56B4E9')
-   } else {
+   print("Discrete color scheme: default")
+   col = c("#d8b365", "#260C7D", "#5ab4ac", "#7D410C", 
+           "#007D06", '#999999','#E69F00', '#56B4E9')
+   if (ui.input$fillColors != ""){
       print("Discrete color scheme: customized")
       cols = ui.input$fillColors
       cols_split = strsplit(cols, ",")[[1]]
-      col = c()
       if (length(cols_split) == 1){
          print(cols_split[1])
-         col <- RColorBrewer::brewer.pal(n = 100,
-                                         name = cols_split[1])
+         try(col <- RColorBrewer::brewer.pal(n = 100,
+                                             name = cols_split[1]),
+             silent = F)
          print(col)
       } else {
          for (i in 1:length(cols_split)){
@@ -233,6 +232,12 @@ plot.histogram <- function(data, ui.input){
          scale_fill_gradient(low = gradientcolors()[1],
                               high = gradientcolors()[2],
                               trans = "date")
+   }
+   if (fill.col == "position"){
+      N = length(unique(data$position))
+      p = p +
+         scale_color_manual(values = fillcolors(N)) +
+         scale_fill_manual(values = fillcolors(N))
    }
    if (facetGrid){
       p = p +

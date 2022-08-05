@@ -65,7 +65,8 @@ shinyServer(function(input, output, session) {
     #' that returns a set of N fillcolors
     fillcolors <<- function(N){
       col = fillcolors_react()
-      return(col[1:N])
+      len = length(col)
+      return(col[(len-N):len])
     }
     
     #' Reactive variable holding colors to be used in 
