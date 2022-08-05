@@ -12,7 +12,6 @@ add.k2data = function(data, values){
    kValues = values$kvalues
    kValues[, "k"] = as.numeric(kValues[, "k"])
    positions = unique(kValues[!is.na(kValues$k), ]$position)
-   
    # Filter data by positions
    data = data %>% 
       filter(position %in% positions)
@@ -129,15 +128,20 @@ get.negativeSFS = function(data, ui.input){
 #' @param data: data.frame, long-format
 #' @param sapWoodDepth: numeric
 #' @return data.frame
-treeScaleSimple1 <- function(data, swd) {
+treeScaleSimple1 <- function(data) {
    # Calculate sap flow rate at each sensor depth
-   data$SFdepth = data$SFDsw * data$Aring
-   
-   # Calculate sap flow rate per time step over alls depths in kg/h
-   data = data %>%
-      group_by(datetime) %>%
-      mutate(sfM1 = sum(SFdepth, na.rm = T) / 1000) %>%
-      ungroup()
+   if ("SFDsw" %in% colnames(data)){
+      data$SFdepth = data$SFDsw * data$Aring
+      # Calculate sap flow rate per time step over alls depths in kg/h
+      data = data %>%
+         group_by(datetime) %>%
+         mutate(sfM1 = sum(SFdepth, na.rm = T) / 1000) %>%
+         ungroup()
+   } else {
+      data$SFdepth = 0
+      data$SFDsw = 0
+      data$sfM1 = 0
+   }
    return(data)
 }
 
@@ -149,20 +153,24 @@ treeScaleSimple2 <- function(data, swd, ui.input) {
    depths = unique(data$depth)
    
    # Calculate mean sap flow per section and divide it by sap wood depth
-   data = data %>%
-      group_by(datetime) %>%
-      mutate(SFD_mean = mean(SFDsw, na.rm = T)) %>% 
-      ungroup()
-   
-   # Calculate sap wood area, which is the difference in total stem area (A_rxy) and
-   # heart wood area
-   rxy = get.rxy(ui.input = ui.input)
-   A_rxy = pi * rxy^2
-   A_hw = pi * (rxy - swd)^2
-   data$SWDarea = A_rxy - A_hw
-
-   # Calculate sap flow rate per time step over alls depths in kg/h
-   data$sfM2 = data$SFD_mean * data$SWDarea / 1000
+   if ("SFDsw" %in% colnames(data)){
+      data = data %>%
+         group_by(datetime) %>%
+         mutate(SFD_mean = mean(SFDsw, na.rm = T)) %>% 
+         ungroup()
+      # Calculate sap wood area, which is the difference in total stem area (A_rxy) and
+      # heart wood area
+      rxy = get.rxy(ui.input = ui.input)
+      A_rxy = pi * rxy^2
+      A_hw = pi * (rxy - swd)^2
+      data$SWDarea = A_rxy - A_hw
+      
+      # Calculate sap flow rate per time step over alls depths in kg/h
+      data$sfM2 = data$SFD_mean * data$SWDarea / 1000
+   } else {
+      data$SFD_mean = 0
+      data$sfM2 = 0
+   }
    return(data)
 }
 
@@ -170,9 +178,8 @@ treeScaleSimple2 <- function(data, swd, ui.input) {
 #' @param data: data.frame, long-format
 #' @param sapWoodDepth: numeric
 #' @return data.frame
-treeScaleSimple3 <- function(data, swd) {
+treeScaleSimple3 <- function(data) {
    data$SFdepthm3 = data$SFS * data$Cring
-   
    data = data %>%
       group_by(datetime) %>%
       mutate(sfM3 = mean(SFdepthm3, na.rm = T) / 1000) %>%
@@ -187,15 +194,14 @@ treeScaleSimple3 <- function(data, swd) {
 #' @return data.frame
 get.sapFlowByMethod <- function(data, method, swd, ui.input) {
    if (method == "treeScaleSimple1") {
-      return(treeScaleSimple1(data, swd))
+      return(treeScaleSimple1(data))
    }
-   
    if (method == "treeScaleSimple2") {
       return(treeScaleSimple2(data, swd, ui.input))
    }
    
    if (method == "treeScaleSimple3") {
-      return(treeScaleSimple3(data, swd))
+      return(treeScaleSimple3(data))
    }
 }
 
