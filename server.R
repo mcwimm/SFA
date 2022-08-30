@@ -176,7 +176,7 @@ shinyServer(function(input, output, session) {
     #' (Project Settings > Measuring environment)
     observeEvent(input$save.sensor_props, {
        save.csv(path = projectPath(), 
-                name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
+                name = "sensor_props",
                 csvObject = get.depths.table(), 
                 ui.input = input)
     })
