@@ -567,27 +567,28 @@ plot.kEst2 <- function(data.complete, data.adj, k,
            y = labels["dT"][[1]], 
            col = labels["T"][[1]])
    
-   if (kMethod == "regression"){
-      newAdj = data.adj %>% 
-         mutate("K+dTsa" = (dTsa + k))%>% 
-         gather(., temp, value, dTSym, `K+dTsa`) #dTsa, dTas,
-      p = p +
-         geom_point(newAdj, 
-                    mapping=aes(x = dTsym.dTas, y = value), 
-                    shape = 4) +
-         stat_smooth(newAdj, method = "lm", formula = fit,
-                     mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                 col = temp),
-                     col = "red", size = 0.5,
-                     fullrange = T, se = F) +
-         stat_regline_equation(newAdj,
-                               formula = fit, #force through origin x+0
-                               mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                           label =  ..adj.rr.label..),
-                               label.y.npc = c("top", "bottom")) +
-         labs(caption = "* Black cross (x): data point used for regression")
-         
-   }
+   # # Add regression line to control plot
+   # if (kMethod == "regression"){
+   #    newAdj = data.adj %>% 
+   #       mutate("K+dTsa" = (dTsa + k))%>% 
+   #       gather(., temp, value, dTSym, `K+dTsa`) #dTsa, dTas,
+   #    p = p +
+   #       geom_point(newAdj, 
+   #                  mapping=aes(x = dTsym.dTas, y = value), 
+   #                  shape = 4) +
+   #       stat_smooth(newAdj, method = "lm", formula = fit,
+   #                   mapping=aes(x = dTsym.dTas, y = value, group = temp,
+   #                               col = temp),
+   #                   col = "red", size = 0.5,
+   #                   fullrange = T, se = F) +
+   #       stat_regline_equation(newAdj,
+   #                             formula = fit, #force through origin x+0
+   #                             mapping=aes(x = dTsym.dTas, y = value, group = temp,
+   #                                         label =  ..adj.rr.label..),
+   #                             label.y.npc = c("top", "bottom")) +
+   #       labs(caption = "* Black cross (x): data point used for regression")
+         # 
+   # }
    
    if (fixedScales){
       p = p +
@@ -651,31 +652,32 @@ plot.kEst3 <- function(data.complete, data.adj, k,
             col = "x-axis", 
             shape = labels["T"][[1]])
    
-   if (kMethod == "regression"){
-      newAdj = data.adj %>% 
-         mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
-         gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
-      p = p +
-         geom_point(newAdj, 
-                    mapping=aes(x = x.value, y = dTas), 
-                    shape = 4) +
-         stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
-                     mapping=aes(x = x.value, y = dTas,
-                                 col = x.temp, group = x.temp),
-                     col = "red", size = 0.5,
-                     fullrange = T, se = F) +
-         geom_point(newAdj, 
-                    mapping=aes(x = x.value, y = dTsa), 
-                    shape = 4) +
-         stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
-                     mapping=aes(x = x.value, y = dTsa,
-                                 col = x.temp, group = x.temp),
-                     col = "red", size = 0.5,
-                     fullrange = T, se = F) +
-         labs(caption = "* Black cross (x): data point used for regression.
-            Gray-shaded values indicate the point of intersection of the two lines.")
-      
-   }
+   # # Add regression line to control plot
+   # if (kMethod == "regression"){
+   #    newAdj = data.adj %>% 
+   #       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
+   #       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
+   #    p = p +
+   #       geom_point(newAdj, 
+   #                  mapping=aes(x = x.value, y = dTas), 
+   #                  shape = 4) +
+   #       stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
+   #                   mapping=aes(x = x.value, y = dTas,
+   #                               col = x.temp, group = x.temp),
+   #                   col = "red", size = 0.5,
+   #                   fullrange = T, se = F) +
+   #       geom_point(newAdj, 
+   #                  mapping=aes(x = x.value, y = dTsa), 
+   #                  shape = 4) +
+   #       stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
+   #                   mapping=aes(x = x.value, y = dTsa,
+   #                               col = x.temp, group = x.temp),
+   #                   col = "red", size = 0.5,
+   #                   fullrange = T, se = F) +
+   #       labs(caption = "* Black cross (x): data point used for regression.
+   #          Gray-shaded values indicate the point of intersection of the two lines.")
+   #    
+   # }
    if (fixedScales){
       p = p +
          xlim(xRange[1], xRange[2]) +
