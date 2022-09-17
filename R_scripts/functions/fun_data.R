@@ -711,7 +711,7 @@ update.filter.ui = function(ui.output, ui.input){
             column(5, (actButton("FilterApply", "Apply filter", "update"))),
             column(5, (actButton("FilterDelete", "Delete filter", "update"))),
          ),
-         htmlOutput("dataPoints")
+         output.html("dataPoints")
       )
    })
    return(ui.output)

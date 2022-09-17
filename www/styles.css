@@ -1,3 +1,44 @@
+/*
+Overwrite shiny dashboard color scheme skin-green
+Color main-header left
+*/
+.skin-green .main-header .logo {
+    background-color: #8b9d6a;
+    color: #fff;
+    border-bottom: 0 solid transparent;
+}
+.skin-green .main-header .navbar .sidebar-toggle:hover, 
+.skin-green .main-header .logo:hover {
+    background-color: #a1b47d;
+}
+
+/*
+Color header full
+*/
+.skin-green .sidebar-menu>li.active>a, .skin-green .sidebar-menu>li:hover>a {
+    color: #fff;
+    background: #1e282c;
+    border-left-color: #b3c88b;
+}
+/*
+Color navigation bar
+*/
+.skin-green .main-header .navbar {
+    background-color: #b3c88b;
+}
+
+/*
+ * Color boxes
+ */
+.box.box-info {
+    border-top-color: #cccccc; /* grey */
+}
+.box.box-warning {
+    border-top-color: #E56855; /* red */
+}
+.box.box-success {
+    border-top-color: #cccccc; /* green #8C9418*/
+}
 .shiny-notification {
     position: fixed;
     top: 60px;
@@ -32,11 +73,4 @@ body > .wrapper > header{
     padding: 10px;
     background-color: #f5f5f5;
     border-radius: 4px;
-}
-
-.skin-black .sidebar-menu>li.active>a,
-.skin-black .sidebar-menu>li:hover>a {
-    color: #fff;
-    background: #1882ad;
-    border-left-color: #fff;
 }

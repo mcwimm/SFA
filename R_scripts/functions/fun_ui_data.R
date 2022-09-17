@@ -37,21 +37,22 @@ box.dat_upl.upload = function(){
       # Input: Select a file ----
       fluidRow(
          column(6, fileInput("file1", "Choose CSV File",
-                             buttonLabel = HTML("<span 
-                class='btn btn-primary' 
-                style='margin: -8px -13px;
-                  position: relative;
-                  top: -2px;
-                  border-radius: 0;margin: -8px -13px;
-                   position: relative;
-                   top: -2px;
-                   border-radius: 0;'>
-                                   Browse...
-                                   </span>"),
                              multiple = F,
                              accept = c("text/csv",
                                         "text/comma-separated-values,text/plain",
                                         ".csv"))),
+         tags$style("
+             .btn-file {  
+             background-color: #78875D; 
+             border-color: #404731; 
+             color: #fff;
+             }
+
+             .progress-bar {
+             background-color: #78875D;
+             }
+
+             "),
          column(6,  selectInput("inputType", "Input file type",
                      c("Raw" = "HFD_raw", 
                        "Delta" = "HFD_delta",

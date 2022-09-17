@@ -3,11 +3,11 @@ source("set-up.R")
 
 shinyUI(
     dashboardPage(
-        skin = "black", 
+        skin = "green", 
         dashboardHeader(title = "Sap Flow Analyzer"),
         
         dashboardSidebar(
-            br(), br(), br(),
+            #br(), br(), br(),
             sidebarMenu(menuOutput()),
             br(), br(), #br(),
             # br(), br(), br(),
