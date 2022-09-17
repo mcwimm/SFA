@@ -100,6 +100,10 @@ shinyServer(function(input, output, session) {
         projectPath()
     })
     
+    #' Show string as default
+    output$prjName <- renderPrint({
+      cat("No project chosen")
+    })
     
     #### Buttons ####
     
@@ -129,7 +133,7 @@ shinyServer(function(input, output, session) {
                            type = "message")
       }
       output$prjName <- renderPrint({
-          projectName()
+          cat(projectName())
       })
     })
     

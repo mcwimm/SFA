@@ -52,7 +52,7 @@ buttonStyles = function(type = "blue"){
    }
    if (type == "red")
    {#orange: #F07221 #red:cc0000
-      return("color: #fff; background-color: #F07221; border-color: #990000; margin-bottom: 2rem; margin-top: 2rem")
+      return("color: #fff; background-color: #F07221; border-color: #990000; margin-bottom: 2rem; margin-top: 1rem")
    }
    if (type == "green")
    {
@@ -74,7 +74,7 @@ numericInputRow <- function(inputId, label, value = ""){
 menuOutput = function(){
    return(list(
       menuItem("About", tabName = "about", icon = icon("th")),
-      menuItem("Project Settings", tabName = "sett", icon = icon("circle-notch")),
+      menuItem("Settings", tabName = "sett", icon = icon("circle-notch")),
       menuItem("Data", tabName = "data", icon = icon("circle-notch"),
                menuSubItem("Upload", tabName = "dat_upl"), 
                menuSubItem("Filter", tabName = "dat_filter"),

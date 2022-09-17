@@ -9,118 +9,146 @@ themes <- list("Bw" = theme_bw(),
 ################
 ### SETTINGS ###
 ################
-settingsOutput = function(){
-   return(
-      fluidRow(
-         column(7,
-                fluidRow(
-                   box(title = "Project",
-                       status = "warning", solidHeader = F, #height = 300,
-                       collapsible = T, width = 12,
-                       
-                       p("Please select a project or create a new folder:"),
-                       
-                       shinyDirButton('folder', 
-                                      'Folder select', 
-                                      'Please select a folder', 
-                                      # multiple = FALSE,
-                                      style = buttonStyles("red"),
-                                      icon = icon("folder-open")),
-                       actButton("crtPrj", "Create/set project", "create"),
-                       br(), br(),
-                       h4("Current project"),
-                       verbatimTextOutput("prjName"),
-                       h4("Current project directory"),
-                       verbatimTextOutput("prjDir")
-                   ),
-                   box(title = "Measuring environment",
-                       status = "warning",
-                       collapsible = T, width = 12,
-                       h4("Wood properties"),
-                       fluidRow(
-                          column(4, numericInput("stemCircumference", 
-                                                 "Stem circumference (cm)",
-                                                 value = 0.0)),
-                          column(4, numericInput("stemDiameter", 
-                                                 "Stem diameter (cm)",
-                                                 value = 0.0)),
-                          column(4, numericInput("barkThickness", 
-                                                 "Bark thickness (cm)",
-                                                 value = 0.0))
-                       ),
-
-                       fluidRow(
-                          column(4, numericInput("sapWoodDepth", 
-                                                 "Sap wood depth (cm)",
-                                                 value = 0.0)),
-                          column(4, numericInput("heartWoodDepth", 
-                                                 "Heart wood depth (cm)",
-                                                 value = 0.0))
-                       ),
-                       
-                       
-                       fluidRow(
-                          column(4, checkboxInput("swExact", "Use exact sap-/ heartwood values*",
-                                                  F)),
-                          column(6, p("* If enabled wood attributes, i.e. R, Aring, Cring, are calculated using 
-                            the sum of sapwood and heartwood depth"))
-                       ),
-                       
-                       
-                       
-                       numericInput("ThermalDiffusivity", 
-                                    HTML("Thermal diffusivity (cm<sup>2</sup> s <sup>-1</sup>)"),
-                                    value = 0.0025),
-                       
-
-                       box.settings_sensor()
-                   )
-                )),
-         column(5,
-                fluidRow(
-                   box(title = "File output",
-                       status = "warning", solidHeader = F, 
-                       collapsible = T, width = 12,
-                       p(em("(Optional inputs)")),
-                       selectInput("figFor", "Figure format",
-                                   c("jpg" = "jpg",
-                                     "rdata" = "rdata",
-                                     "pdf" = "pdf")),
-                       
-                       textInput("figTitle", "Figure title", 
-                                 placeholder = "e.g. tree species"),
-                       radioButtons("fileAppend", "String added to file names",
-                                    choices = c("Input file name" = "inputName",
-                                                "Manual" = "manual",
-                                                "None" = "none")),
-                       conditionalPanel(condition = "input.fileAppend == `manual`",
-                                        textInput("fileAppendName", "File name",
-                                                  placeholder = "e.g. summer_22"))),
-            
-                   box(title = "Visualization",
-                       status = "warning", solidHeader = F, 
-                       collapsible = T, width = 12,
-                       selectInput("figTheme", "Figure theme (ggplot)",
-                                   choices = names(themes),
-                                   selected = themes["Light"]),
-                       uiOutput('theme_output'),
-                       textInput("fillColors", "Fill colors for discrete data*",
-                                 placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
-                       textInput("gradientColors", "Colors for gradient color scale**",
-                                 placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00'),
-                       p("* Colors can be either hex colors or a RColorBrewer palette, 
-                         e.g. 'Blues'"),
-                       p("** Two colors representing low and high values."),
-                       
-          )))
-      )
-   )
+settingsOutput = function() {
+  return(list(fluidRow(
+    box(
+      title = "Measuring environment",
+      status = "warning",
+      collapsible = T,
+      width = 7,
+      box.settings_measuring()
+    ),
+    box(
+      title = "Project",
+      status = "info",
+      solidHeader = F,
+      collapsible = T,
+      width = 5,
+      box.settings_project()
+      
+    ),
+    box(
+      title = "File output (optional)",
+      status = "info",
+      solidHeader = F,
+      collapsible = T,
+      collapsed = T,
+      width = 5,
+      box.setting_files()
+    ),
+    
+    box(
+      title = "Visualization (optional)",
+      status = "info",
+      solidHeader = F,
+      collapsible = T,
+      collapsed = T,
+      width = 5,
+      box.setting_visualization()
+    )
+  )))
 }
 
+box.settings_project = function(){
+  return(list(
+    p("1. Select or create a new folder to store files generated with this app."),
+    shinyDirButton('folder', 
+                   'Folder select', 
+                   'Please select a folder', 
+                   # multiple = FALSE,
+                   style = buttonStyles("red"),
+                   icon = icon("folder-open", style="margin-right:.5em")),
+    
+    p("2. Create your project directory."),
+    actButton("crtPrj", "Create/set project", "create"),
+    # br(), br(),
+    h4("Current project"),
+    verbatimTextOutput("prjName"),
+    h4("Current project directory"),
+    verbatimTextOutput("prjDir")
+  ))
+}
 
+box.setting_files = function(){
+  return(list(
+    selectInput("figFor", "Figure format",
+                c("jpg" = "jpg",
+                  "rdata" = "rdata",
+                  "pdf" = "pdf")),
+    
+    textInput("figTitle", "Figure title", 
+              placeholder = "e.g. tree species"),
+    radioButtons("fileAppend", "String added to file names",
+                 choices = c("Input file name" = "inputName",
+                             "Manual" = "manual",
+                             "None" = "none")),
+    conditionalPanel(condition = "input.fileAppend == `manual`",
+                     textInput("fileAppendName", "File name",
+                               placeholder = "e.g. summer_22"))
+  ))
+}
+
+box.setting_visualization = function(){
+  return(list(
+    selectInput("figTheme", "Figure theme (ggplot)",
+                choices = names(themes),
+                selected = themes["Light"]),
+    uiOutput('theme_output'),
+    textInput("fillColors", "Fill colors for discrete data*",
+              placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
+    textInput("gradientColors", "Colors for gradient color scale**",
+              placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00'),
+    p("* Colors can be either hex colors or a RColorBrewer palette, 
+                         e.g. 'Blues'"),
+    p("** Two colors representing low and high values.")
+  ))
+}
+
+box.settings_measuring = function(){
+  return(list(
+    h3(strong("Wood properties")),
+    fluidRow(
+      column(4, numericInput("stemCircumference", 
+                             "Stem circumference (cm)",
+                             value = 0.0)),
+      column(4, numericInput("stemDiameter", 
+                             "Stem diameter (cm)",
+                             value = 0.0)),
+      column(4, numericInput("barkThickness", 
+                             "Bark thickness (cm)",
+                             value = 0.0))
+    ),
+    
+    fluidRow(
+      column(4, numericInput("sapWoodDepth", 
+                             "Sap wood depth (cm)",
+                             value = 0.0)),
+      column(4, numericInput("heartWoodDepth", 
+                             "Heart wood depth (cm)",
+                             value = 0.0))
+    ),
+    
+    
+    fluidRow(
+      column(4, checkboxInput("swExact", "Use exact sap-/ heartwood values*",
+                              F)),
+      column(6, p("* If enabled wood attributes, i.e. R, Aring, Cring, are calculated using 
+                            the sum of sapwood and heartwood depth"))
+    ),
+    
+    
+    
+    numericInput("ThermalDiffusivity", 
+                 HTML("Thermal diffusivity (cm<sup>2</sup> s <sup>-1</sup>)"),
+                 value = 0.0025),
+    
+    
+    box.settings_sensor()
+  ))
+}
 box.settings_sensor = function(){
    return(list(
-      h4("Sensor properties"),
+      h3(strong("Sensor properties")),
       fluidRow(
          column(6, numericInput("dist2first", 
                                 "Distance to first thermometer (mm)",
