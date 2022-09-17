@@ -11,13 +11,13 @@ dataUplOutput = function(){
                     collapsible = T, width = "100%",
                     status = "warning",
                     box.dat_upl.upload()
-                    )
-                ),
-         column(6,
+                    ),
                 box(title = "Description", collapsed = T,
                     collapsible = T, width = "100%",
                     status = "info",
-                    includeMarkdown("./man/des_data.md")),
+                    includeMarkdown("./man/des_data.md"))
+                ),
+         column(6,
                 box(title = "Preview data",
                     collapsible = T, width = "100%",
                     status = "success",
