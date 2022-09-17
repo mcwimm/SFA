@@ -2,14 +2,22 @@
 ### GENERAL ###
 ###############
 
-output.table = function(outputID){
-   return(list(br(), 
-          DT::dataTableOutput(outputID) %>% 
-             withSpinner(color="#0dc5c1")))
+spinner_color = "#b3c88b"
+
+output.table = function(outputID) {
+   return(list(
+      br(),
+      DT::dataTableOutput(outputID) %>%
+         withSpinner(color = spinner_color, proxy.height = 150)
+   ))
 }
 
-output.figure = function(outputID){
-   return(plotOutput(outputID) %>% withSpinner(color="#0dc5c1"))
+output.figure = function(outputID) {
+   return(plotOutput(outputID) %>% withSpinner(color = spinner_color, proxy.height = 200))
+}
+
+output.html = function(outputID) {
+   return(htmlOutput(outputID) %>% withSpinner(color = spinner_color, proxy.height = 50))
 }
 
 #############
@@ -20,43 +28,58 @@ actButton <- function(ID, label, type){
    if (type == "saveCsv"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
-                   icon("file-download")))
+                   icon("file-download", style="margin-right:.5em")))
    }
    if (type == "saveFigure"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
-                   icon("file-download")))
+                   icon("file-download", style="margin-right:.5em")))
    }
    if (type == "setValue"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("red"), "margin-bottom: 2rem", sep = ";"),
-                   icon("check-circle")))
+                   icon("check-circle", style="margin-right:.5em")))
    }
    if (type == "create"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("red"), "margin-bottom: 2rem", sep = ";"),
-                   icon("folder-plus")))
+                   icon("folder-plus", style="margin-right:.5em")))
    }
    if (type == "update"){
       return(actionButton(ID, label,
                    style = buttonStyles("green"), 
-                   icon("broom")))
+                   icon("broom", style="margin-right:.5em")))
    }
    
 }
 
 buttonStyles = function(type = "blue"){
    if (type == "blue")
-   { ##14B3EE#337ab7
-      return("color: #fff; background-color: #14B3EE; border-color: #2e6da4; margin-bottom: 2rem; margin-top: 2rem")
+   {
+      return("color: #fff; background-color: #78875D; border-color: #404731; margin-bottom: 2rem; margin-top: 2rem")
    }
    if (type == "red")
-   {#orange: #F07221 #red:cc0000
-      return("color: #fff; background-color: #F07221; border-color: #990000; margin-bottom: 2rem; margin-top: 1rem")
+   {
+      return("color: #fff; background-color: #78875D; border-color: #404731; margin-bottom: 2rem; margin-top: 1rem")
    }
    if (type == "green")
    {
-      return("color: #fff; background-color: #42C728; border-color: #38A822; margin-bottom: 2rem; margin-top: 2rem")
+      return("color: #fff; background-color: #78875D; border-color: #404731; margin-bottom: 2rem; margin-top: 2rem")
+   }
+}
+
+buttonStyles2 = function(type = "blue"){
+   if (type == "blue")
+   {
+      return("color: #fff; background-color: #2F8EE0; border-color: #206199; margin-bottom: 2rem; margin-top: 2rem")
+   }
+   if (type == "red")
+   {
+      return("color: #fff; background-color: #E04C46; border-color: #99332F; margin-bottom: 2rem; margin-top: 1rem")
+   }
+   if (type == "green")
+   {
+      return("color: #fff; background-color: #92B535; border-color: #7C992C; margin-bottom: 2rem; margin-top: 2rem")
    }
 }
 

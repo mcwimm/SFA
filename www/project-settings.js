@@ -40,7 +40,7 @@ var setProjectButton = document.getElementById('crtPrj'),
 	});
 
 projectContainer.style.cssText = 'float: right; height: 50px; line-height: 50px; margin-right: 30px;';
-projectContainer.innerHTML = 'Project: <span style="color:#f00">No project chosen</span> | File: <span style="color:#f00">Default</span>';
+projectContainer.innerHTML = 'Project: <span style="color:#00783A">No project chosen</span> | File: <span style="color:#00783A">Default</span>';
 
 
 window.addEventListener('load',function(){
