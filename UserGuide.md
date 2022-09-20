@@ -1,0 +1,253 @@
+---
+title: Analyzing Heat Field Deformation Sap Flow Data with the SapFlowAnalyzer: A User Guide
+author: my name
+date: today
+---
+
+
+Analyzing Heat Field Deformation Sap Flow Data with the SapFlowAnalyzer: A User Guide
+==============
+
+### Abstract
+
+This document describes the handling of the R Shiny Application SapFlowAnalyzer (SFA) to analyze heat field deformation (HFD) sap flow data. Chapters 1 and 2 provide a quick overview of the SFA, while the following chapters provide detailed information on each item of the navigation bar.
+
+
+### Contents
+
+<!-- MarkdownTOC autolink="true" style="unordered" levels="1" -->
+
+- [Introduction](#introduction)
+- [Launch the SFA](#launch-the-sfa)
+- [Settings](#settings)
+- [Data](#data)
+- [K value](#k-value)
+- [Sap Flow](#sap-flow)
+
+<!-- /MarkdownTOC -->
+
+
+<br>
+
+# Introduction
+
+The **Sap Flow Analyzer** (SFA) is an R Shiny app to process sap flow data recorded with the eat Field Deformation (HFD) method. HFD is a thermodynamic method to measure sap flow using a continuous heating system ([Nadezhdina et al., 2006](https://doi.org/10.1093/treephys/26.10.1277); [Nadezhdina, 2018](https://doi.org/10.3832/ifor2381-011)).
+With a needle-like heater a heat field is created and the heat distribution is measured with three needle-like sensors. 
+A needle sensor can have multiple, evenly distributed thermocouples which allows to record a radial flow profile. Based on the ratio of temperature gradients around the heater in axial (TSym) and tangential (Tas) directions, sap flow metrics (sap flow per section, sap flow density), sap flow rate and tree water use can be calculated. 
+The method requires to determine a calibration value (K) for each tree and thermometer. 
+With the SFA, data can be cleaned or filtered, K can be determined and sap flow per section can be scaled to sap flow and total tree water use.
+
+The following sections describe each step required to upload, filter and process data. The SFA is designed in a way that the navigation bar on the left (_Figure 1_) sets the order of analyzing sap flow recordings:
+
+1.  Create a project and define the measuring environment (Settings)
+2.  Upload data (Data)
+3.  Estimate K for each thermometer (K-value)
+4.  Calculate sap flow index (SFI), sap flow per section (SFS), sap flow density (SFD), sap flow (SF) and tree water use (TWU) (Sap flow)
+
+The navigation bar can be collapsed by pressing the triple bar symbol (≡). The header on the top right shows the name of the current project as well as of the uploaded data file.
+
+<br>
+
+# Launch the SFA
+
+SFA can be started in two different ways, either by manually creating a local copy of the github repository or by launching the app via an R wrapper function. Both methods require the package ‘shiny’ (version 1.5, [Chang et al., 2020](https://cran.r-project.org/package=shiny)).
+
+### Manual start
+
+Fork and clone (GitHub, 2022) or download the github repository https://github.com/mcwimm/SFA and navigate to the directory where the repository is stored. The main shiny app files, _server.R_ and _ui.R_, can be used to launch SFA using the ‘Run App’ button in RStudio. This method allows the user to modify the code and cooperate with the developers.
+
+### Wrapper function
+
+Use the ‘runGitHub’ command providing the name and the owner of the repository as well as the destination directory: 
+```
+runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)
+```
+This method has the advantage, that the user always accesses the current version. 
+However, files are stored in a temporary folder if not defined otherwise, and might get lost.
+
+If the app is launched successfully it opens in a browser window, leading the user to the landing page of the SFA, which provides some basic information about the usage of the app, the heat field deformation (HFD) method and output options (_Figure 1_). 
+The main panel is divided in individual boxes.
+The dash or plus in the right upper corner of each box allows to collapse each box.
+
+![Figure 1](man/guide/about.png?raw=true)
+
+_**Figure 1** Screenshot of the SFA About page that opens when the app is launched succesfully._
+
+<br>
+
+# Settings
+
+In the second menu item, the project settings are defined. All project settings are optional but strongly recommended for the efficient use of the SFA.
+
+### Box `Measuring environment`
+
+The measuring environment defines wood and sensor properties.
+Wood properties are crucial to calculate SFD, SF or TWU. 
+For the former, it is recommended to provide sapwood and heartwood depth. 
+Otherwise the values are calculated using DBH, bark depth or circumference, which is, however, not recommended.
+Sensor properties describe the spacing between needles as well as the depth of needle insertion.
+
+Based on wood and sensor properties the exact position of each thermometer is calculated and shown at the button of this box.
+Here, the thermometer positions can be verified or defined manually.
+
+To define wood and sensor properties is only required, if recordings are scaled to SFD, SF or TWU.
+
+### Box `Project`
+
+The user can create a project by selecting a project directory. 
+To create a project, one must press ‘Folder select’ to browse to the directory where all project files should be stored. 
+The user can choose a volume to browse in (on windows this is usually the working directory and the main drive). 
+After a folder is selected, press ‘Create/set project’. The app automatically creates two subdirectories, namely ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
+If no project is created, all results (csv-files and graphics) are saved in the root directory of the app, which might be in the temporary data. 
+If the project was created successfully, the project name is shown in the upper right corner of the SFA  (_Figure 1_).
+
+### Box `File output (optional)`
+
+File output allow the user to define 
+- the format in which figures are saved (jpeg, rdata, pdf)
+- a title added to each saved figure, e.g. the investigated tree species
+- an appendix added to each saved file name
+
+### Box `Visualization (optional)`
+
+In the Visualization box, the figure scheme ([Wickham, 2016](https://doi.org/10.1007/978-0-387-98141-3)) and colors to be used in all graphics can be defined as hex colors.
+
+<br>
+
+# Data
+
+The ‘data’ menu item is divided in three subsections: upload, filter and view.
+
+## Upload
+### Box `Upload file`
+
+To upload a csv file browse to the directory where the file is stored.
+Select the input file type, the separator and the number of lines to skip.
+If the upload is successful, the box _Preview data_ shows a table with data.
+To confirm the usage of the file press the ‘Use data’ button.
+Afterwards, the file name is shown in the upper right corner of the SFA.
+If the data is not shown correctly, open the csv-file externally and check the required column names (Table 1) and the csv-settings.
+
+### Box `Description`
+
+The SFA provides the option to upload csv-files of different types. 
+A detailed description can be found in Table 1, including the required column names. 
+In all cases, the data file must contain time recordings, either provided in two columns named ‘date’ and ‘time’ or in one column named ‘datetime’.  
+Column names are not case sensitive.
+
+Processed data files are previous outputs of the SFA and allow to continue an analysis or produce and update figures. 
+In the ‘read’ mode, the existing data cannot be changed. That means, if the data file, for example, contains SFD calculated with the negative formula, this cannot be switched to the positive formula. 
+However, this mode allows to modify figures. 
+The ‘write’ mode, contrary, allows to change previously calculated results, e.g. by adjusting wood properties.
+
+_**Table 1** Data types available in the SFA. Column names are not case sensitive__
+
+| **Type**                   | **Description**                                                                                                                                                                  | **Required columns**                                                                                                                                                                                       |
+| :---                   : | :---- :                                                                                                                                                                        | :-----------------------------------------------------------     :                                                                                                                                      |
+| **Raw**                    | Raw HFD temperature recordings, this includes temperatures recorded with the upper, side and lower sensor, respectively, at different depths.                                | Column names must contain the number of thermometer position i and the letters U, S or L to indicate the sensor, e.g. “Temp 2 S”, “temp_1_U”.                                                          |
+| **Delta**                  | Recordings of symmetrical and asymmetrical temperatures differences at different depths.                                                                                     | Columns names must contain temperature differences, dtsym and dtas at different depths i, e.g. “dTSym_1”, “dTas 3”.                                                                                    |
+| **Processed read** / **Processed write** | Processed recordings of SFS, SFD, etc., preferably produced with the SFA, in long-format. That is, one column contains the results, e.g. SFD, for all thermometer positions. | Column names are fixed and case sensitive. File contains at least: dTas, dTSym, dTsa, dTsym.dTas. Further optional column names are: k, SFS, SFDsw, depth, Aring, R, Cring, SFdepth, sfM1, sfM2, sfM3. |
+
+### Box `Preview data`
+
+Data are shown in wide and long format. 
+The latter can be downloaded as csv-file and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
+
+<br>
+
+## Filter
+
+### Box `Filter options`
+
+The SFA provides different options to clean the data before processing them. This includes
+- Selecting dates and times, e.g. remove the date when the sensor was installed or removed
+- Selecting minimum and maximum limits for each temperature difference
+- Removing outliers, separately for each temperature difference variable
+- Removing rows with NA values (not available or missing values)
+- Selecting individual sensor positions (e.g. only thermometers that were located in the sapwood)
+
+To load or refresh filter options, press the 'Load filter options' button.
+In case a new data set has been uploaded without refreshin the app, this button needs to be clicked, too, in order to refresh filter options.
+
+By clicking the ‘Apply filter’ button at the bottom, all defined changes are applied to the data set.
+‘Delete filter’ resets the data set to its original extend.
+
+### Box `Figures`
+
+In this box, the filtered data are visualized, either as violin plot, boxplot, histogram or using frequency polygons.
+The drop-down menues 'Variable' and 'Color/ Group' determine the appearance of the image.
+
+Filtered data can be saved as csv-file (long-format) or as figure by clicking the 'Save csv' or 'Save figure' button in this box, respectively.
+
+<br>
+
+## View
+
+This menu item allows to create customized figures.
+In the box `Settings`, the variables which are used to build the plot, e.g. axis and color vairables, are defined.
+A click on ‘Render figure’ produces the graphic shown in box `Figure`.
+Each figure can be saved using the 'Save figure' button.
+
+<br>
+
+# K value
+## Description
+
+Here a short description on how to estimate K and the type of K diagrams is provided. 
+A detailed discussion on the meaning of K in sap flow estimation can be found in [Nadezhdina, 2018](https://doi.org/10.3832/ifor2381-011).
+
+## Estimation
+### Box `K-value estimation`
+
+For each thermometer position, K has to be estimated and set.
+By clicking on a radio button (Figure 7(1a)), K is estimated using the method (Figure 7(1b)) and optional filter options (Figure 7(1c)) defined below. 
+If K is estimated properly, it can be set using the ‘Set k-value’ button.
+
+The tables at the button of box (Figure 7(1d)) provide estimated for all thermometer positions obtained with different methods. 
+All optional regression options (Figure 7(1c)) apply to this table, too. 
+If the values of this tables are sufficient, they can all be set at once by clicking ‘Use k-values’ button below the table. 
+If K values are provided in a csv-file, the file can be uploaded in the ‘Read csv’ tab (Figure 7(1e)). 
+All set K values will appear in the table ‘Selected’.
+
+A detailed description of K estimation using the SFA is provided in _Wimmler et al. (2023)_.
+
+### Box `Control plots`
+
+This box shows the typical K diagram as well as two control diagrams to assess the quality of the estimate.
+
+It is possible to zoom in by defining the range of the x-axis variable by setting 'Scales' to _fixed_ and defining minimum and maximum values.
+If the method 'regression' is chosen to estimate K, the regression line can be forced to cross the y-axis by enabling 'Fullrange regression' in the K-diagram tab.
+
+The ‘Save figures’ button in this box downloads the K-diagram as well as the two control diagrams for the selected thermometer position.
+
+<br>
+
+# Sap Flow
+## Sap Flow Metrics
+
+This menu item shows sap flow metrics as diurnal flow and as radial profile. 
+What is shown in box `Figures` needs to be defined in box `Settings`.
+
+### Box `Settings`
+
+In the drop down menu ‘y-axis’, the user can choose which metric is shown, namely sap flow index (SFI), sap flow per section (SFS) or sap flow density (SFD).
+The style options define the appearance of the figure, i.e. whether all data is presented in one figure (‘Normal’), in different panels for thermometer position or day of the year (‘Facet wrap’) or if thermometers should be grouped. 
+In the latter case, names of the groups and the associated thermometer positions must be provided.
+
+The radio buttons under ‘SFS-formula’ define which formula is used to calculate SFS and hence, SFD.
+Detailed information on the use of those formulas is given in [Nadezhdina and Nadezhdin, 2017](https://doi.org/10.1016/j.envexpbot.2017.04.005) and _Wimmler et al. (2022)_.
+If the radio button ‘Negative’ is chosen, the negative formula is applied to each recording with SFI below a certain threshold. 
+The default threshold for all thermometer positions is 0°C but can be customized either with a general threshold or for each thermometer position individually.
+
+
+<br>
+
+## Tree Water Use
+
+Sap flow rate and daily tree water can be calculated using three different upscaling methods (box `Settings`, methods are described in Wimmler et al. 2022).
+Upscaling is based on sap wood depth, thus the correct definition of wood properties is essential (Settings > Measuring environment > Wood properties). 
+
+The tab ‘Diurnal pattern’ shows the total sap flow rate of a tree (or stem) over time, while tabs ‘Daily balance’ and ‘Radial profile’ show the total tree water use, which is calculated as the area under the curve of the sap flow rate (box `Figures`). 
+
+The tree water use per day is shown in the table in box `Tree water use`.
+
