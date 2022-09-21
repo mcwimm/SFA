@@ -1,6 +1,7 @@
 Analyzing Heat Field Deformation Sap Flow Data with the SapFlowAnalyzer: A User Guide
 ==============
 
+
 ### Abstract
 
 This document describes the handling of the R Shiny Application SapFlowAnalyzer (SFA) to analyze heat field deformation (HFD) sap flow data. Chapters 1 and 2 provide a quick overview of the SFA, while the following chapters provide detailed information on each item of the navigation bar.
@@ -58,56 +59,76 @@ runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)
 This method has the advantage, that the user always accesses the current version. 
 However, files are stored in a temporary folder if not defined otherwise, and might get lost.
 
-If the app is launched successfully it opens in a browser window, leading the user to the landing page of the SFA, which provides some basic information about the usage of the app, the heat field deformation (HFD) method and output options ([_Figure 1_](https://i.imgur.com/0yA3bU4.png)). 
-The main panel is divided in individual boxes.
-The dash or plus in the right upper corner of each box allows to collapse each box.
+If the app is launched successfully it opens in a browser window, leading the user to the landing (about) page of the SFA (**<1>**), which provides some basic information about the app (**<2>**), the heat field deformation (HFD) method (**<3>**), a short guide on how to use the app (**<4>**) and output options (**<5>**). 
+The dash or plus in the right upper corner of each box allows to collapse each box (**<6>**).
 
-![Figure 1](https://i.imgur.com/0yA3bU4.png)
-
-_**Figure 1** Screenshot of the SFA About page that opens when the app is launched succesfully._
+![](https://i.imgur.com/CX2rdZX.png)
 
 <br>
 
 # Settings
 
-In the second menu item, the project settings are defined ([Figure 2](https://i.imgur.com/94dLEi7.png)). All project settings are optional but strongly recommended for the efficient use of the SFA.
-
-![Figure 2](https://i.imgur.com/94dLEi7.png)
-
-_**Figure 2** Screenshot of the SFA Settings page._
+In the second menu item, the project settings are defined. All project settings are optional but strongly recommended for the efficient use of the SFA.
 
 ### Box `Measuring environment`
 
 The measuring environment defines wood and sensor properties.
-Wood properties are crucial to calculate SFD, SF or TWU. 
-For the former, it is recommended to provide sapwood and heartwood depth. 
-Otherwise the values are calculated using DBH, bark depth or circumference, which is, however, not recommended.
-Sensor properties describe the spacing between needles as well as the depth of needle insertion.
+Wood and sensor properties are crucial to calculate SFD, SF or TWU as they determine the position of each thermometer.
 
-Based on wood and sensor properties the exact position of each thermometer is calculated and shown at the button of this box.
-Here, the thermometer positions can be verified or defined manually.
+Wood properties (**<1>**) describe, inter alia, the stem geometry that is used to estimate thermometer positions.
+If know, exact measures of sapwood and heartwood depth can be provided and used instead (**<2>**).
+Sensor properties describe the spacing between needles as well as the depth of needle insertion (**<3>**).
 
-To define wood and sensor properties is only required, if recordings are scaled to SFD, SF or TWU.
+![](https://i.imgur.com/gr4yaH4.png)
+
+
+The calculated prositions can be seen at the button of this box.
+Thermometer positions can also be defined manually.
+
+The definition of wood and sensor properties is only required, if recordings are scaled to SFD, SF or TWU.
+
+
 
 ### Box `Project`
 
 The user can create a project by selecting a project directory. 
+
 To create a project, one must press ‘Folder select’ to browse to the directory where all project files should be stored. 
-The user can choose a volume to browse in (on windows this is usually the working directory and the main drive). 
-After a folder is selected, press ‘Create/set project’. The app automatically creates two subdirectories, namely ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
+The user can choose a volume to browse in (on windows this is usually the working directory and the main drive, **<1>**). 
+A folder is selected by clicking on it's name (**<2>**).
+The user can also create a new subfolder by clicking **<3>**, type a name and confirm with **<4>**.
+Finally select the folder by clicking **<5>**.
+
+
+![](https://i.imgur.com/fkNvjF4.png)
+
+
+After a folder is selected, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories, namely ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
 If no project is created, all results (csv-files and graphics) are saved in the root directory of the app, which might be in the temporary data. 
-If the project was created successfully, the project name is shown in the upper right corner of the SFA  (_Figure 1_).
+If the project was created successfully, the project name is shown in the upper right corner of the SFA **<3>**.
+The path to the project directory is shown in **<4>**.
+If no project was created, the path to the root directory is shown.
+
+![](https://i.imgur.com/xFsRLB5.png)
+
+
 
 ### Box `File output (optional)`
 
 File output allow the user to define 
 - the format in which figures are saved (jpeg, rdata, pdf)
 - a title added to each saved figure, e.g. the investigated tree species
-- an appendix added to each saved file name
+- an prefix added to the name of each saved file
+
+![](https://i.imgur.com/OvD1v0e.png)
+
 
 ### Box `Visualization (optional)`
 
 In the Visualization box, the figure scheme ([Wickham, 2016](https://doi.org/10.1007/978-0-387-98141-3)) and colors to be used in all graphics can be defined as hex colors.
+
+![](https://i.imgur.com/anaRas8.png)
+
 
 <br>
 
@@ -118,12 +139,14 @@ The ‘data’ menu item is divided in three subsections: upload, filter and vie
 ## Upload
 ### Box `Upload file`
 
-To upload a csv file browse to the directory where the file is stored.
-Select the input file type, the separator and the number of lines to skip.
-If the upload is successful, the box _Preview data_ shows a table with data.
-To confirm the usage of the file press the ‘Use data’ button.
+To upload a csv file browse to the directory where the file is stored (**<1>**).
+Select the input file type (**<2>**), the separator and the number of lines to skip (**<3>**).
+If the upload is successful, the box `Preview data` shows a table with data.
+To confirm the usage of the file click ‘Use data’ (**<4>**).
 Afterwards, the file name is shown in the upper right corner of the SFA.
 If the data is not shown correctly, open the csv-file externally and check the required column names (Table 1) and the csv-settings.
+
+![](https://i.imgur.com/vjHo9IU.png =400x)
 
 ### Box `Description`
 
@@ -148,12 +171,11 @@ _**Table 1** Data types available in the SFA. Column names are not case sensitiv
 
 ### Box `Preview data`
 
-Data are shown in wide and long format. 
-The latter can be downloaded as csv-file and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
+Data are shown in wide and long format (**<1, 2>**). 
+The latter can be downloaded as csv-file (**<3>**) and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
 
-![Figure 3](https://i.imgur.com/QbSWwqL.png)
+![](https://i.imgur.com/yYJLQLP.png =400x)
 
-_**Figure 3** Screenshot of SFA Data Upload page._
 
 <br>
 
@@ -168,22 +190,24 @@ The SFA provides different options to clean the data before processing them. Thi
 - Removing rows with NA values (not available or missing values)
 - Selecting individual sensor positions (e.g. only thermometers that were located in the sapwood)
 
-To load or refresh filter options, press the 'Load filter options' button.
-In case a new data set has been uploaded without refreshin the app, this button needs to be clicked, too, in order to refresh filter options.
+To load or refresh filter options, click 'Load filter options' (**<1>**).
+In case a new data set has been uploaded without refreshin the app, this button needs to be clicked, too, in order to refresh filter options (**<2>**).
 
-By clicking the ‘Apply filter’ button at the bottom, all defined changes are applied to the data set.
-‘Delete filter’ resets the data set to its original extend.
+By clicking ‘Apply filter’ (**<3>**), all defined changes are applied to the data set.
+‘Delete filter’ resets the data set to its original extend (**<4>**).
+
+![](https://i.imgur.com/1BW5eXx.png =400x)
+
 
 ### Box `Figures`
 
-In this box, the filtered data are visualized, either as violin plot, boxplot, histogram or using frequency polygons.
+In this box, the filtered data are visualized, either as violin plot, boxplot, histogram or using frequency polygons (**<1>**).
 The drop-down menues 'Variable' and 'Color/ Group' determine the appearance of the image.
 
-Filtered data can be saved as csv-file (long-format) or as figure by clicking the 'Save csv' or 'Save figure' button in this box, respectively.
+Filtered data can be saved as csv-file (long-format) or as figure by clicking 'Save csv' or 'Save figure', respectively (**<2>**).
 
-![Figure 4](https://i.imgur.com/tzrAQEJ.png)
+![](https://i.imgur.com/ty0GeJu.png)
 
-_**Figure 4** Screenshot of SFA Data Filter page._
 
 <br>
 
@@ -205,30 +229,36 @@ A detailed discussion on the meaning of K in sap flow estimation can be found in
 ## Estimation
 ### Box `K-value estimation`
 
-For each thermometer position, K has to be estimated and set ([Figure 5](https://i.imgur.com/onBnESg.png)).
-By clicking on a radio button (Figure 7(1a)), K is estimated using the method (Figure 7(1b)) and optional filter options (Figure 7(1c)) defined below. 
-If K is estimated properly, it can be set using the ‘Set k-value’ button.
+For each thermometer position, K has to be estimated.
+By clicking on a radio button (**<1>**), K is estimated using the selected method (**<2>**) and optional filter options (**<3>**). 
+If K is estimated properly, it can be set using the ‘Set k-value’ button (**<4>**).
 
-The tables at the button of box (Figure 7(1d)) provide estimated for all thermometer positions obtained with different methods. 
-All optional regression options (Figure 7(1c)) apply to this table, too. 
-If the values of this tables are sufficient, they can all be set at once by clicking ‘Use k-values’ button below the table. 
-If K values are provided in a csv-file, the file can be uploaded in the ‘Read csv’ tab (Figure 7(1e)). 
-All set K values will appear in the table ‘Selected’.
+![](https://i.imgur.com/7CeNUlc.png)
+
+All set K values will appear in the table ‘Selected’ (**<1>**).
+The other tables (**<2>**) provide estimation for all thermometer positions at once obtained with each method. 
+All optional regression options (figure above **<3>**) apply to this table, too. 
+If the values of this tables are sufficient, they can all be set at once by clicking ‘Use k-values’ below the table. 
+If K values are provided in a csv-file, the file can be uploaded in the ‘Read csv’ tab (**<2>**). 
+Selected K values can be saved as csv (**<3>**).
+
+![](https://i.imgur.com/ojhtS4Z.png)
+
 
 A detailed description of K estimation using the SFA is provided in _Wimmler et al. (2023)_.
 
 ### Box `Control plots`
 
-This box shows the typical K diagram as well as two control diagrams to assess the quality of the estimate.
+This box shows the typical K diagram (**<1>**) as well as two control diagrams (**<2>**) to assess the quality of the estimate.
 
-It is possible to zoom in by defining the range of the x-axis variable by setting 'Scales' to _fixed_ and defining minimum and maximum values.
-If the method 'regression' is chosen to estimate K, the regression line can be forced to cross the y-axis by enabling 'Fullrange regression' in the K-diagram tab.
+It is possible to zoom in by defining the range of the x-axis variable by setting 'Scales' (**<3>**) to _fixed_ and defining minimum and maximum values.
+If the method 'regression' is chosen to estimate K, the regression line can be forced to cross the y-axis by enabling 'Fullrange regression' in the K-diagram tab (**<4>**).
 
-The ‘Save figures’ button in this box downloads the K-diagram as well as the two control diagrams for the selected thermometer position.
+The ‘Save figures’ button (**<5>**) downloads the K-diagram as well as the two control diagrams for the selected thermometer position.
 
-![Figure 5](https://i.imgur.com/onBnESg.png)
+![](https://i.imgur.com/kZjMvei.png)
 
-_**Figure 5** Screenshot of SFA K-vakue Estimation page._
+
 
 <br>
 
@@ -259,3 +289,58 @@ The tab ‘Diurnal pattern’ shows the total sap flow rate of a tree (or stem) 
 
 The tree water use per day is shown in the table in box `Tree water use`.
 
+<br>
+
+# Visualization
+
+All produced figures can be downloaded. 
+The format is either jpeg, rdata or pdf and is defined under ‘Settings > File output > Figure format’.
+A general figure title and appendix to figure files can be defined under ‘Figure title’ and ‘File appendix’ in the same box. 
+The style of figures can be customized under ‘Settings > Visualization’. Downloading figures as rdata file allows to load the figure-object to the R environment again and process the figure according to user demands.
+
+For some figures, special settings are available. 
+An explanation to those options is listed below.
+
+- **Facet wrap** Shows subsets of data presented in individual panels
+    - **Facet** variable that is arranged in different panels, e.g. day of the year or thermometer positions
+    - **No. colums** Number of columns presented in one row
+    - **Scales** Description by (Wickham, Navarro and Pedersen, 2022)
+		- “scales = "fixed": x and y scales are fixed across all panels.
+		- scales = "free_x": the x scale is free, and the y scale is fixed.
+		- scales = "free_y": the y scale is free, and the x scale is fixed.
+		- scales = "free": x and y scales vary across panels.”
+- **Facet grid** Similar to facet wrap. Presents data as 2d grid, defined by two variables.
+- **Scales**
+    - **Free** x and y scale is free
+    - **Fixed** x and/ or y scale can be customized
+
+<br>
+
+# Troubleshooting
+
+We try to provide constructive warnings or error messages.
+However, we cannot catch all issues.
+Below is a list with possible operating errors and their cause and solution.
+
+
+
+| **Launch the SFA** | 
+| -------- | 
+| &#10060; The SFA does not open when started via the ‘Run App’ or ‘RungGitHub’-command.
+&#10004; Try to run the script ‘setup.R’ separately to install and load all required packages
+&#10004; On Mac: Allow your Mac XXX | 
+
+| **Data upload** | 
+| -------- | 
+| &#10060; Preview table shows error message instead of uploaded table
+&#10004; Carefully check the upload settings. May open the csv file externally in a text editor and see which separator is used and how many lines need to be skipped. In some cases, the raw data file contains header sections between recordings, which can cause trouble. Delete them manually.|
+
+| **Sap Flow Metrics** | 
+| -------- | 
+|&#10060; The SFS or SFD figures presents less thermometer positions than present in the data set
+&#10004; K values were not set for all positions. Go back to K-value > Estimation and check table ‘Selected’ in the box `K-value estimation`.|
+
+| **Sap Flow Metrics** | 
+| -------- | 
+|&#10060; Negative formula option show less SFS and SFD data than present in the data set although all K values have been set.
+&#10004; More than one manual thresholds is provided but the total number of thresholds is smaller than the number of thermometers.|
