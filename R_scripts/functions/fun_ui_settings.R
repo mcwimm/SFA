@@ -78,7 +78,7 @@ box.setting_files = function(){
     
     textInput("figTitle", "Figure title", 
               placeholder = "e.g. tree species"),
-    radioButtons("fileAppend", "String added to file names",
+    radioButtons("fileAppend", "Prefix added to file names",
                  choices = c("Input file name" = "inputName",
                              "Manual" = "manual",
                              "None" = "none")),
