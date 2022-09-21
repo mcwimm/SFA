@@ -17,3 +17,6 @@ requires `shiny` package
 1. fork/ clone the complete project (repo)
 2. open _ui.R_ with R and click `Run App`
 
+## User Guide
+
+[Go to SFA User Guide](https://hackmd.io/@-Zyj5KK8QtCu0gqPrdZVGA/rkNXyruZs)
