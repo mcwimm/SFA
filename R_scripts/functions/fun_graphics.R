@@ -536,7 +536,6 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
    fixedScales = ui.input$k1Plot_scales
-   force = ui.input$k1Plot.forceOrigin
    kMethod = ui.input$kMethod
    
    if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
@@ -544,8 +543,6 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    } else {
       xmin = -0.1
    }
-   
-   fit = ifelse(force, "y ~ x + 0", "y ~ x")
    
    d = data.complete %>% 
       mutate("K+dTsa" = (dTsa + k)) %>% 
@@ -568,6 +565,8 @@ plot.kEst2 <- function(data.complete, data.adj, k,
            col = labels["T"][[1]])
    
    # # Add regression line to control plot
+   # force = ui.input$k1Plot.forceOrigin
+   # fit = ifelse(force, "y ~ x + 0", "y ~ x")
    # if (kMethod == "regression"){
    #    newAdj = data.adj %>% 
    #       mutate("K+dTsa" = (dTsa + k))%>% 
