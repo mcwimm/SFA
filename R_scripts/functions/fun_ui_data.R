@@ -52,23 +52,19 @@ box.dat_upl.upload = function(){
                              accept = c("text/csv",
                                         "text/comma-separated-values,text/plain",
                                         ".csv"))),
+         column(6,  selectInput("inputType", "Input file type",
+                     c("Raw" = "HFD_raw", 
+                       "Delta" = "HFD_delta",
+                       "Processed read" = "HFD_processed_read",
+                       "Processed write" = "HFD_processed_write")))
+      ),
+      fluidRow(
          column(6,  selectInput("sep", "Separator", 
                                 choices = c("Semicolon" = ";",
                                             "Comma" = ",",
-                                            "Tab" = "\t")))
+                                            "Tab" = "\t"))),
+         column(6,   numericInput("skip", "Skip:", min = 0, max = 100, 10))        
       ),
-      
-      selectInput("inputType", "Input file type",
-                  c("Raw" = "HFD_raw", 
-                    "Delta" = "HFD_delta",
-                    "Processed read" = "HFD_processed_read",
-                    "Processed write" = "HFD_processed_write")),
-      numericInput("skip", "Skip:", min = 0, max = 100, 10),
-
-      # Input: Checkbox if file has header ----
-      # checkboxInput("header", "Header", TRUE),
-      # Input: Select separator ----
-      
       actButton("setData", "Use data", "create"),
       p(em("<Note> If your data set contains non-numeric rows, e.g. logger warnings,
            they are converted to NA values. Remove them in the 'Data > Filter' section."))
