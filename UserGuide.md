@@ -1,10 +1,3 @@
----
-title: Analyzing Heat Field Deformation Sap Flow Data with the SapFlowAnalyzer: A User Guide
-author: my name
-date: today
----
-
-
 Analyzing Heat Field Deformation Sap Flow Data with the SapFlowAnalyzer: A User Guide
 ==============
 
@@ -15,7 +8,7 @@ This document describes the handling of the R Shiny Application SapFlowAnalyzer 
 
 ### Contents
 
-<!-- MarkdownTOC autolink="true" style="unordered" levels="1" -->
+<!-- MarkdownTOC autolink="true" style="unordered" levels="1,2" -->
 
 - [Introduction](#introduction)
 - [Launch the SFA](#launch-the-sfa)
@@ -65,11 +58,11 @@ runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)
 This method has the advantage, that the user always accesses the current version. 
 However, files are stored in a temporary folder if not defined otherwise, and might get lost.
 
-If the app is launched successfully it opens in a browser window, leading the user to the landing page of the SFA, which provides some basic information about the usage of the app, the heat field deformation (HFD) method and output options (_Figure 1_). 
+If the app is launched successfully it opens in a browser window, leading the user to the landing page of the SFA, which provides some basic information about the usage of the app, the heat field deformation (HFD) method and output options ([_Figure 1_](https://i.imgur.com/0yA3bU4.png)). 
 The main panel is divided in individual boxes.
 The dash or plus in the right upper corner of each box allows to collapse each box.
 
-![Figure 1](man/guide/about.png?raw=true)
+![Figure 1](https://i.imgur.com/0yA3bU4.png)
 
 _**Figure 1** Screenshot of the SFA About page that opens when the app is launched succesfully._
 
@@ -77,7 +70,11 @@ _**Figure 1** Screenshot of the SFA About page that opens when the app is launch
 
 # Settings
 
-In the second menu item, the project settings are defined. All project settings are optional but strongly recommended for the efficient use of the SFA.
+In the second menu item, the project settings are defined ([Figure 2](https://i.imgur.com/94dLEi7.png)). All project settings are optional but strongly recommended for the efficient use of the SFA.
+
+![Figure 2](https://i.imgur.com/94dLEi7.png)
+
+_**Figure 2** Screenshot of the SFA Settings page._
 
 ### Box `Measuring environment`
 
@@ -142,16 +139,21 @@ The ‘write’ mode, contrary, allows to change previously calculated results, 
 
 _**Table 1** Data types available in the SFA. Column names are not case sensitive__
 
-| **Type**                   | **Description**                                                                                                                                                                  | **Required columns**                                                                                                                                                                                       |
-| :---                   : | :---- :                                                                                                                                                                        | :-----------------------------------------------------------     :                                                                                                                                      |
-| **Raw**                    | Raw HFD temperature recordings, this includes temperatures recorded with the upper, side and lower sensor, respectively, at different depths.                                | Column names must contain the number of thermometer position i and the letters U, S or L to indicate the sensor, e.g. “Temp 2 S”, “temp_1_U”.                                                          |
-| **Delta**                  | Recordings of symmetrical and asymmetrical temperatures differences at different depths.                                                                                     | Columns names must contain temperature differences, dtsym and dtas at different depths i, e.g. “dTSym_1”, “dTas 3”.                                                                                    |
+| **Type**                                 | **Description**                                                                                                                                                              | **Required columns**                                                                                                                                                                                   |
+|:---------------------------------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Raw**                                  | Raw HFD temperature recordings, this includes temperatures recorded with the upper, side and lower sensor, respectively, at different depths.                                | Column names must contain the number of thermometer position i and the letters U, S or L to indicate the sensor, e.g. “Temp 2 S”, “temp_1_U”.                                                          |
+| **Delta**                                | Recordings of symmetrical and asymmetrical temperatures differences at different depths.                                                                                     | Columns names must contain temperature differences, dtsym and dtas at different depths i, e.g. “dTSym_1”, “dTas 3”.                                                                                    |
 | **Processed read** / **Processed write** | Processed recordings of SFS, SFD, etc., preferably produced with the SFA, in long-format. That is, one column contains the results, e.g. SFD, for all thermometer positions. | Column names are fixed and case sensitive. File contains at least: dTas, dTSym, dTsa, dTsym.dTas. Further optional column names are: k, SFS, SFDsw, depth, Aring, R, Cring, SFdepth, sfM1, sfM2, sfM3. |
+
 
 ### Box `Preview data`
 
 Data are shown in wide and long format. 
 The latter can be downloaded as csv-file and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
+
+![Figure 3](https://i.imgur.com/QbSWwqL.png)
+
+_**Figure 3** Screenshot of SFA Data Upload page._
 
 <br>
 
@@ -179,6 +181,10 @@ The drop-down menues 'Variable' and 'Color/ Group' determine the appearance of t
 
 Filtered data can be saved as csv-file (long-format) or as figure by clicking the 'Save csv' or 'Save figure' button in this box, respectively.
 
+![Figure 4](https://i.imgur.com/tzrAQEJ.png)
+
+_**Figure 4** Screenshot of SFA Data Filter page._
+
 <br>
 
 ## View
@@ -199,7 +205,7 @@ A detailed discussion on the meaning of K in sap flow estimation can be found in
 ## Estimation
 ### Box `K-value estimation`
 
-For each thermometer position, K has to be estimated and set.
+For each thermometer position, K has to be estimated and set ([Figure 5](https://i.imgur.com/onBnESg.png)).
 By clicking on a radio button (Figure 7(1a)), K is estimated using the method (Figure 7(1b)) and optional filter options (Figure 7(1c)) defined below. 
 If K is estimated properly, it can be set using the ‘Set k-value’ button.
 
@@ -220,6 +226,10 @@ If the method 'regression' is chosen to estimate K, the regression line can be f
 
 The ‘Save figures’ button in this box downloads the K-diagram as well as the two control diagrams for the selected thermometer position.
 
+![Figure 5](https://i.imgur.com/onBnESg.png)
+
+_**Figure 5** Screenshot of SFA K-vakue Estimation page._
+
 <br>
 
 # Sap Flow
@@ -228,9 +238,7 @@ The ‘Save figures’ button in this box downloads the K-diagram as well as the
 This menu item shows sap flow metrics as diurnal flow and as radial profile. 
 What is shown in box `Figures` needs to be defined in box `Settings`.
 
-### Box `Settings`
-
-In the drop down menu ‘y-axis’, the user can choose which metric is shown, namely sap flow index (SFI), sap flow per section (SFS) or sap flow density (SFD).
+In the drop down menu ‘y-axis’ (box `Settings`), the user can choose which metric is shown, namely sap flow index (SFI), sap flow per section (SFS) or sap flow density (SFD).
 The style options define the appearance of the figure, i.e. whether all data is presented in one figure (‘Normal’), in different panels for thermometer position or day of the year (‘Facet wrap’) or if thermometers should be grouped. 
 In the latter case, names of the groups and the associated thermometer positions must be provided.
 
