@@ -62,7 +62,7 @@ However, files are stored in a temporary folder if not defined otherwise, and mi
 If the app is launched successfully it opens in a browser window, leading the user to the landing (about) page of the SFA (**<1>**), which provides some basic information about the app (**<2>**), the heat field deformation (HFD) method (**<3>**), a short guide on how to use the app (**<4>**) and output options (**<5>**). 
 The dash or plus in the right upper corner of each box allows to collapse each box (**<6>**).
 
-![](https://i.imgur.com/CX2rdZX.png)
+![](https://storage.david-giesemann.de/SFA/about.png)
 
 <br>
 
@@ -79,7 +79,7 @@ Wood properties (**<1>**) describe, inter alia, the stem geometry that is used t
 If know, exact measures of sapwood and heartwood depth can be provided and used instead (**<2>**).
 Sensor properties describe the spacing between needles as well as the depth of needle insertion (**<3>**).
 
-![](https://i.imgur.com/gr4yaH4.png)
+![](https://storage.david-giesemann.de/SFA/settings_measuring.png)
 
 
 The calculated prositions can be seen at the button of this box.
@@ -99,8 +99,7 @@ A folder is selected by clicking on it's name (**<2>**).
 The user can also create a new subfolder by clicking **<3>**, type a name and confirm with **<4>**.
 Finally select the folder by clicking **<5>**.
 
-
-![](https://i.imgur.com/fkNvjF4.png)
+![](https://storage.david-giesemann.de/SFA/settings_project.png)
 
 
 After a folder is selected, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories, namely ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
@@ -109,7 +108,7 @@ If the project was created successfully, the project name is shown in the upper 
 The path to the project directory is shown in **<4>**.
 If no project was created, the path to the root directory is shown.
 
-![](https://i.imgur.com/xFsRLB5.png)
+![](https://storage.david-giesemann.de/SFA/settings_project_2.png)
 
 
 
@@ -120,14 +119,14 @@ File output allow the user to define
 - a title added to each saved figure, e.g. the investigated tree species
 - an prefix added to the name of each saved file
 
-![](https://i.imgur.com/OvD1v0e.png)
+![](https://storage.david-giesemann.de/SFA/settings_file.png =400x)
 
 
 ### Box `Visualization (optional)`
 
 In the Visualization box, the figure scheme ([Wickham, 2016](https://doi.org/10.1007/978-0-387-98141-3)) and colors to be used in all graphics can be defined as hex colors.
 
-![](https://i.imgur.com/anaRas8.png)
+![](https://storage.david-giesemann.de/SFA/settings_visualization.png =400x)
 
 
 <br>
@@ -146,7 +145,7 @@ To confirm the usage of the file click ‘Use data’ (**<4>**).
 Afterwards, the file name is shown in the upper right corner of the SFA.
 If the data is not shown correctly, open the csv-file externally and check the required column names (Table 1) and the csv-settings.
 
-![](https://i.imgur.com/vjHo9IU.png =400x)
+![](https://storage.david-giesemann.de/SFA/data_upload.png =400x)
 
 ### Box `Description`
 
@@ -174,7 +173,7 @@ _**Table 1** Data types available in the SFA. Column names are not case sensitiv
 Data are shown in wide and long format (**<1, 2>**). 
 The latter can be downloaded as csv-file (**<3>**) and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
 
-![](https://i.imgur.com/yYJLQLP.png =400x)
+![](https://storage.david-giesemann.de/SFA/data_upload_preview.png =400x)
 
 
 <br>
@@ -196,7 +195,7 @@ In case a new data set has been uploaded without refreshin the app, this button 
 By clicking ‘Apply filter’ (**<3>**), all defined changes are applied to the data set.
 ‘Delete filter’ resets the data set to its original extend (**<4>**).
 
-![](https://i.imgur.com/1BW5eXx.png =400x)
+![](https://storage.david-giesemann.de/SFA/data_filter.png =400x)
 
 
 ### Box `Figures`
@@ -206,7 +205,7 @@ The drop-down menues 'Variable' and 'Color/ Group' determine the appearance of t
 
 Filtered data can be saved as csv-file (long-format) or as figure by clicking 'Save csv' or 'Save figure', respectively (**<2>**).
 
-![](https://i.imgur.com/ty0GeJu.png)
+![](https://storage.david-giesemann.de/SFA/data_filter_figures.png)
 
 
 <br>
@@ -233,7 +232,7 @@ For each thermometer position, K has to be estimated.
 By clicking on a radio button (**<1>**), K is estimated using the selected method (**<2>**) and optional filter options (**<3>**). 
 If K is estimated properly, it can be set using the ‘Set k-value’ button (**<4>**).
 
-![](https://i.imgur.com/7CeNUlc.png)
+![](https://storage.david-giesemann.de/SFA/k_estimation.png)
 
 All set K values will appear in the table ‘Selected’ (**<1>**).
 The other tables (**<2>**) provide estimation for all thermometer positions at once obtained with each method. 
@@ -242,7 +241,7 @@ If the values of this tables are sufficient, they can all be set at once by clic
 If K values are provided in a csv-file, the file can be uploaded in the ‘Read csv’ tab (**<2>**). 
 Selected K values can be saved as csv (**<3>**).
 
-![](https://i.imgur.com/ojhtS4Z.png)
+![](https://storage.david-giesemann.de/SFA/k_table.png)
 
 
 A detailed description of K estimation using the SFA is provided in _Wimmler et al. (2023)_.
@@ -256,7 +255,7 @@ If the method 'regression' is chosen to estimate K, the regression line can be f
 
 The ‘Save figures’ button (**<5>**) downloads the K-diagram as well as the two control diagrams for the selected thermometer position.
 
-![](https://i.imgur.com/kZjMvei.png)
+![](https://storage.david-giesemann.de/SFA/k_control.png)
 
 
 
@@ -304,7 +303,7 @@ An explanation to those options is listed below.
 - **Facet wrap** Shows subsets of data presented in individual panels
     - **Facet** variable that is arranged in different panels, e.g. day of the year or thermometer positions
     - **No. colums** Number of columns presented in one row
-    - **Scales** Description by (Wickham, Navarro and Pedersen, 2022)
+    - **Scales** Description by ([Wickham, Navarro and Pedersen, 2022](https://ggplot2-book.org/index.html))
 		- “scales = "fixed": x and y scales are fixed across all panels.
 		- scales = "free_x": the x scale is free, and the y scale is fixed.
 		- scales = "free_y": the y scale is free, and the x scale is fixed.
