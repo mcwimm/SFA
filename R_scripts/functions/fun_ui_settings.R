@@ -71,6 +71,10 @@ box.settings_project = function(){
 
 box.setting_files = function(){
   return(list(
+    selectInput("fileFor", "File format",
+                c("csv" = "csv",
+                  "xlsx" = "xlsx")),
+    
     selectInput("figFor", "Figure format",
                 c("jpg" = "jpg",
                   "rdata" = "rdata",

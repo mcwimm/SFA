@@ -816,17 +816,25 @@ save.figure = function(path, name, plotObject, ui.input){
 #' @param csvObject: object to be saved, i.e. data.frame
 #' @param fileAppendix: character to be appended to file name
 save.csv = function(path, name, csvObject, ui.input){
+   format = ui.input$fileFor
+   
    # Gets list(noti_note, noti_type, path)
    nots = get.notifications(ui.input)
    if (nots[[2]] == "message"){
       path = paste(path, "csv-files", sep = "/")
    }
-   filename = get.filename(path, name, "csv", ui.input)
    
-   res = try(write.csv(csvObject, 
-                       file = filename,
-                       row.names = FALSE))
-   if (is.null(res)){
+   if (format == "xlsx") {
+      filename = get.filename(path, name, "xlsx", ui.input)
+      res = try(write_xlsx(csvObject,
+                           path = filename))
+   } else {
+      filename = get.filename(path, name, "csv", ui.input)
+      res = try(write.csv(csvObject,
+                          file = filename,
+                          row.names = FALSE))
+   }
+   if (file.exists(filename)){
       showNotification(nots[[1]], 
                        type = nots[[2]])
    } else {
