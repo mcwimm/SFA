@@ -871,6 +871,7 @@ shinyServer(function(input, output, session) {
                !is.null(input$sf_facet_scales) |
                !is.null(input$sf_facet_column) |
                !is.null(input$sf_facet_col_nums) |
+               !is.null(input$sapFlowMetric0flow) |
                input$sf_style != "sf_grouped" | 
                input$sf_formula == "Positve" | 
                input$sf_grouped_go |

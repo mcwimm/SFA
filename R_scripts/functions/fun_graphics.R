@@ -721,6 +721,13 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
       p = plot.sf.function(data = data,
                         ui.input = ui.input, 
                         radial.profile = radial.profile)
+      if (ui.input$sapFlowMetric0flow){
+         p = p +
+            geom_hline(aes(yintercept = 0),
+                       col = "black", alpha = 0.6,
+                       linetype = "dotted")
+      }
+      
    } else {
       p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Project settings')")
    }

@@ -126,6 +126,9 @@ sfDensityOutput <- function(){
          box(title = "Figures",
              collapsible = T, width = 8,
              status = "success",
+             checkboxInput("sapFlowMetric0flow", 
+                           "Show zero-flow line (y=0)",
+                           T),
              tabsetPanel(
                 tabPanel("Diurnal pattern", br(),
                          output.figure("sapFlowMetric"),
