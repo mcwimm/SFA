@@ -171,14 +171,14 @@ get.date.format = function(date){
    }
 }
 
-#' Symetric and asymetric temperature differences for each needle position.
+#' Symmetric and asymmetric temperature differences for each needle position.
 #' 
 #' @description 
-#' Returns asymetric and symetric temperature differences as well as 
-#' their ratio for each sensor position.
+#' Returns asymmetric and symmetric temperature differences as well as 
+#' their ratio for each thermometer position.
 #' 
 #' @details 
-#' The differences are calculated from raw temperature measurments of 
+#' The differences are calculated from raw temperature measurements of 
 #' sensors installed above, below and alongside the heater.
 #' 
 #' @usage get.delta.temp.depth(rawData, position)
@@ -314,10 +314,10 @@ convertTimeToDeci <- function(time){
    return(dt)
 }
 
-#' Sensor positions
+#' Thermometer positions
 #' 
 #' @description 
-#' Sensor positions are either extracted from raw data file or
+#' Thermometer positions are either extracted from raw data file or
 #' entered manually
 #' @param dataSource: data.frame
 #' @param input: UI-input
@@ -364,13 +364,13 @@ get.thermometer.distance <- function(ui.input){
 }
 
 
-#' Sensor positions relative to stem center
-#' @description Position of each sensor as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
+#' Thermometer positions relative to stem center
+#' @description Position of each thermometer as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
 #' @param depthManual: boolean indicating whether depth is defined manually in UI (default: F)
 #' @param inputType: character string indicating sensor type
-#' @param positions: vector with sensor positions
+#' @param positions: vector with thermometer positions
 #' @param rxy: numeric indicating distance between stem center and outer sap wood
-#' @param depthInput: character string indicating manual sensor depths
+#' @param depthInput: character string indicating manual thermometer depths
 #' @param thermo_distance: numeric indicating distance between thermometers
 #' @return data.frame
 get.depths <- function(depthManual = F, inputType,
@@ -427,9 +427,9 @@ add.Props2DepthsHelper = function(depths){
 
 #' Function to create data.frame with sensor information and corresponding 
 #' areas and circumferences
-#' @param depths: vector indicating sensor depths
+#' @param depths: vector indicating thermometer depths
 #' @param r1: numeric indicating distance between stem center and first thermometer
-#' @param swd: numeric indicating sapwooddepth in cm
+#' @param swd: numeric indicating sapwood depth in cm
 #' @return data.frame
 add.Props2Depths = function(depths, swd){
    if (all(depths$depth > 0)){
@@ -455,17 +455,16 @@ add.Props2Depths = function(depths, swd){
    return(depths)
 }
 
-#' Update sensor positions
+#' Update thermometer positions
 #' @param ui.input: UI-inputs
 #' @param data: data.frame: long-format data
 #' @param reactive.value: reactive values
-#' 
 #' @return list with reactive values and vector
 update.positions = function(data, ui.input, reactive.value){
    positions = get.positionsFromRawData(dataSource = data,
                                         input = ui.input)
    
-   # Update sensor positions if a filter was applied to the data set
+   # Update thermometer positions if a filter was applied to the data set
    if (ui.input$LoadFilter != 0){
       # Case if FilterApply button was activated the first time: use filtered data
       if (!is.null(ui.input$FilterApply)){
@@ -517,7 +516,7 @@ get.r1 = function(rxy, ui.input){
 }
 
 
-#' Update sensor depths
+#' Update thermometer depths
 #' @param ui.input: UI-inputs
 #' @param positions: vector: sensor positions
 #' @param thermo_distance: numeric: distance between thermometers, mm
@@ -535,7 +534,7 @@ update.depths = function(ui.input, positions, thermo_distance, swd){
                        depth = ui.input$depthInput,
                        thermo_distance = thermo_distance)
 
-   # Àdd area and circumference of circular ring
+   # Add area and circumference of circular ring
    depths = add.Props2Depths(depths = depths, 
                              swd = swd)
    print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy, ', r1: ', r1))
@@ -639,7 +638,7 @@ get.filteredData <- function(data, ui.input){
       filter((dTsym.dTas >= dTsym.dTasMin) %>% replace_na(TRUE)) %>%
       filter((dTsym.dTas <= dTsym.dTasMax) %>% replace_na(TRUE))
 
-   # filter by sensor positions
+   # filter by thermometer positions
    if (ui.input$sensorFilter != ""){
       sensorFilter = as.numeric(unlist(strsplit(ui.input$sensorFilter,",")))
       data = data %>%
@@ -699,9 +698,9 @@ update.filter.ui = function(ui.output, ui.input){
          # General filters
          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
          
-         # Sensor filters
-         h4(strong("Sensor positions")),
-         fluidRow(# sensor positions
+         # thermometer filters
+         fluidRow(# thermometer positions
+            column(12, h4(strong("Thermometer positions"))),
             column(12, textInput("sensorFilter", "",
                                  placeholder = "comma delimited: 1, 2, 3"))
          ),

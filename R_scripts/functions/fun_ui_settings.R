@@ -198,7 +198,7 @@ box.settings_sensor = function(){
          ),
       
       p(strong("<Note>"), 
-        "The following table shows estimated depth of thermometers as distance to the center (`Sensor R`) 
+        "The following table shows estimated depth of thermometers as distance to the center (`Thermometer R`) 
         as well as the area and circumference of the cirular ring, assuming the thermometers are centered 
         in the respective ring. Based on the values shown here, sap flow per section can be scaled to
         sap flow density or total tree water use."),
@@ -206,9 +206,9 @@ box.settings_sensor = function(){
       
       output.table("depth.table"),
       
-      p("* negative values for 'Sensor R' indicate that the thermometer is longer than 
-        tree radius (diameter / 2 - barkthickness) and the respective thermometer positions are on the opposite side of the tree. "),
-      p("** negative values for 'Area' indicate that the thermometers are located in the heartwood. Please adjust wood properties."),
+      p("* negative values for 'Thermometer R' indicate that the sensor needles cross the center of the 
+        tree (i.e. needle length > diameter / 2 - barkthickness) and the respective thermometer positions are on the 
+        opposite side of the tree. "),
       actButton("save.sensor_props", "Save csv", "saveCsv"),
       
       br(),
