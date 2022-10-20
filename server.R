@@ -204,9 +204,7 @@ shinyServer(function(input, output, session) {
         if (is.null(depths) | sum(depths$R) == 0) {
           return(
             tab.with.message(
-              message = "Specify wood and sensor properties. Make sure the number of inputs corresponds to your data.",
-              col = "#AB2803",
-              background = "#F8C9BC"
+              message = "Specify wood and sensor properties. Make sure the number of inputs corresponds to your data."
             )
           )
         } else {
@@ -409,8 +407,9 @@ shinyServer(function(input, output, session) {
     #### Table outputs #####
 
     tab.with.message = function(message,
-                                col = "#AB2803",
-                                background = "#F8C9BC") {
+                                col = "#E56855", # theme red
+                                background = "#cccccc" # theme grey
+                                ) {
       m = matrix(data = c(message))
       return(
         datatable(m, options = list(dom = 't'), colnames = NULL) %>%

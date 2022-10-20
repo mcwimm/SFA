@@ -884,7 +884,7 @@ plot.emptyMessage = function(message){
    return(p = ggplot() +
              annotate(geom = "text", x = 0, y = 5, 
                       label = message,
-                      color = "#E04C46", size = 6,
+                      color = "#E56855", size = 6,
                       hjust = 0) +
              xlim(c(0, 10)) +
              ylim(c(0, 10)) +
