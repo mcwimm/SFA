@@ -27,6 +27,7 @@ shinyServer(function(input, output, session) {
       )
     }
     
+    
     ########################
     ### PROJECT SETTINGS ###
     ########################
@@ -437,22 +438,22 @@ shinyServer(function(input, output, session) {
       if ("dTime" %in% colnames(rawData)){
         rawDataTable = rawData %>% 
                mutate(dTime = round(dTime, 2))
-        rawDataTable = datatable(rawDataTable )%>% 
-          formatDate("datetime", "toLocaleString")
       } else {
         rawDataTable = tab.with.message(message.fail.upload)
       }
       return(rawDataTable)
-    }, options = list(scrollX = TRUE, searching = F))
+    }, options = list(scrollX = TRUE,
+                      scrollY = "400px",
+                      dom = "t")) 
+    
     
     #' UI Table with raw data, long-format 
     #' (Data > Upload > Preview data)
     output$raw.long <- DT::renderDataTable(rownames = FALSE, {
       an.error.occured = FALSE
       tryCatch({
-        tab  = datatable(deltaTempLongNoFilter() %>%
-                           mutate_if(is.numeric, round, 3)) %>%
-          formatDate("datetime", "toLocaleString")
+        tab  = deltaTempLongNoFilter() %>%
+                           mutate_if(is.numeric, round, 3) 
       },
       error = function(e) {
         an.error.occured <<- TRUE
@@ -461,7 +462,9 @@ shinyServer(function(input, output, session) {
         tab = tab.with.message(message.fail.upload)
       }
       return(tab)
-    }, options = list(scrollX = TRUE, searching = F))
+    }, options = list(scrollX = TRUE,
+                      scrollY = "400px",
+                      dom = "t")) 
     
     #### Text output ####
 
@@ -722,7 +725,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$setKfromRegression, {
       emptyKvalues()
       values = fill.k.table(method = "regression",
-                            k.data = kComplete()$regression %>% round(., 3), 
+                            k.data = kComplete()$regression %>% mutate_if(is.numeric, round, 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -733,7 +736,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$setKfromZeroFlow, {
       emptyKvalues()
       values = fill.k.table(method = "no.flow",
-                            k.data = kComplete()$no.flow %>% round(., 3), 
+                            k.data = kComplete()$no.flow %>% mutate_if(is.numeric, round, 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -760,13 +763,13 @@ shinyServer(function(input, output, session) {
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable(rownames = FALSE, {  
-      return(kComplete()$regression  %>% round(., 2))
+      return(kComplete()$regression %>% mutate_if(is.numeric, round, 2))
     }, options = list(scrollX = TRUE, dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Zero-flow)
     output$kZeroFlow <- DT::renderDataTable(rownames = FALSE, {
-      return(kComplete()$no.flow %>% round(., 2))
+      return(kComplete()$no.flow %>% mutate_if(is.numeric, round, 2))
     }, options = list(scrollX = TRUE, dom = 't'))
 
     #' UI table output of uploaded k-values
@@ -920,9 +923,9 @@ shinyServer(function(input, output, session) {
     #' for selected method
     treeWaterUse <- reactive({ 
        if (all(is.na(values$kvalues$k))){
-          return(data.frame(x = message.no.k))
+          return(tab.with.message(message.no.k))
           } else if (get.sapFlowSum() == 0){ 
-             data.frame('.' = message.no.sapflow)
+            tab.with.message(message.no.sapflow)
              } else {
                 get.treeWaterUseByMethod(data = sapFlow(),
                                          ui.input = input)
