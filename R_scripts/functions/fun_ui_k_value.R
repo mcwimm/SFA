@@ -119,7 +119,7 @@ box.k.estimation = function() {
             tabPanel(
                "Selected",
                output.table("kSelected"),
-               actButton("save.kValues", "Save csv", "saveCsv")
+               actButton("save.kValues", "Save file", "saveCsv")
             ),
             tabPanel(
                "Regression",

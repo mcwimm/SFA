@@ -136,7 +136,7 @@ sfDensityOutput <- function(){
                                    "Save figure", 
                                    "saveFigure"),
                          actButton("save.sapFlowMetrics", 
-                                   "Save csv", "saveCsv")),
+                                   "Save file", "saveCsv")),
                 tabPanel("Radial profile", br(),
                          output.figure("sapFlowMetric.RadialProfile"),
                          actButton("save.sapFlowMetric.RadialProfile",
@@ -183,7 +183,7 @@ sfRateOutput <- function(){
                                    output.figure("sapFlowTree"),
                                    actButton("save.sapFlowTree", "Save figure",
                                              "saveFigure"),
-                                   actButton("save.SapFlowCsv", "Save csv", "saveCsv")),
+                                   actButton("save.SapFlowCsv", "Save file", "saveCsv")),
                           tabPanel("Daily balance", br(),
                                    output.figure("TWUbar"),
                                    actButton("save.TWUbarplot",
@@ -204,7 +204,7 @@ sfRateOutput <- function(){
                        width = NULL,
                        status = "success",
                        output.table("TWUtable"),
-                       actButton("save.TWUCsv", "Save csv", "saveCsv")
+                       actButton("save.TWUCsv", "Save file", "saveCsv")
                    ))
          )))
 }

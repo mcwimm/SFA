@@ -211,7 +211,7 @@ box.settings_sensor = function(){
       output.table("depth.table"),
       output.html("depth.table.info"),
 
-      actButton("save.sensor_props", "Save csv", "saveCsv"),
+      actButton("save.sensor_props", "Save file", "saveCsv"),
       
       br(),
       h4(strong("Schematic representation of an HFD sensor and its placement in the stem")),

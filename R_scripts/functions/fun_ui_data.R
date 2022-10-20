@@ -26,7 +26,7 @@ dataUplOutput = function(){
                        tabPanel("wide", br(),
                                 output.table("raw.wide")),
                        tabPanel("long", br(),
-                                actButton("save_dat_upl", "Save csv", "saveCsv"),
+                                actButton("save_dat_upl", "Save file", "saveCsv"),
                                 br(),
                                 output.table("raw.long")))))
       ))
@@ -89,7 +89,7 @@ dataFilterOutput = function(){
                     collapsible = T, width = "100%",
                     status = "success",
                     box.filter.figures(),
-                    actButton("save_dat_filter", "Save csv", "saveCsv"),
+                    actButton("save_dat_filter", "Save file", "saveCsv"),
                     actButton("save_dat_filter_fig", "Save figure", "saveFigure")),
                 box(title = "Info",
                     collapsible = T, width = "100%",
