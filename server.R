@@ -432,6 +432,8 @@ shinyServer(function(input, output, session) {
       if ("dTime" %in% colnames(rawData)){
         rawDataTable = rawData %>% 
                mutate(dTime = round(dTime, 2))
+        rawDataTable = datatable(rawDataTable )%>% 
+          formatDate("datetime", "toLocaleString")
       } else {
         rawDataTable = tab.with.message(message.fail.upload)
       }
@@ -442,10 +444,15 @@ shinyServer(function(input, output, session) {
     #' (Data > Upload > Preview data)
     output$raw.long <- DT::renderDataTable(rownames = FALSE, {
       an.error.occured = FALSE
-      tryCatch( { tab  = deltaTempLongNoFilter() %>% 
-                            mutate_if(is.numeric, round, 3) },
-                error = function(e) {an.error.occured <<- TRUE})
-      if (an.error.occured){
+      tryCatch({
+        tab  = datatable(deltaTempLongNoFilter() %>%
+                           mutate_if(is.numeric, round, 3)) %>%
+          formatDate("datetime", "toLocaleString")
+      },
+      error = function(e) {
+        an.error.occured <<- TRUE
+      })
+      if (an.error.occured) {
         tab = tab.with.message(message.fail.upload)
       }
       return(tab)

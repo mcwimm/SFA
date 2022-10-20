@@ -71,14 +71,14 @@ unify.datetime = function(rawData){
          # Define columns with lower case names for further processing
          rawData$date = date_col[[1]]
          rawData$time = time_col[[1]]
-
          datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
          dateformat = get.date.format(rawData[1,]$date)
          
          rawData = rawData %>% 
             rowwise() %>% 
             mutate(datetime = as.POSIXct(x = paste(date, time),
-                                         format = datetimeformat),
+                                         format = datetimeformat,
+                                         tz = "GMT"),
                    date = as.Date(date,
                                   format = dateformat))
       }
