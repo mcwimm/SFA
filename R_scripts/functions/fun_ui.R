@@ -68,21 +68,6 @@ buttonStyles = function(type = "blue"){
    }
 }
 
-buttonStyles2 = function(type = "blue"){
-   if (type == "blue")
-   {
-      return("color: #fff; background-color: #2F8EE0; border-color: #206199; margin-bottom: 2rem; margin-top: 2rem")
-   }
-   if (type == "red")
-   {
-      return("color: #fff; background-color: #E04C46; border-color: #99332F; margin-bottom: 2rem; margin-top: 1rem")
-   }
-   if (type == "green")
-   {
-      return("color: #fff; background-color: #92B535; border-color: #7C992C; margin-bottom: 2rem; margin-top: 2rem")
-   }
-}
-
 
 numericInputRow <- function(inputId, label, value = ""){
    div(style="display:inline-block",
