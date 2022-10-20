@@ -17,7 +17,7 @@ shinyServer(function(input, output, session) {
     ) {
       m = matrix(data = c(message))
       return(
-        datatable(m, options = list(scrollX = TRUE, dom = 't'), colnames = NULL) %>%
+        datatable(m, options = list(dom = 't'), colnames = NULL) %>%
           formatStyle(
             1,
             color = col,
@@ -255,7 +255,7 @@ shinyServer(function(input, output, session) {
     #' UI depths table
     output$depth.table <- DT::renderDataTable(rownames = FALSE, {
       return(get.depths.table())
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, options = list(dom = 't'))
 
     output$depth.table.info <- renderText({
       depths = get.depths.table()
@@ -442,9 +442,7 @@ shinyServer(function(input, output, session) {
         rawDataTable = tab.with.message(message.fail.upload)
       }
       return(rawDataTable)
-    }, options = list(scrollX = TRUE,
-                      scrollY = "400px",
-                      dom = "t")) 
+    }, options = list(dom = "t")) 
     
     
     #' UI Table with raw data, long-format 
@@ -462,9 +460,7 @@ shinyServer(function(input, output, session) {
         tab = tab.with.message(message.fail.upload)
       }
       return(tab)
-    }, options = list(scrollX = TRUE,
-                      scrollY = "400px",
-                      dom = "t")) 
+    }, options = list(dom = "t")) 
     
     #### Text output ####
 
@@ -758,25 +754,25 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation > Selected)
     output$kSelected <- DT::renderDataTable(rownames = FALSE, {  
       return(values$kvalues)
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, options = list(dom = 't'))
     
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable(rownames = FALSE, {  
       return(kComplete()$regression %>% mutate_if(is.numeric, round, 2))
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, options = list(dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Zero-flow)
     output$kZeroFlow <- DT::renderDataTable(rownames = FALSE, {
       return(kComplete()$no.flow %>% mutate_if(is.numeric, round, 2))
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, options = list(dom = 't'))
 
     #' UI table output of uploaded k-values
     #' (K-value > Estimation > K-value estimation > Read csv)
     output$uploadedKvalues <- DT::renderDataTable(rownames = FALSE, { 
       return(kFromCsv())
-    }, options = list(scrollX = TRUE, dom = 't'))
+    }, options = list(dom = 't'))
   
     
     #### Graphics ####
@@ -1197,7 +1193,7 @@ shinyServer(function(input, output, session) {
     #' UI-Table with daily tree water use
     output$TWUtable <- DT::renderDataTable(rownames = FALSE, {
        treeWaterUse()
-    }, options = list(scrollX = TRUE, searching = F)) #dom = 't')
+    }, options = list(dom = 't'))
     
     
     #' Eventlistener to save daily tree water use as csv
