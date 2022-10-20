@@ -2,7 +2,31 @@
 options(shiny.maxRequestSize = 15*1024^2)
 
 shinyServer(function(input, output, session) {
+    ######################
+    ### Error messages ###
+    ######################
   
+    message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
+    message.no.k = "No k-values have been set yet."
+    message.no.sapflow = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Settings)."
+  
+    #' Function to return table with warning message
+    tab.with.message = function(message,
+                                col = "#E56855", # theme red
+                                background = "#cccccc" # theme grey
+    ) {
+      m = matrix(data = c(message))
+      return(
+        datatable(m, options = list(scrollX = TRUE, dom = 't'), colnames = NULL) %>%
+          formatStyle(
+            1,
+            color = col,
+            backgroundColor = background,
+            fontWeight = 'bold'
+          )
+      )
+    }
+    
     ########################
     ### PROJECT SETTINGS ###
     ########################
@@ -405,24 +429,6 @@ shinyServer(function(input, output, session) {
     
     
     #### Table outputs #####
-
-    tab.with.message = function(message,
-                                col = "#E56855", # theme red
-                                background = "#cccccc" # theme grey
-                                ) {
-      m = matrix(data = c(message))
-      return(
-        datatable(m, options = list(dom = 't'), colnames = NULL) %>%
-          formatStyle(
-            1,
-            color = col,
-            backgroundColor = background,
-            fontWeight = 'bold'
-          )
-      )
-    }
-    
-    message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
@@ -914,9 +920,9 @@ shinyServer(function(input, output, session) {
     #' for selected method
     treeWaterUse <- reactive({ 
        if (all(is.na(values$kvalues$k))){
-          return(data.frame(x = "No k-values have been set yet."))
+          return(data.frame(x = message.no.k))
           } else if (get.sapFlowSum() == 0){ 
-             data.frame('.' = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
+             data.frame('.' = message.no.sapflow)
              } else {
                 get.treeWaterUseByMethod(data = sapFlow(),
                                          ui.input = input)
@@ -953,7 +959,7 @@ shinyServer(function(input, output, session) {
                     ui.input = input)
       } else {
          if (all(is.na(values$kvalues$k))){
-            plot.emptyMessage(message = "No k-values have been set yet.")
+            plot.emptyMessage(message = message.no.k)
          } else {
           plot.sf.helper(data = sapFlowDens(),
                       ui.input = input)
@@ -1002,7 +1008,7 @@ shinyServer(function(input, output, session) {
                     radial.profile = TRUE)
       } else {
          if (all(is.na(values$kvalues$k))){
-            plot.emptyMessage(message = "No k-values have been set yet.")
+            plot.emptyMessage(message = message.no.k)
             } else {
             plot.sf.helper(data = sapFlowDens(),
                            ui.input = input,
@@ -1039,7 +1045,7 @@ shinyServer(function(input, output, session) {
                             ui.input = input)
       } else {
          if (all(is.na(values$kvalues$k))){
-            plot.emptyMessage(message = "No k-values have been set yet.")
+            plot.emptyMessage(message = message.no.k)
             } else {
                plot.emptyMessage(message = 
                                "This figure is only available for SFS \n(not SFI or SFD) when negative \nSFS-formula is applied.")
@@ -1083,10 +1089,10 @@ shinyServer(function(input, output, session) {
     #' for selected methods
     sapFlowTreePlot <- reactive({
        if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = "No k-values have been set yet.")
+          plot.emptyMessage(message = message.no.k)
           } else {
              if (get.sapFlowSum() == 0){ 
-                     plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
+                     plot.emptyMessage(message = message.no.sapflow)
                 } else {
                    plot.sapFlowRate(data = sapFlow(), 
                                     ui.input = input)
@@ -1124,10 +1130,10 @@ shinyServer(function(input, output, session) {
     #' for selected methods
     TWUbarplot <- reactive({
        if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = "No k-values have been set yet.")
+          plot.emptyMessage(message = message.no.k)
           } else {
              if (get.sapFlowSum() == 0){ 
-                plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
+                plot.emptyMessage(message = message.no.sapflow)
              } else {
                 plot.sapFlowDay(data = sapFlow(),
                                 ui.input = input)
@@ -1156,10 +1162,10 @@ shinyServer(function(input, output, session) {
     #' for selected methods
     TWUradialprofilePlot <- reactive({
        if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = "No k-values have been set yet.")
+          plot.emptyMessage(message = message.no.k)
           } else {
              if (get.sapFlowSum() == 0){ 
-                plot.emptyMessage(message = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Project Settings).")
+                plot.emptyMessage(message = message.no.sapflow)
              } else {
                 plot.twu.radialprofile(data = sapFlow(), 
                                        ui.input = input)
