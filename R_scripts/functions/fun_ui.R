@@ -17,7 +17,7 @@ output.figure = function(outputID) {
 }
 
 output.html = function(outputID) {
-   return(htmlOutput(outputID) %>% withSpinner(color = spinner_color, proxy.height = 50))
+   return(htmlOutput(outputID) %>% withSpinner(color = spinner_color, proxy.height = 25))
 }
 
 #############
@@ -28,17 +28,17 @@ actButton <- function(ID, label, type){
    if (type == "saveCsv"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
-                   icon("file-download", style="margin-right:.5em")))
+                   icon("file-arrow-down", style="margin-right:.5em")))
    }
    if (type == "saveFigure"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("blue"), "margin-bottom: 2rem", sep = ";"),
-                   icon("file-download", style="margin-right:.5em")))
+                   icon("file-arrow-down", style="margin-right:.5em")))
    }
    if (type == "setValue"){
       return(actionButton(ID, label,
                    style = paste(buttonStyles("red"), "margin-bottom: 2rem", sep = ";"),
-                   icon("check-circle", style="margin-right:.5em")))
+                   icon("circle-check", style="margin-right:.5em")))
    }
    if (type == "create"){
       return(actionButton(ID, label,
@@ -99,16 +99,16 @@ menuOutput = function(){
       menuItem("About", tabName = "about", icon = icon("th")),
       menuItem("Settings", tabName = "sett", icon = icon("circle-notch")),
       menuItem("Data", tabName = "data", icon = icon("circle-notch"),
-               menuSubItem("Upload", tabName = "dat_upl"), 
-               menuSubItem("Filter", tabName = "dat_filter"),
-               menuSubItem("View", tabName = "dat_view")),
+               menuSubItem("Upload", tabName = "dat_upl", icon = icon("angles-right")), 
+               menuSubItem("Filter", tabName = "dat_filter", icon = icon("angles-right")),
+               menuSubItem("View", tabName = "dat_view", icon = icon("angles-right"))),
       menuItem("K-value", tabName = "k_values", icon = icon("circle-notch"),
-               menuSubItem("Description", tabName = "k_des"), 
-               menuSubItem("Estimation", tabName = "k_est")),
+               menuSubItem("Description", tabName = "k_des", icon = icon("angles-right")), 
+               menuSubItem("Estimation", tabName = "k_est", icon = icon("angles-right"))),
       menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "sf_des"), 
-               menuSubItem("Sap Flow Metrics", tabName = "sf_metrics"),
-               menuSubItem("Tree Water Use", tabName = "sf_flow"))
+               menuSubItem("Sap Flow Metrics", tabName = "sf_metrics", icon = icon("angles-right")),
+               menuSubItem("Tree Water Use", tabName = "sf_flow", icon = icon("angles-right")))
       ))
 }
 

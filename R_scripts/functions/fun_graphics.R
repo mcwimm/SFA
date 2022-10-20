@@ -465,18 +465,14 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
    d = data.complete %>% 
       gather(., temp, value, dTsa, dTas, dTSym)
    
-   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
-      xmin = min(data.complete$dTsym.dTas, na.rm = T)
-   } else {
-      xmin = -0.1
-   }
+   xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
    
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
                              col = temp), shape = 1) +
       scale_color_manual(values=fillcolors(3)) +
-      xlim(xmin, max(d$dTsym.dTas)) +
+      xlim(c(xmin, max(d$dTsym.dTas))) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       
       labs(x = labels["dTsym.dTas"][[1]], 
@@ -725,6 +721,13 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
       p = plot.sf.function(data = data,
                         ui.input = ui.input, 
                         radial.profile = radial.profile)
+      if (ui.input$sapFlowMetric0flow){
+         p = p +
+            geom_hline(aes(yintercept = 0),
+                       col = "black", alpha = 0.6,
+                       linetype = "dotted")
+      }
+      
    } else {
       p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Project settings')")
    }

@@ -5,25 +5,19 @@
 get.rawData = function(input){
    an.error.occured = F
    if (input$inputType == "HFD_raw"){
-      # print("HFD_raw")
       tryCatch( { rawData  = get.temperatures.HFD(input$file1$datapath,
                                                   sep = input$sep,
                                                   skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
-      # print(an.error.occured)
-      
    }
    if (input$inputType == "HFD_delta" |
        input$inputType == "HFD_processed_read" |
        input$inputType == "HFD_processed_write"){
-      # print("HFD_delta")
       tryCatch( { rawData  = get.temp.differences.HFD(input$file1$datapath,
                                                       sep = input$sep,
                                                       skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
-      
    }
-
    if (an.error.occured){
       return(data.frame())
    } else {
@@ -171,14 +165,14 @@ get.date.format = function(date){
    }
 }
 
-#' Symetric and asymetric temperature differences for each needle position.
+#' Symmetric and asymmetric temperature differences for each needle position.
 #' 
 #' @description 
-#' Returns asymetric and symetric temperature differences as well as 
-#' their ratio for each sensor position.
+#' Returns asymmetric and symmetric temperature differences as well as 
+#' their ratio for each thermometer position.
 #' 
 #' @details 
-#' The differences are calculated from raw temperature measurments of 
+#' The differences are calculated from raw temperature measurements of 
 #' sensors installed above, below and alongside the heater.
 #' 
 #' @usage get.delta.temp.depth(rawData, position)
@@ -314,10 +308,10 @@ convertTimeToDeci <- function(time){
    return(dt)
 }
 
-#' Sensor positions
+#' Thermometer positions
 #' 
 #' @description 
-#' Sensor positions are either extracted from raw data file or
+#' Thermometer positions are either extracted from raw data file or
 #' entered manually
 #' @param dataSource: data.frame
 #' @param input: UI-input
@@ -336,15 +330,16 @@ get.positionsFromRawData = function(dataSource, input){
       if (input$inputType == "HFD_delta"){
          reg = "(?i)dTSym"
       }
-      
-      if (input$positionManual){
-         positions = as.numeric(unlist(strsplit(input$positionInput,",")))
-      } else {
-         positions = c(1:ncol(dataSource[, grepl(reg, 
-                                                 colnames(dataSource))]))
-      }
+      positions = c(1:ncol(dataSource[, grepl(reg, 
+                                              colnames(dataSource))]))
    }
-   
+   if (input$thermoNumbering == "ascending"){
+      positions = factor(sort(positions),
+                         levels = sort(positions))
+   } else {
+      positions = factor(sort(positions, decreasing = TRUE),
+                         levels = sort(positions, decreasing = TRUE))
+   }
    return(positions)
 }
 
@@ -358,114 +353,103 @@ get.thermometer.distance <- function(ui.input){
    if (ui.input$sensorType == "HFD8-100"){
       return(1)
    }
-   if (ui.input$sensorType == "Manual"){
+   if (ui.input$sensorType == "Manual" & ui.input$thermoDistances == "fixed"){
       return(ui.input$distInput)
    }
+   if (ui.input$sensorType == "Manual" & ui.input$thermoDistances == "variable"){
+      return(NULL)
+   }
 }
 
 
-#' Sensor positions relative to stem center
-#' @description Position of each sensor as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
-#' @param depthManual: boolean indicating whether depth is defined manually in UI (default: F)
-#' @param inputType: character string indicating sensor type
-#' @param positions: vector with sensor positions
+#' Thermometer positions relative to stem center
+#' @description Position of each thermometer as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
+#' @param ui.input: UI input
+#' @param positions: vector with thermometer positions
 #' @param rxy: numeric indicating distance between stem center and outer sap wood
-#' @param depthInput: character string indicating manual sensor depths
 #' @param thermo_distance: numeric indicating distance between thermometers
 #' @return data.frame
-get.depths <- function(depthManual = F, inputType,
-                       positions, r1, depthInput, thermo_distance){
+get.depths <- function(ui.input, positions, r1,  thermo_distance){
    number_pos = length(positions)
-   if (depthManual){
-      df = data.frame(position = positions,
-                      depth = as.numeric(unlist(strsplit(depthInput, ","))))
-   } else if (r1 == 0){
+   if (r1 == 0) {
       df = data.frame(position = c(1:number_pos),
                       depth = rep(r1, number_pos))
-      } else {
+   } else {
       # distance between sensor cap and first thermometer is 2 cm
-      if (inputType == "HFD8-50"){ # sensorLength = 6.2
+      if (ui.input$sensorType == "HFD8-50") {
+         # sensorLength = 6.2
          df = data.frame(position = c(1:8),
-                         depth = seq(r1, (r1-3.5), by = -thermo_distance))
+                         depth = seq(r1, (r1 - 3.5), by = -thermo_distance))
       }
-      if (inputType == "HFD8-100"){ # sensorLength = 9.7
+      if (ui.input$sensorType == "HFD8-100") {
+         # sensorLength = 9.7
          df = data.frame(position = c(1:8),
-                         depth = seq(r1, (r1-7), by = -thermo_distance))
-
+                         depth = seq(r1, (r1 - 7), by = -thermo_distance))
+         
       }
-      if (inputType == "Manual"){ # sensorLength = unknown
-         df = data.frame(position = c(1:number_pos),
-                         depth = seq(r1, 
-                                     (r1-((number_pos-1)*thermo_distance)), 
-                                     by = -thermo_distance))
+      if (ui.input$sensorType == "Manual") {
+         if (ui.input$thermoDistances == "variable"){
+            df = data.frame(position = positions,
+                            depth = as.numeric(unlist(strsplit(ui.input$depthInput, ","))))
+         } else
+         # sensorLength = unknown
+         df = data.frame(
+            position = positions,
+            depth = seq(r1,
+                        (r1 - ((number_pos - 1) * thermo_distance
+                        )),
+                        by = -thermo_distance)
+         )
       }
       
-      df = df[df$position %in% positions, ]
+      df = df[df$position %in% positions,]
    }
-   
    return(df)
-   
 }
 
-#' Get area and circumference of circular ring to dataframe with positions and depths
-#' @param depths: vector indicating sensor depths
-#' @param thermo_distance: numeric indicating distance between thermometers, cm
+#' Get area and circumference of circular ring to data frame with positions and depths
+#' @param depths: vector indicating thermometer depths
 #' @return data.frame
 add.Props2DepthsHelper = function(depths){
-   thermo_distance = abs(depths[1, "depth"] - depths[2, "depth"]) 
-   
+   # Calculate area and circumference of annuli
    depths = depths %>% 
-      mutate(r_outer = depth + thermo_distance/2,
-             r_inner = depth - thermo_distance/2,
+      mutate(r_outer = depth + thermo_distance,
+             r_inner = depth - thermo_distance,
              Aring = pi*(r_outer^2 - r_inner^2),
              R = depth,
              Cring = 2*pi * R) %>% 
-      select(-c(r_outer, r_inner))
-
+      select(-c(thermo_distance, r_outer, r_inner)) %>% 
+      mutate(Aring = abs(Aring),
+             Cring = abs(Cring))
    return(depths)
 }
 
 #' Function to create data.frame with sensor information and corresponding 
 #' areas and circumferences
-#' @param depths: vector indicating sensor depths
+#' @param depths: vector indicating thermometer depths
 #' @param r1: numeric indicating distance between stem center and first thermometer
-#' @param swd: numeric indicating sapwooddepth in cm
+#' @param swd: numeric indicating sapwood depth in cm
 #' @return data.frame
 add.Props2Depths = function(depths, swd){
-   if (all(depths$depth > 0)){
-      depths = add.Props2DepthsHelper(depths = depths)
-   } else {
-      pos = depths[depths[, "depth"] > 0,] %>%
-         add.Props2DepthsHelper(.)
-      neu = depths[depths[, "depth"] == 0,] %>%
-         mutate(Aring = 0,
-                R = 0,
-                Cring = 0)
-      neg = depths[depths[, "depth"] < 0,] %>%
-         mutate(depth_helper = depth,
-                depth = abs(depth)) %>% 
-         arrange(desc(depth)) %>% 
-         add.Props2DepthsHelper(.) %>% 
-         mutate(depth = depth_helper) %>% 
-         select(-depth_helper) %>% 
-         arrange(position)
-      
-      depths = bind_rows(pos, neu, neg)
-   }
+   # Calculate average distance to next thermometer
+   depths = depths %>% 
+      arrange(-depth) %>% 
+      mutate(thermo_distance = abs((depth - lead(depth)) / 2))
+   depths[nrow(depths), "thermo_distance"] = depths[nrow(depths)-1, "thermo_distance"]
+   depths = add.Props2DepthsHelper(depths = depths)
    return(depths)
 }
 
-#' Update sensor positions
+#' Update thermometer positions
 #' @param ui.input: UI-inputs
 #' @param data: data.frame: long-format data
 #' @param reactive.value: reactive values
-#' 
 #' @return list with reactive values and vector
 update.positions = function(data, ui.input, reactive.value){
    positions = get.positionsFromRawData(dataSource = data,
                                         input = ui.input)
    
-   # Update sensor positions if a filter was applied to the data set
+   # Update thermometer positions if a filter was applied to the data set
    if (ui.input$LoadFilter != 0){
       # Case if FilterApply button was activated the first time: use filtered data
       if (!is.null(ui.input$FilterApply)){
@@ -494,7 +478,7 @@ update.positions = function(data, ui.input, reactive.value){
 
 #' Calculate the distance Rxy from the stem center to the inner bark
 #' Prioritize information on sap wood depth over dbh
-get.rxy = function(ui.input){ #hier
+get.rxy = function(ui.input){
    if (ui.input$swExact){
       rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
    } else {
@@ -509,33 +493,41 @@ get.rxy = function(ui.input){ #hier
 
 #' Calculate distance between center and first thermometer
 get.r1 = function(rxy, ui.input){
-   r1 = 0
+   
    if (rxy != 0){
-      r1 = rxy - (ui.input$dist2first - ui.input$spacer)/10
+      if (ui.input$swExact){
+         # If exact values is chosen don't consider bark thickness
+         r1 = rxy - (ui.input$dist2first - ui.input$spacer) / 10
+      } else {
+         r1 = rxy - (ui.input$dist2first - ui.input$spacer - ui.input$barkThickness)/10
+         # = radius - bark - (dist2first - spacer - bark)
+         # = radius - bark - (dist2first - spacer) + bark
+         # = radius - (dist2first - spacer)
+      }
+   }
+   else {
+      r1 = 0
    }
    return(r1)
 }
 
 
-#' Update sensor depths
+#' Update thermometer depths
 #' @param ui.input: UI-inputs
-#' @param positions: vector: sensor positions
-#' @param thermo_distance: numeric: distance between thermometers, mm
+#' @param positions: vector: thermometer positions
 #' @param swd: numeric: sapwood depth
 #' @return data.frame
-update.depths = function(ui.input, positions, thermo_distance, swd){
+update.depths = function(ui.input, positions, swd){
    rxy = get.rxy(ui.input = ui.input)
    r1 = get.r1(rxy = rxy,
                ui.input = ui.input)
    thermo_distance = get.thermometer.distance(ui.input = ui.input)
-   depths = get.depths(depthManual = ui.input$depthManual,
-                       inputType = ui.input$sensorType,
+   depths = get.depths(ui.input = ui.input,
                        positions = positions,
                        r1 = r1,
-                       depth = ui.input$depthInput,
                        thermo_distance = thermo_distance)
 
-   # Àdd area and circumference of circular ring
+   # Add area and circumference of circular ring
    depths = add.Props2Depths(depths = depths, 
                              swd = swd)
    print(paste('Estimated sap wood depth in cm: ', swd, ', rxy: ', rxy, ', r1: ', r1))
@@ -639,7 +631,7 @@ get.filteredData <- function(data, ui.input){
       filter((dTsym.dTas >= dTsym.dTasMin) %>% replace_na(TRUE)) %>%
       filter((dTsym.dTas <= dTsym.dTasMax) %>% replace_na(TRUE))
 
-   # filter by sensor positions
+   # filter by thermometer positions
    if (ui.input$sensorFilter != ""){
       sensorFilter = as.numeric(unlist(strsplit(ui.input$sensorFilter,",")))
       data = data %>%
@@ -699,9 +691,9 @@ update.filter.ui = function(ui.output, ui.input){
          # General filters
          checkboxInput("removeOutlier", "Remove outliers of plot variable", F),
          
-         # Sensor filters
-         h4(strong("Sensor positions")),
-         fluidRow(# sensor positions
+         # thermometer filters
+         fluidRow(# thermometer positions
+            column(12, h4(strong("Thermometer positions"))),
             column(12, textInput("sensorFilter", "",
                                  placeholder = "comma delimited: 1, 2, 3"))
          ),
@@ -816,17 +808,25 @@ save.figure = function(path, name, plotObject, ui.input){
 #' @param csvObject: object to be saved, i.e. data.frame
 #' @param fileAppendix: character to be appended to file name
 save.csv = function(path, name, csvObject, ui.input){
+   format = ui.input$fileFor
+   
    # Gets list(noti_note, noti_type, path)
    nots = get.notifications(ui.input)
    if (nots[[2]] == "message"){
       path = paste(path, "csv-files", sep = "/")
    }
-   filename = get.filename(path, name, "csv", ui.input)
    
-   res = try(write.csv(csvObject, 
-                       file = filename,
-                       row.names = FALSE))
-   if (is.null(res)){
+   if (format == "xlsx") {
+      filename = get.filename(path, name, "xlsx", ui.input)
+      res = try(write_xlsx(csvObject,
+                           path = filename))
+   } else {
+      filename = get.filename(path, name, "csv", ui.input)
+      res = try(write.csv(csvObject,
+                          file = filename,
+                          row.names = FALSE))
+   }
+   if (file.exists(filename)){
       showNotification(nots[[1]], 
                        type = nots[[2]])
    } else {

@@ -97,7 +97,7 @@ shinyServer(function(input, output, session) {
     #' Show project path in Project Settings > Project
     #' if a project folder is selected
     output$prjDir <- renderPrint({
-        projectPath()
+        cat(projectPath())
     })
     
     #' Show string as default
@@ -137,46 +137,125 @@ shinyServer(function(input, output, session) {
       })
     })
     
-    #### Depths table ####
+    #### Thermometer positions ####
     
-    #' Table with sensor data, i.e.
-    #' sensor position, depth, area and circumference of ring
-    #' (Data > Upload > Sensor settings)
+    #' Reactive variable holding thermometer positions
+    #' (a vector numbering the thermometers) derived from input file
+    positions <- reactive({
+      if (!is.null(input$file1)){  
+        req(input$setData)
+      } 
+      h = update.positions(data = rawData(), 
+                           ui.input = input, 
+                           reactive.value = values)
+      values = h[[1]]
+      positions = h[[2]]
+      return(positions)
+    })
+    
+    #' Reactive variable holding depth of each thermometer positions
+    #' in cm
+    depths <- reactive({
+      if (!is.null(input$file1)){
+        req(input$setData)
+      }
+      out = try(
+        {
+          
+          update.depths(ui.input = input,
+                        positions = positions(),
+                        swd = sapWoodDepth())  
+        }
+      )
+      if (is.character(out)){
+        return(NULL)
+      } else {
+        return(out)
+      }
+    })
+    
+    #' Table with thermometer data, i.e.
+    #' thermometer position, depth, area and circumference of ring
+    #' (Settings > Measuring environment)
     get.depths.table <- reactive({
-       rawData = rawData()
-       
-       # Conditions to determine whether processed data contains relevant
-       # wood properties
-       # If true, show them
-       cond1 = input$inputType == "HFD_processed_read"
-       cond2 = input$inputType == "HFD_processed_write" & 
-          sapWoodDepth() == 0
-       cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
-       
-       if ((cond1 | cond2) & cond3){
-          return(rawData %>% 
-                    distinct(position, R, Aring, Cring) %>% 
-                    select(position, R, Aring, Cring) %>% 
-                    mutate_at(vars(2,3, 4), round, 1)%>%
-                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                    "Circ. (cm)")))
-       } else {
-          return(depths() %>%
-                    select(-R) %>%
-                    mutate_at(vars(2), round, 2) %>%
-                    mutate_at(vars(3, 4), round, 1) %>%
-                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                    "Circ. (cm)")))
-       }
+      rawData = rawData()
+      
+      # Conditions to determine whether processed data contains relevant
+      # wood properties
+      # If true, show them
+      cond1 = input$inputType == "HFD_processed_read"
+      cond2 = input$inputType == "HFD_processed_write" &
+        sapWoodDepth() == 0
+      cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
+      
+      if ((cond1 | cond2) & cond3) {
+        return(
+          rawData %>%
+            distinct(position, R, Aring, Cring) %>%
+            select(position, R, Aring, Cring) %>%
+            mutate_at(vars(2, 3, 4), round, 1) %>%
+            `colnames<-` (
+              c("Position", "Thermometer R (cm)", "Area (cm²)",
+                "Circ. (cm)")
+            )
+        )
+      } else {
+        depths = depths()
+        if (is.null(depths) | sum(depths$R) == 0) {
+          return(
+            tab.with.message(
+              message = "Specify wood and sensor properties. Make sure the number of inputs corresponds to your data.",
+              col = "#AB2803",
+              background = "#F8C9BC"
+            )
+          )
+        } else {
+          return(
+            depths %>%
+              select(-R) %>%
+              mutate_at(vars(2), round, 2) %>%
+              mutate_at(vars(3, 4), round, 1) %>%
+              `colnames<-` (
+                c(
+                  "Position",
+                  "Thermometer R (cm)",
+                  "Area (cm²)",
+                  "Circ. (cm)"
+                )
+              )
+          )
+
+        }
+      }
     })
 
     #' UI depths table
     output$depth.table <- DT::renderDataTable(rownames = FALSE, {
-       return(get.depths.table())
-    }, options = list(scrollX = TRUE, searching = F))
+      return(get.depths.table())
+    }, options = list(scrollX = TRUE, dom = 't'))
+
+    output$depth.table.info <- renderText({
+      depths = get.depths.table()
+      note = ""
+      if (!is.null(ncol(depths))){
+        if (min(depths[, 2]) < 0){
+          note = paste(
+            note,
+            "<b>Note:</b> negative values for 'Thermometer R' indicate that the sensor needles cross the center of the
+        tree (i.e. needle length > diameter / 2 - barkthickness) and the respective thermometer positions are on the
+        opposite side of the tree. ", sep="<br/>")
+        }
+        needle_cover = max(depths[, 2]) - min(depths[, 2])
+        if (needle_cover > (2*get.rxy(ui.input = input))){
+          note = paste(
+            note,
+            "<b>Note:</b> the sensors needles seem to be longer than the stem diameter.", sep="<br/>")
+        }
+      }
+      return(note)
+    })
     
-    
-    #' Eventlistener to save sensor depth table
+    #' Eventlistener to save thermometer depth table
     #' (Project Settings > Measuring environment)
     observeEvent(input$save.sensor_props, {
        save.csv(path = projectPath(), 
@@ -253,37 +332,11 @@ shinyServer(function(input, output, session) {
     })
     
     #' Reactive variable holding long-format data for
-    #' specific UI-selected sensor position
+    #' specific UI-selected thermometer position
     deltaTempLong.depth <- reactive({
       req(input$kPositionSelect)
       deltaTempLong() %>% 
         filter(position == input$kPositionSelect)
-    })
-    
-    #' Reactive variable holding sensor positions
-    #' (a vector numbering the sensors) derived from input file
-    positions <- reactive({
-      if (!is.null(input$file1)){  
-        req(input$setData)
-      } 
-      h = update.positions(data = rawData(), 
-                           ui.input = input, 
-                           reactive.value = values)
-      values = h[[1]]
-      positions = h[[2]]
-      return(positions)
-    })
-    
-    #' Reactive variable holding depth of each sensor positions
-    #' in cm
-    depths <- reactive({
-      if (!is.null(input$file1)){
-        req(input$setData)
-      }
-      return(update.depths(ui.input = input,
-                           positions = positions(),
-                           thermo_distance = sensor.dist(),
-                           swd = sapWoodDepth()))
     })
     
 
@@ -355,13 +408,22 @@ shinyServer(function(input, output, session) {
     
     #### Table outputs #####
 
-    tab.with.file.upload.message = function(){
-      m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
-      return(datatable(m) %>%
-        formatStyle(1, color = 'red',
-                    backgroundColor = 'orange',
-                    fontWeight = 'bold'))
+    tab.with.message = function(message,
+                                col = "#AB2803",
+                                background = "#F8C9BC") {
+      m = matrix(data = c(message))
+      return(
+        datatable(m, options = list(dom = 't'), colnames = NULL) %>%
+          formatStyle(
+            1,
+            color = col,
+            backgroundColor = background,
+            fontWeight = 'bold'
+          )
+      )
     }
+    
+    message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
@@ -371,7 +433,7 @@ shinyServer(function(input, output, session) {
         rawDataTable = rawData %>% 
                mutate(dTime = round(dTime, 2))
       } else {
-        rawDataTable = tab.with.file.upload.message()
+        rawDataTable = tab.with.message(message.fail.upload)
       }
       return(rawDataTable)
     }, options = list(scrollX = TRUE, searching = F))
@@ -384,7 +446,7 @@ shinyServer(function(input, output, session) {
                             mutate_if(is.numeric, round, 3) },
                 error = function(e) {an.error.occured <<- TRUE})
       if (an.error.occured){
-        tab = tab.with.file.upload.message()
+        tab = tab.with.message(message.fail.upload)
       }
       return(tab)
     }, options = list(scrollX = TRUE, searching = F))
@@ -512,7 +574,7 @@ shinyServer(function(input, output, session) {
     
     #### UI #####
     
-    #' UI radiobuttons to select sensor position
+    #' UI radio buttons to select thermometer position
     #' Derives positions from filtered data set
     #' (K-value > Estimation > K-value estimation)
     output$kPositionSelect <- renderUI({
@@ -544,7 +606,7 @@ shinyServer(function(input, output, session) {
     
     #' Reactive variable holding a list with cleaned data,
     #' positive and negative k-value (K.dTas, K.dTsa) for a
-    #' selected sensor position
+    #' selected thermometer position
     cleanedDataAndKvalues <- reactive({
       data = deltaTempLong() %>%
           filter(position == input$kPositionSelect)
@@ -556,7 +618,7 @@ shinyServer(function(input, output, session) {
     })
     
     #' Reactive variable holding k-values derived
-    #' based on selected method for selected sensor
+    #' based on selected method for selected thermometer
     #' position
     kValue <- reactive({
       return(get.kByMethod(data = deltaTempLong(),
@@ -566,14 +628,14 @@ shinyServer(function(input, output, session) {
 
     #' Reactive variable holding k-values derived
     #' based on selected method (zero-flow and regression)
-    #' for all sensor positions, shown in tables
+    #' for all thermometer positions, shown in tables
     kComplete <- reactive({
       return(get.kByMethodAll(deltaTempLong(),
                               ui.input = input))
     })
     
     #' Reactive variable holding k-values derived
-    #' from csv-input for all sensor positions
+    #' from csv-input for all thermometer positions
     kFromCsv <- reactive({
       req(input$file2)
       return(get.csvKvalues(ui.input = input))
@@ -787,15 +849,15 @@ shinyServer(function(input, output, session) {
       appendix = str_replace_all(appendix, pattern = "\\.", replacement = "_")
       
       save.figure(path = projectPath(),
-                  name = paste("k-diagram_sensor", "_", appendix, sep = ""),
+                  name = paste("k-diagram_position", "_", appendix, sep = ""),
                   plotObject = kplot1(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-1_sensor", "_", appendix, sep = ""),
+                  name = paste("k-control-1_position", "_", appendix, sep = ""),
                   plotObject = kplot2(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-2_sensor", "_", appendix, sep = ""),
+                  name = paste("k-control-2_position", "_", appendix, sep = ""),
                   plotObject = kplot3(),
                   ui.input = input)
       
@@ -831,13 +893,7 @@ shinyServer(function(input, output, session) {
                                   ui.input = input))
         }
     })
-    
-    #' Reactive variable holding distances between
-    #' sensors
-    sensor.dist <- reactive({
-      return(get.thermometer.distance(ui.input = input))
-    })
-    
+
     #' Reactive variable holding sap flow rates
     #' for all methods
     sapFlow <- reactive({
@@ -871,6 +927,7 @@ shinyServer(function(input, output, session) {
                !is.null(input$sf_facet_scales) |
                !is.null(input$sf_facet_column) |
                !is.null(input$sf_facet_col_nums) |
+               !is.null(input$sapFlowMetric0flow) |
                input$sf_style != "sf_grouped" | 
                input$sf_formula == "Positve" | 
                input$sf_grouped_go |
@@ -899,13 +956,13 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to show figure of sap flow density
-    #' (Sap Flow > Sap Flow Density > Figure > Diurnal pattern)
+    #' (Sap Flow > Sap Flow Metrics > Figure > Diurnal pattern)
     output$sapFlowMetric <- renderPlot({
       sapFlowMetricPlot()
     })
     
     #' Eventlistener to save sap flow density plot
-    #' (Sap Flow > Sap Flow Density > Figures > Diurnal pattern)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Diurnal pattern)
     observeEvent(input$save.sapFlowMetricPlot, {
       save.figure(path = projectPath(),
                   name = paste(input$sf_y_axis, input$sf_formula, sep = "_"), 
@@ -915,7 +972,7 @@ shinyServer(function(input, output, session) {
     
     #' Eventlistener to save sap flow density plot
     #' vertical profile
-    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Radial profile)
     observeEvent(input$save.sapFlowMetrics, {
       if (is.null(values$kvalues)){
         d = deltaTempLong()
@@ -950,13 +1007,13 @@ shinyServer(function(input, output, session) {
     
     #' Eventlistener to show figure of sap flow density
     #' vertical profile
-    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Radial profile)
     output$sapFlowMetric.RadialProfile <- renderPlot({
       sapFlowMetricPlot.RadialProfile()
     })
     
     #' Eventlistener to save sap flow density plot
-    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Radial profile)
     observeEvent(input$save.sapFlowMetric.RadialProfile, {
       save.figure(path = projectPath(),
                   name = paste(input$sf_y_axis, input$sf_formula, 
@@ -986,13 +1043,13 @@ shinyServer(function(input, output, session) {
     
     #' Eventlistener to show figure of sap flow density
     #' vertical profile
-    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Negative...)
     output$sapFlowMetric.NegControl <- renderPlot({
       sapFlowMetricPlot.NegControl()
     })
     
     #' Eventlistener to save sap flow density plot
-    #' (Sap Flow > Sap Flow Density > Figures > Sensor profile)
+    #' (Sap Flow > Sap Flow Metrics > Figures > Negative...)
     observeEvent(input$save.sapFlowMetric.NegControl, {
       save.figure(path = projectPath(),
                   name = "SFS_Negative_control",
