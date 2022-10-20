@@ -137,43 +137,123 @@ shinyServer(function(input, output, session) {
       })
     })
     
-    #### Depths table ####
+    #### Thermometer positions ####
+    
+    #' Reactive variable holding thermometer positions
+    #' (a vector numbering the thermometers) derived from input file
+    positions <- reactive({
+      if (!is.null(input$file1)){  
+        req(input$setData)
+      } 
+      h = update.positions(data = rawData(), 
+                           ui.input = input, 
+                           reactive.value = values)
+      values = h[[1]]
+      positions = h[[2]]
+      return(positions)
+    })
+    
+    #' Reactive variable holding depth of each thermometer positions
+    #' in cm
+    depths <- reactive({
+      if (!is.null(input$file1)){
+        req(input$setData)
+      }
+      out = try(
+        {
+          
+          update.depths(ui.input = input,
+                        positions = positions(),
+                        swd = sapWoodDepth())  
+        }
+      )
+      if (is.character(out)){
+        return(NULL)
+      } else {
+        return(out)
+      }
+    })
     
     #' Table with thermometer data, i.e.
     #' thermometer position, depth, area and circumference of ring
     #' (Settings > Measuring environment)
     get.depths.table <- reactive({
-       
-       # Conditions to determine whether processed data contains relevant
-       # wood properties
-       # If true, show them
-       cond1 = input$inputType == "HFD_processed_read"
-       cond2 = input$inputType == "HFD_processed_write" & 
-          sapWoodDepth() == 0
-       cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
-       
-       if ((cond1 | cond2) & cond3){
-          return(rawData %>% 
-                    distinct(position, R, Aring, Cring) %>% 
-                    select(position, R, Aring, Cring) %>% 
-                    mutate_at(vars(2,3, 4), round, 1)%>%
-                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                    "Circ. (cm)")))
-       } else {
-          return(depths() %>%
-                    select(-R) %>%
-                    mutate_at(vars(2), round, 2) %>%
-                    mutate_at(vars(3, 4), round, 1) %>%
-                    `colnames<-` (c("Position", "Sensor R (cm)", "Area (cm²)",
-                                    "Circ. (cm)")))
-       }
+      rawData = rawData()
+      
+      # Conditions to determine whether processed data contains relevant
+      # wood properties
+      # If true, show them
+      cond1 = input$inputType == "HFD_processed_read"
+      cond2 = input$inputType == "HFD_processed_write" &
+        sapWoodDepth() == 0
+      cond3 = all(c("position", "R", "Aring", "Cring") %in% colnames(rawData))
+      
+      if ((cond1 | cond2) & cond3) {
+        return(
+          rawData %>%
+            distinct(position, R, Aring, Cring) %>%
+            select(position, R, Aring, Cring) %>%
+            mutate_at(vars(2, 3, 4), round, 1) %>%
+            `colnames<-` (
+              c("Position", "Thermometer R (cm)", "Area (cm²)",
+                "Circ. (cm)")
+            )
+        )
+      } else {
+        depths = depths()
+        if (is.null(depths) | sum(depths$R) == 0) {
+          return(
+            tab.with.message(
+              message = "Specify wood and sensor properties. Make sure the number of inputs corresponds to your data.",
+              col = "#AB2803",
+              background = "#F8C9BC"
+            )
+          )
+        } else {
+          return(
+            depths %>%
+              select(-R) %>%
+              mutate_at(vars(2), round, 2) %>%
+              mutate_at(vars(3, 4), round, 1) %>%
+              `colnames<-` (
+                c(
+                  "Position",
+                  "Thermometer R (cm)",
+                  "Area (cm²)",
+                  "Circ. (cm)"
+                )
+              )
+          )
+
+        }
+      }
     })
 
     #' UI depths table
     output$depth.table <- DT::renderDataTable(rownames = FALSE, {
-       return(get.depths.table())
-    }, options = list(scrollX = TRUE, searching = F))
-    
+      return(get.depths.table())
+    }, options = list(scrollX = TRUE, dom = 't'))
+
+    output$depth.table.info <- renderText({
+      depths = get.depths.table()
+      note = ""
+      if (!is.null(ncol(depths))){
+        if (min(depths[, 2]) < 0){
+          note = paste(
+            note,
+            "<b>Note:</b> negative values for 'Thermometer R' indicate that the sensor needles cross the center of the
+        tree (i.e. needle length > diameter / 2 - barkthickness) and the respective thermometer positions are on the
+        opposite side of the tree. ", sep="<br/>")
+        }
+        needle_cover = max(depths[, 2]) - min(depths[, 2])
+        if (needle_cover > (2*get.rxy(ui.input = input))){
+          note = paste(
+            note,
+            "<b>Note:</b> the sensors needles seem to be longer than the stem diameter.", sep="<br/>")
+        }
+      }
+      return(note)
+    })
     
     #' Eventlistener to save thermometer depth table
     #' (Project Settings > Measuring environment)
@@ -259,32 +339,6 @@ shinyServer(function(input, output, session) {
         filter(position == input$kPositionSelect)
     })
     
-    #' Reactive variable holding thermometer positions
-    #' (a vector numbering the thermometers) derived from input file
-    positions <- reactive({
-      if (!is.null(input$file1)){  
-        req(input$setData)
-      } 
-      h = update.positions(data = rawData(), 
-                           ui.input = input, 
-                           reactive.value = values)
-      values = h[[1]]
-      positions = h[[2]]
-      return(positions)
-    })
-    
-    #' Reactive variable holding depth of each thermometer positions
-    #' in cm
-    depths <- reactive({
-      if (!is.null(input$file1)){
-        req(input$setData)
-      }
-      return(update.depths(ui.input = input,
-                           positions = positions(),
-                           thermo_distance = sensor.dist(),
-                           swd = sapWoodDepth()))
-    })
-    
 
     #### FILTER ####
     
@@ -354,13 +408,22 @@ shinyServer(function(input, output, session) {
     
     #### Table outputs #####
 
-    tab.with.file.upload.message = function(){
-      m = matrix(data = c("An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."))
-      return(datatable(m) %>%
-        formatStyle(1, color = 'red',
-                    backgroundColor = 'orange',
-                    fontWeight = 'bold'))
+    tab.with.message = function(message,
+                                col = "#AB2803",
+                                background = "#F8C9BC") {
+      m = matrix(data = c(message))
+      return(
+        datatable(m, options = list(dom = 't'), colnames = NULL) %>%
+          formatStyle(
+            1,
+            color = col,
+            backgroundColor = background,
+            fontWeight = 'bold'
+          )
+      )
     }
+    
+    message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
@@ -370,7 +433,7 @@ shinyServer(function(input, output, session) {
         rawDataTable = rawData %>% 
                mutate(dTime = round(dTime, 2))
       } else {
-        rawDataTable = tab.with.file.upload.message()
+        rawDataTable = tab.with.message(message.fail.upload)
       }
       return(rawDataTable)
     }, options = list(scrollX = TRUE, searching = F))
@@ -383,7 +446,7 @@ shinyServer(function(input, output, session) {
                             mutate_if(is.numeric, round, 3) },
                 error = function(e) {an.error.occured <<- TRUE})
       if (an.error.occured){
-        tab = tab.with.file.upload.message()
+        tab = tab.with.message(message.fail.upload)
       }
       return(tab)
     }, options = list(scrollX = TRUE, searching = F))
@@ -830,13 +893,7 @@ shinyServer(function(input, output, session) {
                                   ui.input = input))
         }
     })
-    
-    #' Reactive variable holding distances between
-    #' sensors
-    sensor.dist <- reactive({
-      return(get.thermometer.distance(ui.input = input))
-    })
-    
+
     #' Reactive variable holding sap flow rates
     #' for all methods
     sapFlow <- reactive({

@@ -5,25 +5,19 @@
 get.rawData = function(input){
    an.error.occured = F
    if (input$inputType == "HFD_raw"){
-      # print("HFD_raw")
       tryCatch( { rawData  = get.temperatures.HFD(input$file1$datapath,
                                                   sep = input$sep,
                                                   skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
-      # print(an.error.occured)
-      
    }
    if (input$inputType == "HFD_delta" |
        input$inputType == "HFD_processed_read" |
        input$inputType == "HFD_processed_write"){
-      # print("HFD_delta")
       tryCatch( { rawData  = get.temp.differences.HFD(input$file1$datapath,
                                                       sep = input$sep,
                                                       skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
-      
    }
-
    if (an.error.occured){
       return(data.frame())
    } else {
@@ -336,15 +330,16 @@ get.positionsFromRawData = function(dataSource, input){
       if (input$inputType == "HFD_delta"){
          reg = "(?i)dTSym"
       }
-      
-      if (input$positionManual){
-         positions = as.numeric(unlist(strsplit(input$positionInput,",")))
-      } else {
-         positions = c(1:ncol(dataSource[, grepl(reg, 
-                                                 colnames(dataSource))]))
-      }
+      positions = c(1:ncol(dataSource[, grepl(reg, 
+                                              colnames(dataSource))]))
    }
-   
+   if (input$thermoNumbering == "ascending"){
+      positions = factor(sort(positions),
+                         levels = sort(positions))
+   } else {
+      positions = factor(sort(positions, decreasing = TRUE),
+                         levels = sort(positions, decreasing = TRUE))
+   }
    return(positions)
 }
 
@@ -358,70 +353,74 @@ get.thermometer.distance <- function(ui.input){
    if (ui.input$sensorType == "HFD8-100"){
       return(1)
    }
-   if (ui.input$sensorType == "Manual"){
+   if (ui.input$sensorType == "Manual" & ui.input$thermoDistances == "fixed"){
       return(ui.input$distInput)
+   }
+   if (ui.input$sensorType == "Manual" & ui.input$thermoDistances == "variable"){
+      return(NULL)
    }
 }
 
 
 #' Thermometer positions relative to stem center
 #' @description Position of each thermometer as distance to the center of the stem. Can be defined manually. Otherwise the distance between center and outer sap wood Rxy is required.
-#' @param depthManual: boolean indicating whether depth is defined manually in UI (default: F)
-#' @param inputType: character string indicating sensor type
+#' @param ui.input: UI input
 #' @param positions: vector with thermometer positions
 #' @param rxy: numeric indicating distance between stem center and outer sap wood
-#' @param depthInput: character string indicating manual thermometer depths
 #' @param thermo_distance: numeric indicating distance between thermometers
 #' @return data.frame
-get.depths <- function(depthManual = F, inputType,
-                       positions, r1, depthInput, thermo_distance){
+get.depths <- function(ui.input, positions, r1,  thermo_distance){
    number_pos = length(positions)
-   if (depthManual){
-      df = data.frame(position = positions,
-                      depth = as.numeric(unlist(strsplit(depthInput, ","))))
-   } else if (r1 == 0){
+   if (r1 == 0) {
       df = data.frame(position = c(1:number_pos),
                       depth = rep(r1, number_pos))
-      } else {
+   } else {
       # distance between sensor cap and first thermometer is 2 cm
-      if (inputType == "HFD8-50"){ # sensorLength = 6.2
+      if (ui.input$sensorType == "HFD8-50") {
+         # sensorLength = 6.2
          df = data.frame(position = c(1:8),
-                         depth = seq(r1, (r1-3.5), by = -thermo_distance))
+                         depth = seq(r1, (r1 - 3.5), by = -thermo_distance))
       }
-      if (inputType == "HFD8-100"){ # sensorLength = 9.7
+      if (ui.input$sensorType == "HFD8-100") {
+         # sensorLength = 9.7
          df = data.frame(position = c(1:8),
-                         depth = seq(r1, (r1-7), by = -thermo_distance))
-
+                         depth = seq(r1, (r1 - 7), by = -thermo_distance))
+         
       }
-      if (inputType == "Manual"){ # sensorLength = unknown
-         df = data.frame(position = c(1:number_pos),
-                         depth = seq(r1, 
-                                     (r1-((number_pos-1)*thermo_distance)), 
-                                     by = -thermo_distance))
+      if (ui.input$sensorType == "Manual") {
+         if (ui.input$thermoDistances == "variable"){
+            df = data.frame(position = positions,
+                            depth = as.numeric(unlist(strsplit(ui.input$depthInput, ","))))
+         } else
+         # sensorLength = unknown
+         df = data.frame(
+            position = positions,
+            depth = seq(r1,
+                        (r1 - ((number_pos - 1) * thermo_distance
+                        )),
+                        by = -thermo_distance)
+         )
       }
       
-      df = df[df$position %in% positions, ]
+      df = df[df$position %in% positions,]
    }
-   
    return(df)
-   
 }
 
-#' Get area and circumference of circular ring to dataframe with positions and depths
-#' @param depths: vector indicating sensor depths
-#' @param thermo_distance: numeric indicating distance between thermometers, cm
+#' Get area and circumference of circular ring to data frame with positions and depths
+#' @param depths: vector indicating thermometer depths
 #' @return data.frame
 add.Props2DepthsHelper = function(depths){
-   thermo_distance = abs(depths[1, "depth"] - depths[2, "depth"]) 
-   
+   # Calculate area and circumference of annuli
    depths = depths %>% 
-      mutate(r_outer = depth + thermo_distance/2,
-             r_inner = depth - thermo_distance/2,
+      mutate(r_outer = depth + thermo_distance,
+             r_inner = depth - thermo_distance,
              Aring = pi*(r_outer^2 - r_inner^2),
              R = depth,
              Cring = 2*pi * R) %>% 
-      select(-c(r_outer, r_inner))
-
+      select(-c(thermo_distance, r_outer, r_inner)) %>% 
+      mutate(Aring = abs(Aring),
+             Cring = abs(Cring))
    return(depths)
 }
 
@@ -432,26 +431,12 @@ add.Props2DepthsHelper = function(depths){
 #' @param swd: numeric indicating sapwood depth in cm
 #' @return data.frame
 add.Props2Depths = function(depths, swd){
-   if (all(depths$depth > 0)){
-      depths = add.Props2DepthsHelper(depths = depths)
-   } else {
-      pos = depths[depths[, "depth"] > 0,] %>%
-         add.Props2DepthsHelper(.)
-      neu = depths[depths[, "depth"] == 0,] %>%
-         mutate(Aring = 0,
-                R = 0,
-                Cring = 0)
-      neg = depths[depths[, "depth"] < 0,] %>%
-         mutate(depth_helper = depth,
-                depth = abs(depth)) %>% 
-         arrange(desc(depth)) %>% 
-         add.Props2DepthsHelper(.) %>% 
-         mutate(depth = depth_helper) %>% 
-         select(-depth_helper) %>% 
-         arrange(position)
-      
-      depths = bind_rows(pos, neu, neg)
-   }
+   # Calculate average distance to next thermometer
+   depths = depths %>% 
+      arrange(-depth) %>% 
+      mutate(thermo_distance = abs((depth - lead(depth)) / 2))
+   depths[nrow(depths), "thermo_distance"] = depths[nrow(depths)-1, "thermo_distance"]
+   depths = add.Props2DepthsHelper(depths = depths)
    return(depths)
 }
 
@@ -493,7 +478,7 @@ update.positions = function(data, ui.input, reactive.value){
 
 #' Calculate the distance Rxy from the stem center to the inner bark
 #' Prioritize information on sap wood depth over dbh
-get.rxy = function(ui.input){ #hier
+get.rxy = function(ui.input){
    if (ui.input$swExact){
       rxy = ui.input$sapWoodDepth + ui.input$heartWoodDepth
    } else {
@@ -529,20 +514,17 @@ get.r1 = function(rxy, ui.input){
 
 #' Update thermometer depths
 #' @param ui.input: UI-inputs
-#' @param positions: vector: sensor positions
-#' @param thermo_distance: numeric: distance between thermometers, mm
+#' @param positions: vector: thermometer positions
 #' @param swd: numeric: sapwood depth
 #' @return data.frame
-update.depths = function(ui.input, positions, thermo_distance, swd){
+update.depths = function(ui.input, positions, swd){
    rxy = get.rxy(ui.input = ui.input)
    r1 = get.r1(rxy = rxy,
                ui.input = ui.input)
    thermo_distance = get.thermometer.distance(ui.input = ui.input)
-   depths = get.depths(depthManual = ui.input$depthManual,
-                       inputType = ui.input$sensorType,
+   depths = get.depths(ui.input = ui.input,
                        positions = positions,
                        r1 = r1,
-                       depth = ui.input$depthInput,
                        thermo_distance = thermo_distance)
 
    # Add area and circumference of circular ring

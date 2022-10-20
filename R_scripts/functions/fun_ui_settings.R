@@ -177,42 +177,44 @@ box.settings_sensor = function(){
       
       conditionalPanel(
          condition = "input.sensorType == 'Manual'",
-         numericInput("distInput", "Distance between thermometers (cm)",
-                      value = 1),
          fluidRow(
-            column(4, checkboxInput("positionManual", "Manual position input",
-                                    F)),
-            column(4, checkboxInput("depthManual", "Manual depth input",
-                                    F))
+           column(6,
+                  radioButtons("thermoDistances", "Distances between thermometers",
+                               choices = c("fixed" = "fixed",
+                                           "variable" = "variable"))),
+           column(6,
+                  radioButtons("thermoNumbering", "Thermometer numbering",
+                               choices = c("ascending" = "ascending",
+                                           "descending" = "descending")))
          ),
          conditionalPanel(
-            condition = "input.positionManual == true",
-            textInput("positionInput", "Thermometer positions",
-                      placeholder = "Thermometer positions as vector (comma delimited): 1, 2, 3")),
-         
+           condition = "input.thermoDistances == 'fixed'",
+           numericInput("distInput", "Distance between thermometers (cm)",
+                        value = 1)
+           ),
          conditionalPanel(
-            condition = "input.depthManual == true",
-            textInput("depthInput", "Thermometer depths",
-                      placeholder = "Thermometer depths (cm) as vector (comma delimited): 
+           condition = "input.thermoDistances == 'variable'",
+           textInput("depthInput", "Thermometer depths",
+                     placeholder = "Thermometer depths (cm) as vector (comma delimited): 
                    10, 8, 7.5")),
          ),
+
+      h3(strong("Estimated thermometer positions")),
       
-      p(strong("<Note>"), 
-        "The following table shows estimated depth of thermometers as distance to the center (`Thermometer R`) 
+      p("The following table shows estimated depth of thermometers as distance to the center (`Thermometer R`) 
         as well as the area and circumference of the cirular ring, assuming the thermometers are centered 
         in the respective ring. Based on the values shown here, sap flow per section can be scaled to
         sap flow density or total tree water use."),
-      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark)."),
+      p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark). To change this
+        select sensor type 'manual'."),
       
       output.table("depth.table"),
-      
-      p("* negative values for 'Thermometer R' indicate that the sensor needles cross the center of the 
-        tree (i.e. needle length > diameter / 2 - barkthickness) and the respective thermometer positions are on the 
-        opposite side of the tree. "),
+      output.html("depth.table.info"),
+
       actButton("save.sensor_props", "Save csv", "saveCsv"),
       
       br(),
-      p(strong("Schematic representation of an HFD sensor and its placement in the stem")),
+      h4(strong("Schematic representation of an HFD sensor and its placement in the stem")),
       img(src='stemProfile.png', width = "100%")
       
    ))
