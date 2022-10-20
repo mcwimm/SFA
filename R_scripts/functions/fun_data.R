@@ -508,9 +508,20 @@ get.rxy = function(ui.input){ #hier
 
 #' Calculate distance between center and first thermometer
 get.r1 = function(rxy, ui.input){
-   r1 = 0
+   
    if (rxy != 0){
-      r1 = rxy - (ui.input$dist2first - ui.input$spacer)/10
+      if (ui.input$swExact){
+         # If exact values is chosen don't consider bark thickness
+         r1 = rxy - (ui.input$dist2first - ui.input$spacer) / 10
+      } else {
+         r1 = rxy - (ui.input$dist2first - ui.input$spacer - ui.input$barkThickness)/10
+         # = radius - bark - (dist2first - spacer - bark)
+         # = radius - bark - (dist2first - spacer) + bark
+         # = radius - (dist2first - spacer)
+      }
+   }
+   else {
+      r1 = 0
    }
    return(r1)
 }
