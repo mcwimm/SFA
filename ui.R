@@ -15,6 +15,8 @@ shinyUI(
             tags$footer("Chair of Forest Biometrics", align = "center"),
             tags$footer("and", align = "center"),
             tags$footer("Systems Analysis", align = "center"),
+            tags$footer("Technische Universität", align = "center"),
+            tags$footer("Dresden", align = "center"),
             tags$footer("2020 - 2022", align = "center"),
             tags$hr()
             
