@@ -86,7 +86,7 @@ unify.datetime = function(rawData){
    
    # add hour of day and date of year
    rawData$dTime = convertTimeToDeci(as.character(rawData$time))
-   rawData$doy <- as.numeric(strftime(rawData$datetime, format = "%j"))
+   rawData$doy <- as.numeric(strftime(rawData$datetime, format = "%j",  tz = "GMT"))
 
    # Reorder columns
    rawData = data.frame(rawData) %>% 
