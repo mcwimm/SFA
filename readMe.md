@@ -1,22 +1,30 @@
 # Sap Flow Analyzer
 
-The Sap Flow analyser is an R Shiny app to process sap flow data recorded with HFD (Heat Field Defomation) sensors. The app allows to clean the data, determine the k-value, calculate sap flow index and sap flow density and to estimate sap flow rates and tree water use if tree properties are given.
-
-## Installation
-
-### ... in R: Option 1
-
-requires `shiny` package
-
-``runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)``
-
-``'destdir`` ... destination directory. If ``NULL`` this is the temporary directory (Caution: files will be deleted)
-
-### ... in R: Option 2
-
-1. fork/ clone the complete project (repo)
-2. open _ui.R_ with R and click `Run App`
+The Sap Flow Analyzer is an [R Shiny](https://shiny.rstudio.com/) App to process sap flow data recorded with Heat Field Deformation (HFD) sensors. The app allows to clean the data, determine k-values, calculate sap flow per section and density as well as to estimate sap flow rates and tree water use.
 
 ## User Guide
 
 [Go to SFA User Guide](https://hackmd.io/@-Zyj5KK8QtCu0gqPrdZVGA/rkNXyruZs)
+
+## Launch the App
+
+#### Requirements
+
+- [`R`](https://cran.r-project.org/)
+- *optional* [`R Studio`](https://www.rstudio.com/)
+- In `R`: shiny package
+  + `if(!require("shiny")) install.packages("shiny")`
+  
+#### Option 1
+
+
+- Download and open github repository via shiny function
+  + ``runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)``
+
+#### Option 2
+
+- Clone or download the complete project (repo) manually
+- RStudio: open _ui.R_ and click `Run App`
+- Command line: R -e "shiny::runApp('~/shinyapp')"
+
+For more information visit [Shiny](https://shiny.rstudio.com/articles/basics.html)
