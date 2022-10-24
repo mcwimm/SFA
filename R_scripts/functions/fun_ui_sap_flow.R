@@ -161,10 +161,8 @@ sfRateOutput <- function(){
                    box(title = "Settings",
                        collapsible = T, width = NULL,
                        status = "warning",
-                       
-                       p(strong("<Note>"), "The estimation of sap flow is based on
-                                        wood and sensor properties (see 'Project settings').
-                         If tree water use calculated with a specific method is 0, more information are required."),
+                       HTML("<b>Note:</b> The estimation of sap flow and tree water use is based on
+                       wood and sensor properties (see 'Settings')."),
                        
                        checkboxInput("treeScaleSimple1", 
                                      "Method 1: Area of circular ring", F),
@@ -190,15 +188,15 @@ sfRateOutput <- function(){
                                              "Save figure", "saveFigure")),
                           tabPanel("Radial profile", br(),
                                    p("Note: radial profile is not available for scaling method 2."),
-                                   #p("Each point represents one day."),
                                    output.figure("TWUradialprofile"),
                                    actButton("save.TWUradialprofile",
                                              "Save figure", "saveFigure")))
                        
                    ),
                    box(title = "Tree water use",
-                       p("Daily tree water use (in liter per day) estimated as the area under
-                     the curve (AUC) of the figure above, separated by flow direction (i.e. positive flow rates = transpiration, negative flow rates = reverse flow)."),
+                       p("Daily tree water use (in liter per day) is estimated as the area under
+                     the curve (AUC) of the figure above, separated by flow direction (i.e. positive flow
+                         rates = transpiration, negative flow rates = reverse flow)."),
                        p("Note: Incomplete data sets (e.g. half a day) might lead to an over- or underestimation."),
                        collapsible = T,
                        width = NULL,

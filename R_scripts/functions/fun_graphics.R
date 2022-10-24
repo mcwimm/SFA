@@ -729,7 +729,7 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
       }
       
    } else {
-      p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Project settings')")
+      p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Settings')")
    }
    return(p)
 }

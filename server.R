@@ -28,9 +28,9 @@ shinyServer(function(input, output, session) {
     }
     
     
-    ########################
-    ### PROJECT SETTINGS ###
-    ########################
+    ################
+    ### SETTINGS ###
+    ################
     
     #### Variables ####
   
@@ -119,7 +119,7 @@ shinyServer(function(input, output, session) {
       NULL
     })
     
-    #' Show project path in Project Settings > Project
+    #' Show project path in Settings > Project
     #' if a project folder is selected
     output$prjDir <- renderPrint({
         cat(projectPath())
@@ -132,7 +132,7 @@ shinyServer(function(input, output, session) {
     
     #### Buttons ####
     
-    #' Button to create a project (Project Settings > Project)
+    #' Button to create a project (Settings > Project)
     #' Requires a folder to be selected (Folder select)
     #' If directory does not exist create two folders:
     #' 'csv-files', 'graphics'
@@ -279,7 +279,7 @@ shinyServer(function(input, output, session) {
     })
     
     #' Eventlistener to save thermometer depth table
-    #' (Project Settings > Measuring environment)
+    #' (Settings > Measuring environment)
     observeEvent(input$save.sensor_props, {
        save.csv(path = projectPath(), 
                 name = "sensor_props",
