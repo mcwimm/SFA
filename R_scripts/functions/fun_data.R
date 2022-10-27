@@ -321,7 +321,7 @@ get.positionsFromRawData = function(dataSource, input){
    cond1 = grepl("processed", input$inputType)
    cond2 = any(grepl("(?i)position", colnames(dataSource)))
    if (cond1 & cond2){
-      positions = unique(dataSource[, grepl("(?i)pos", colnames(dataSource))])
+      positions = unique(dataSource[, grepl("(?i)position", colnames(dataSource))])
    } else {
       if (input$inputType == "HFD_raw"){
          reg = "(?i)Asym"

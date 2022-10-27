@@ -457,11 +457,11 @@ shinyServer(function(input, output, session) {
       an.error.occured = FALSE
       tryCatch({
         tab  = deltaTempLongNoFilter() %>%
-                           mutate_if(is.numeric, round, 3) 
-      },
-      error = function(e) {
-        an.error.occured <<- TRUE
-      })
+          mutate_if(is.numeric, round, 3)
+        },
+        error = function(e) {
+          an.error.occured <<- TRUE
+          })
       if (an.error.occured) {
         tab = tab.with.message(message.fail.upload)
       }
