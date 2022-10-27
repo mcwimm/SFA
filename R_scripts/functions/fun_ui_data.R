@@ -188,6 +188,7 @@ dataViewOutput = function(){
           ),
           # tags$hr(),
           checkboxInput("rawPlot_lines", "Draw lines instead of points", F),
+          checkboxInput("rawPlot_zerolines", "Show zero-temperature line(s) (x=y=0)", F),
           
           tags$hr(),
           checkboxInput("rawPlot_gathered", "Plot all temperature differences over time", F),

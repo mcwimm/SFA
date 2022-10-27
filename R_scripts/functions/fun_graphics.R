@@ -274,7 +274,8 @@ get.customizedPlotSettings = function(ui.input){
       facet = ui.input$rawPlot.facet,
       no.cols = ui.input$rawPlot.columns,
       all.dT = ui.input$rawPlot_gathered,
-      draw_lines = ui.input$rawPlot_lines
+      draw_lines = ui.input$rawPlot_lines,
+      zerolines = ui.input$rawPlot_zerolines
    ))
 }
 
@@ -293,6 +294,7 @@ plot.customTemperature <- function(data, ui.input.processed){
    facet = ui.input.processed$facet
    no.cols = ui.input.processed$no.cols
    draw_lines = ui.input.processed$draw_lines
+   zerolines = ui.input.processed$zerolines
    
    if (draw_lines & col.col == "dTime"){
       p = plot.emptyMessage("Error: Settings not possible. \nDay time can not be selected \nas color in line mode.")
@@ -408,10 +410,16 @@ plot.customTemperature <- function(data, ui.input.processed){
       }
       
       if (facetWrap){
-         facet = get.labelledFacets(data, facet) #facet.col #hier
+         facet = get.labelledFacets(data, facet)
          p = p +
             facet_wrap(~ (facet), scales = scales,
                        ncol = no.cols)
+      }
+      
+      if (zerolines){
+         p = p +
+            geom_hline(aes(yintercept = 0), col = "#333333", linetype = "dashed") + 
+            geom_vline(aes(xintercept = 0), col = "#333333", linetype = "dashed")
       }
    }
    
