@@ -110,28 +110,37 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
    # Filter by max. dTsym-dTas ratio, if filter is enables
    data = get.dTratio.filtered.data(data = data,
                                     ui.input = ui.input)
-   # Iterate through data
-   data.adj = clean.data.iteration(data)
-   
-   datapoints_used = nrow(data.adj[[1]])
-   print(paste(round(datapoints_used/datapoints_sensordepth*100, 1),
-               " % (", datapoints_used, "/ ", datapoints_sensordepth,
-               " ) of data points are used to estimate k.",
-               sep = ""))
-   
-   # Combine results into a table
-   df = data.frame(kAs = data.adj[[2]][[1]],
-                   R.kAs = data.adj[[2]][[2]],
-                   kSa = data.adj[[3]][[1]],
-                   R.kSa = data.adj[[3]][[2]])
-   
-   # Set K depending on user input
-   # Use mean of regressions with dTas AND dTsa
-   if (ui.input$kRegUseBoth){
-      df$k = mean(c(abs(df$kAs), abs(df$kSa)))
-   } else { # Use only dTas
-      df$k = df$kAs
+   df = NULL
+   if (nrow(data) > 0) {
+      # Iterate through data
+      data.adj = clean.data.iteration(data)
+      
+      datapoints_used = nrow(data.adj[[1]])
+      print(paste(round(datapoints_used/datapoints_sensordepth*100, 1),
+                  " % (", datapoints_used, "/ ", datapoints_sensordepth,
+                  " ) of data points are used to estimate k.",
+                  sep = ""))
+      
+      # Combine results into a table
+      df = data.frame(kAs = data.adj[[2]][[1]],
+                      R.kAs = data.adj[[2]][[2]],
+                      kSa = data.adj[[3]][[1]],
+                      R.kSa = data.adj[[3]][[2]])
+      
+      # Set K depending on user input
+      # Use mean of regressions with dTas AND dTsa
+      if (ui.input$kRegUseBoth){
+         df$k = mean(c(abs(df$kAs), abs(df$kSa)))
+      } else { # Use only dTas
+         df$k = df$kAs
+      }
+   } else {
+      df = data.frame(kAs = NA, R.kAs = NA,
+                      kSa = NA, R.kSa = NA,
+                      k = "Error: no values available with the chosen setting.")
    }
+  
+
    return(df)
 }
 
@@ -249,10 +258,8 @@ clean.data.iteration = function(data_ini, initial.cutoff = 0){
    data.n1 = data 
    
    while (r.adj.diff > 0.01){
-      # print(paste("Step ", step))
       data = cleaning(data, x.col = "dTsym.dTas", y.col = "dTas")
-      # print(paste("nrow(data)  ", nrow(data)))
-      
+
       if (nrow(data) < 50){
          print(paste("[Warning] Iteration stopped as number of data points < 50."))
          data = data.n1
@@ -263,11 +270,7 @@ clean.data.iteration = function(data_ini, initial.cutoff = 0){
       r.adj.n <- K.dTas[2]   
       
       r.adj.diff <- r.adj.n - r.adj.n1
-      
-      # print(paste("r.adj.n  ", r.adj.n))   
-      # print(paste("r.adj.n1  ", r.adj.n1))
-      # print(paste("r.adj.diff  ", r.adj.diff))
-      
+
       if (r.adj.diff < 0){
          data = data.n1 
       }

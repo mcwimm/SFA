@@ -625,7 +625,11 @@ shinyServer(function(input, output, session) {
                                     ui.input = input)
       data = get.dTratio.filtered.data(data = data,
                                     ui.input = input)
-      return(clean.data.iteration(data))
+      if (nrow(data) > 0){
+        return(clean.data.iteration(data))
+      } else {
+        return(list(data = NULL, K.dTas = NA, K.dTsa = NA))
+      }
     })
     
     #' Reactive variable holding k-values derived
@@ -701,7 +705,7 @@ shinyServer(function(input, output, session) {
       }
       values$kvalues[values$kvalues$position == input$kPositionSelect, 2:3] <- cbind(
         method = as.character(method_name),
-        k = round(kValue(), 3))
+        k = kValue())
     })
 
     #' Eventlistener to store k-values from csv upload
@@ -744,7 +748,12 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation)
     output$kCurrent <- renderPrint({ 
       req(input$kPositionSelect)
-      paste("K-value", round(kValue(), 3))
+      kValue = kValue()
+      if (is.numeric(kValue)){
+        paste("K-value", round(kValue, 3))
+      } else {
+        paste("K-value", kValue)
+      }
     })
     
     
@@ -753,7 +762,19 @@ shinyServer(function(input, output, session) {
     #' UI table output of selected k-values
     #' (K-value > Estimation > K-value estimation > Selected)
     output$kSelected <- DT::renderDataTable(rownames = FALSE, {  
-      return(values$kvalues)
+      kvalues = values$kvalues
+      # If reactive values 'kvalues' already exist, i.e. is data.frame, prettify table
+      # else return empty reactive value
+      if (is.data.frame(kvalues)){
+        # Transform k column to numeric and round values
+        kvalues = kvalues %>% mutate(k = round(as.numeric(k), 2))
+        # If NAs are produced and the a method is already chosen
+        # show 'Error' in k column
+        kvalues[is.na(kvalues$k) & !is.na(kvalues$method), "k"] = "Error"
+        return(kvalues)
+      } else {
+        return(kvalues)
+      }
     }, options = list(dom = 't'))
     
     #' UI table output of auto. regression k-values
@@ -804,12 +825,12 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding the control-diagram 1
     #' ggplot warnings are suppressed
     kplot2 <- reactive({
-      # suppressWarnings(print(
-        plot.kEst2(data.complete = deltaTempLong.depth(),
-                 data.adj =cleanedDataAndKvalues()[[1]],
-                 k = kValue(),
-                 ui.input = input)
-      # ))
+      plot.kEst2(
+        data.complete = deltaTempLong.depth(),
+        data.adj = cleanedDataAndKvalues()[[1]],
+        k = kValue(),
+        ui.input = input
+      )
     })
     
     #' UI output of Control-diagram 1

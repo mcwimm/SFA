@@ -489,22 +489,30 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
            col = labels["T"][[1]])
       
    if (kMethod == "regression"){
-      ad = data.adj %>% 
-         gather(., temp, value, dTsa, dTas)
-      p = p +
-        geom_point(ad, 
-                   mapping = aes(x = dTsym.dTas, y = value, group = temp), 
-                   col = "black", shape = 4) +
-        stat_smooth(ad, method = "lm", formula = 'y ~ x',
-                    mapping=aes(x = dTsym.dTas, y = value, group = temp),
-                    col = "red") +
-        stat_regline_equation(ad,
-                              mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                          label =  paste(..eq.label..,
-                                                         ..adj.rr.label.., 
-                                                         sep = "~~~~")),
-                              label.y.npc = c("top", "bottom")) +
-        labs(caption = "* Black cross (x): data point used for regression")
+      if (is.null(data.adj)){
+         p = p +
+            labs(subtitle = "ERROR: Regression with chosen settings not possible.") +
+            theme(plot.subtitle = element_text(face="bold", color="#E56855"))
+            
+      } else {
+         ad = data.adj %>% 
+            gather(., temp, value, dTsa, dTas)
+         p = p +
+            geom_point(ad, 
+                       mapping = aes(x = dTsym.dTas, y = value, group = temp), 
+                       col = "black", shape = 4) +
+            stat_smooth(ad, method = "lm", formula = 'y ~ x',
+                        mapping=aes(x = dTsym.dTas, y = value, group = temp),
+                        col = "red") +
+            stat_regline_equation(ad,
+                                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                                              label =  paste(..eq.label..,
+                                                             ..adj.rr.label.., 
+                                                             sep = "~~~~")),
+                                  label.y.npc = c("top", "bottom")) +
+            labs(caption = "* Black cross (x): data point used for regression")
+      }
+
    } else {
       p = p +
          geom_point(data.frame(k = c(k, -k)),
@@ -535,76 +543,53 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
 #' @return ggplot-object
 plot.kEst2 <- function(data.complete, data.adj, k, 
                        ui.input){
-   if (is.na(k)){
-      return(plot.emptyMessage("K is not defined."))
-   }
-   xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
-   fullrange = ui.input$k1Plot.fullrange
-   fixedScales = ui.input$k1Plot_scales
-   kMethod = ui.input$kMethod
-   
-   xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
-   xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
-   
-   d = data.complete %>% 
-      mutate("K+dTsa" = (dTsa + k)) %>% 
-      gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`)
-
-   p = ggplot() +
-      geom_point(d, 
-                 mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                             col = temp), shape = 1) +
-      geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
-                     label = paste("k = ", round(k, 2))), 
-                 fill = "#B8B361", alpha = 0.6) +
-      scale_color_manual(values=fillcolors(4)) +
-      xlim(xmin, xmax) +
-      ylim(min(d$value), max(d$value)) +
-      geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
-      geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
-      labs(x = labels["dTsym.dTas"][[1]], 
-           y = labels["dT"][[1]], 
-           col = labels["T"][[1]])
-   
-   # # Add regression line to control plot
-   # force = ui.input$k1Plot.forceOrigin
-   # fit = ifelse(force, "y ~ x + 0", "y ~ x")
-   # if (kMethod == "regression"){
-   #    newAdj = data.adj %>% 
-   #       mutate("K+dTsa" = (dTsa + k))%>% 
-   #       gather(., temp, value, dTSym, `K+dTsa`) #dTsa, dTas,
-   #    p = p +
-   #       geom_point(newAdj, 
-   #                  mapping=aes(x = dTsym.dTas, y = value), 
-   #                  shape = 4) +
-   #       stat_smooth(newAdj, method = "lm", formula = fit,
-   #                   mapping=aes(x = dTsym.dTas, y = value, group = temp,
-   #                               col = temp),
-   #                   col = "red", size = 0.5,
-   #                   fullrange = T, se = F) +
-   #       stat_regline_equation(newAdj,
-   #                             formula = fit, #force through origin x+0
-   #                             mapping=aes(x = dTsym.dTas, y = value, group = temp,
-   #                                         label =  ..adj.rr.label..),
-   #                             label.y.npc = c("top", "bottom")) +
-   #       labs(caption = "* Black cross (x): data point used for regression")
-         # 
-   # }
-   
-   if (fixedScales){
-      p = p +
-         xlim(xRange[1], xRange[2]) +
-         geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$value),
+   if (!is.numeric(k)){
+      p = plot.emptyMessage("K is not defined.")
+   } else {
+      xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
+      fullrange = ui.input$k1Plot.fullrange
+      fixedScales = ui.input$k1Plot_scales
+      kMethod = ui.input$kMethod
+      
+      xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
+      xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
+      
+      d = data.complete %>% 
+         mutate("K+dTsa" = (dTsa + k)) %>% 
+         gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`)
+      
+      p = ggplot() +
+         geom_point(d, 
+                    mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                                col = temp), shape = 1) +
+         geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                         label = paste("k = ", round(k, 2))), 
-                    fill = "#B8B361", alpha = 0.6)
+                    fill = "#B8B361", alpha = 0.6) +
+         scale_color_manual(values=fillcolors(4)) +
+         xlim(xmin, xmax) +
+         ylim(min(d$value), max(d$value)) +
+         geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
+         geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
+         labs(x = labels["dTsym.dTas"][[1]], 
+              y = labels["dT"][[1]], 
+              col = labels["T"][[1]])
+      
+      if (fixedScales){
+         p = p +
+            xlim(xRange[1], xRange[2]) +
+            geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$value),
+                           label = paste("k = ", round(k, 2))), 
+                       fill = "#B8B361", alpha = 0.6)
+      }
+      if (fullrange){
+         p = p +
+            stat_smooth(data.adj, method = "lm", 
+                        mapping=aes(x = dTsym.dTas, y = dTas),
+                        col = "#333333", fullrange = T, se = F,
+                        size = 0.5)
+      }
    }
-   if (fullrange){
-      p = p +
-         stat_smooth(data.adj, method = "lm", 
-                     mapping=aes(x = dTsym.dTas, y = dTas),
-                     col = "#333333", fullrange = T, se = F,
-                     size = 0.5)
-   }
+   
    return(p)
 }
 
@@ -616,73 +601,46 @@ plot.kEst2 <- function(data.complete, data.adj, k,
 #' @return ggplot-object
 plot.kEst3 <- function(data.complete, data.adj, k,
                        ui.input){
-   if (is.na(k)){
-      return(plot.emptyMessage("K is not defined."))
+   if (!is.numeric(k)){
+      p = plot.emptyMessage("K is not defined.")
+   } else {
+      xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
+      fixedScales = ui.input$k1Plot_scales
+      kMethod = ui.input$kMethod
+      
+      d = data.complete %>%
+         mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
+         gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
+      
+      xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
+      xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
+      
+      p = ggplot() +
+         geom_point(d, 
+                    mapping=aes(x = x.value, y = dTas, 
+                                col = x.temp, shape = "dTas")) +
+         geom_point(d, 
+                    mapping=aes(x = x.value, y = dTsa, 
+                                col = x.temp, shape = "dTsa")) +
+         geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
+                        label = paste("k = ", round(k, 2))), 
+                    fill = "#B8B361", alpha = 0.6) + #D2D0AD
+         scale_color_manual(values=fillcolors(2)) +
+         scale_shape_manual(values = c(21, 24)) +
+         xlim(xmin, xmax) +
+         ylim(-max(d$dTas), max(d$dTas)) +
+         geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
+         labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
+               y = labels["dT"][[1]], 
+               col = "x-axis", 
+               shape = labels["T"][[1]])
+      if (fixedScales){
+         p = p +
+            xlim(xRange[1], xRange[2]) +
+            geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$dTas),
+                           label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
+      }
    }
-   xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
-   fixedScales = ui.input$k1Plot_scales
-   kMethod = ui.input$kMethod
-   
-   d = data.complete %>%
-      mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
-      gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
-   
-   xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
-   xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
-   
-   p = ggplot() +
-      geom_point(d, 
-                 mapping=aes(x = x.value, y = dTas, 
-                             col = x.temp, shape = "dTas")) +
-      geom_point(d, 
-                 mapping=aes(x = x.value, y = dTsa, 
-                             col = x.temp, shape = "dTsa")) +
-      geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
-                     label = paste("k = ", round(k, 2))), 
-                 fill = "#B8B361", alpha = 0.6) + #D2D0AD
-      scale_color_manual(values=fillcolors(2)) +
-      scale_shape_manual(values = c(21, 24)) +
-      xlim(xmin, xmax) +
-      ylim(-max(d$dTas), max(d$dTas)) +
-      geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
-      labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
-            y = labels["dT"][[1]], 
-            col = "x-axis", 
-            shape = labels["T"][[1]])
-   
-   # # Add regression line to control plot
-   # if (kMethod == "regression"){
-   #    newAdj = data.adj %>% 
-   #       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
-   #       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
-   #    p = p +
-   #       geom_point(newAdj, 
-   #                  mapping=aes(x = x.value, y = dTas), 
-   #                  shape = 4) +
-   #       stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
-   #                   mapping=aes(x = x.value, y = dTas,
-   #                               col = x.temp, group = x.temp),
-   #                   col = "red", size = 0.5,
-   #                   fullrange = T, se = F) +
-   #       geom_point(newAdj, 
-   #                  mapping=aes(x = x.value, y = dTsa), 
-   #                  shape = 4) +
-   #       stat_smooth(newAdj, method = "lm", formula = 'y ~ x',
-   #                   mapping=aes(x = x.value, y = dTsa,
-   #                               col = x.temp, group = x.temp),
-   #                   col = "red", size = 0.5,
-   #                   fullrange = T, se = F) +
-   #       labs(caption = "* Black cross (x): data point used for regression.
-   #          Gray-shaded values indicate the point of intersection of the two lines.")
-   #    
-   # }
-   if (fixedScales){
-      p = p +
-         xlim(xRange[1], xRange[2]) +
-         geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$dTas),
-                        label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
-   }
-
    return(p)
 }
 
