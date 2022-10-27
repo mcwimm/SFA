@@ -66,7 +66,11 @@ box.dat_upl.upload = function(){
                                             "Tab" = "\t"))),
          column(6,   numericInput("skip", "Skip:", min = 0, max = 100, 10))        
       ),
-      actButton("setData", "Use data", "create"),
+      fluidRow(
+         column(6, actButton("setData", "Use data", "create")),
+         # Invisible text output to get file name in header
+         column(6, span(textOutput("fileName"), style="color:white"))
+      ),
       p(em("<Note> If your data set contains non-numeric rows, e.g. logger warnings,
            they are converted to NA values. Remove them in the 'Data > Filter' section."))
    ))
@@ -192,7 +196,6 @@ dataViewOutput = function(){
           
           tags$hr(),
           checkboxInput("rawPlot_gathered", "Plot all temperature differences over time", F),
-          
           
           actButton("renderPlot", "Render figure", "update")
       

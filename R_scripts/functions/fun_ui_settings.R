@@ -88,9 +88,13 @@ box.setting_files = function(){
                              "None" = "none")),
     conditionalPanel(condition = "input.fileAppend == `manual`",
                      textInput("fileAppendName", "File name",
-                               placeholder = "e.g. summer_22"))
+                               placeholder = "e.g. summer_22"),
+                     # Invisible text output to get individual name to header
+                     span(textOutput("manualName"), style="color:white"))
   ))
 }
+
+
 
 box.setting_visualization = function(){
   return(list(

@@ -157,8 +157,11 @@ shinyServer(function(input, output, session) {
           showNotification("Project set successfully!",
                            type = "message")
       }
+      
+      # Update project name in header
       output$prjName <- renderPrint({
-          cat(projectName())
+        # If name is provided manually add it to header
+        cat(projectName())
       })
     })
     
@@ -428,7 +431,7 @@ shinyServer(function(input, output, session) {
       filter_helper(input, output)
     })
     
-    
+
     #### Table outputs #####
 
     #' UI Table with raw data, wide-format
@@ -464,6 +467,16 @@ shinyServer(function(input, output, session) {
     
     #### Text output ####
 
+    output$fileName <- renderPrint({
+        cat(input$file1$name)
+      })
+    
+    output$manualName <- renderPrint({
+      if (input$fileAppend == "manual"){
+        cat(input$fileAppendName)
+      }
+    })
+    
     #' UI Text output of remaining data points after filtering
     #' (Data > Filter > Subset data)    
     output$dataPoints <- renderText({
