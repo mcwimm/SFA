@@ -436,6 +436,9 @@ shinyServer(function(input, output, session) {
 
     #' UI Table with raw data, wide-format
     #' (Data > Upload > Preview data)
+    #' datatable options
+    #' dom: l - length, t - table, i - information
+    #' p - pagination control
     output$raw.wide <- DT::renderDataTable(rownames = FALSE, {
       rawData = rawData()
       if ("dTime" %in% colnames(rawData)){
@@ -445,7 +448,7 @@ shinyServer(function(input, output, session) {
         rawDataTable = tab.with.message(message.fail.upload)
       }
       return(rawDataTable)
-    }, options = list(dom = "t")) 
+    }, options = list(dom = "ltip")) 
     
     
     #' UI Table with raw data, long-format 
@@ -463,7 +466,7 @@ shinyServer(function(input, output, session) {
         tab = tab.with.message(message.fail.upload)
       }
       return(tab)
-    }, options = list(dom = "t")) 
+    }, options = list(dom = "ltip")) 
     
     #### Text output ####
 
