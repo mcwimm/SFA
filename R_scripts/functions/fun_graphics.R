@@ -474,13 +474,14 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
       gather(., temp, value, dTsa, dTas, dTSym)
    
    xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
+   xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
    
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
                              col = temp), shape = 1) +
       scale_color_manual(values=fillcolors(3)) +
-      xlim(c(xmin, max(d$dTsym.dTas))) +
+      xlim(c(xmin, xmax)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       
       labs(x = labels["dTsym.dTas"][[1]], 
@@ -542,11 +543,8 @@ plot.kEst2 <- function(data.complete, data.adj, k,
    fixedScales = ui.input$k1Plot_scales
    kMethod = ui.input$kMethod
    
-   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
-      xmin = min(data.complete$dTsym.dTas, na.rm = T)
-   } else {
-      xmin = -0.1
-   }
+   xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
+   xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
    
    d = data.complete %>% 
       mutate("K+dTsa" = (dTsa + k)) %>% 
@@ -560,7 +558,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                      label = paste("k = ", round(k, 2))), 
                  fill = "#B8B361", alpha = 0.6) +
       scale_color_manual(values=fillcolors(4)) +
-      xlim(xmin, max(d$dTsym.dTas)) +
+      xlim(xmin, xmax) +
       ylim(min(d$value), max(d$value)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
@@ -629,11 +627,8 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
       gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
    
-   if (min(data.complete$dTsym.dTas, na.rm = T) < 0){
-      xmin = min(data.complete$dTsym.dTas, na.rm = T)
-   } else {
-      xmin = -0.1
-   }
+   xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
+   xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
    
    p = ggplot() +
       geom_point(d, 
@@ -647,7 +642,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
                  fill = "#B8B361", alpha = 0.6) + #D2D0AD
       scale_color_manual(values=fillcolors(2)) +
       scale_shape_manual(values = c(21, 24)) +
-      xlim(xmin, max(d$x.value)) +
+      xlim(xmin, xmax) +
       ylim(-max(d$dTas), max(d$dTas)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
