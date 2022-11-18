@@ -42,7 +42,6 @@ get.temperatures.HFD = function(file, sep, skip){
       
       rawData = suppressWarnings(unify.datetime(rawData))
    }
-   
    return(rawData)
 }
 
@@ -62,7 +61,6 @@ unify.datetime = function(rawData){
    } else {
       if (all(c(tolower("time"), tolower("date")) %in% tolower(names(rawData)))){
          print("Add datetime based on date and time")
-         
          date_col = rawData[grepl("(?i)date", colnames(rawData))]
          time_col = rawData[grepl("(?i)time", colnames(rawData))]
          # Remove upper case columns if exist
@@ -73,7 +71,7 @@ unify.datetime = function(rawData){
          rawData$time = time_col[[1]]
          datetimeformat = get.datetime.format(rawData[1,]$date, rawData[1,]$time)
          dateformat = get.date.format(rawData[1,]$date)
-         
+
          rawData = rawData %>% 
             rowwise() %>% 
             mutate(datetime = as.POSIXct(x = paste(date, time),
@@ -91,7 +89,7 @@ unify.datetime = function(rawData){
    # Reorder columns
    rawData = data.frame(rawData) %>% 
       relocate(datetime, date, time, doy, dTime)
-   
+
    return(rawData)
 }
 
@@ -261,13 +259,14 @@ get.delta.temp.depth = function(rawData, position){
    }
    delta.temp <- data.frame(
       datetime = rawData[, "datetime"],
+      date = rawData[, "date"],
       time = rawData[, "time"],
       doy = rawData[, "doy"],
       dTime = rawData[, "dTime"],
       dTas = asym,
       dTSym = sym
    )
-   colnames(delta.temp) = c("datetime", "time", "doy", "dTime",
+   colnames(delta.temp) = c("datetime", "date", "time", "doy", "dTime",
                             "dTas", "dTSym")
    
    delta.temp = cbind(delta.temp, 
