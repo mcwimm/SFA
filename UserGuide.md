@@ -9,14 +9,14 @@ This document describes the handling of the R Shiny Application SapFlowAnalyzer 
 
 ### Contents
 
-<!-- MarkdownTOC autolink="true" style="unordered" levels="1,2" -->
+<!-- MarkdownTOC autolink="false" style="unordered" levels="1,2" -->
 
-- [Introduction](#introduction)
-- [Launch the SFA](#launch-the-sfa)
-- [Settings](#settings)
-- [Data](#data)
-- [K value](#k-value)
-- [Sap Flow](#sap-flow)
+- [Introduction](#Introduction)
+- [Launch the SFA](#Launch-the-SFA)
+- [Settings](#Settings)
+- [Data](#Data)
+- [K value](#K-value)
+- [Sap Flow](#Sap-Flow)
 
 <!-- /MarkdownTOC -->
 
@@ -25,39 +25,44 @@ This document describes the handling of the R Shiny Application SapFlowAnalyzer 
 
 # Introduction
 
-The **Sap Flow Analyzer** (SFA) is an R Shiny app to process sap flow data recorded with the eat Field Deformation (HFD) method. HFD is a thermodynamic method to measure sap flow using a continuous heating system ([Nadezhdina et al., 2006](https://doi.org/10.1093/treephys/26.10.1277); [Nadezhdina, 2018](https://doi.org/10.3832/ifor2381-011)).
-With a needle-like heater a heat field is created and the heat distribution is measured with three needle-like sensors. 
-A needle sensor can have multiple, evenly distributed thermocouples which allows to record a radial flow profile. Based on the ratio of temperature gradients around the heater in axial (TSym) and tangential (Tas) directions, sap flow metrics (sap flow per section, sap flow density), sap flow rate and tree water use can be calculated. 
+The **Sap Flow Analyzer** (SFA) is a R Shiny app to process sap flow data recorded with the Heat Field Deformation (HFD) method. HFD is a thermodynamic method to measure sap flow using a continuous heating system ([Nadezhdina et al., 2006](https://doi.org/10.1093/treephys/26.10.1277); [Nadezhdina, 2018](https://doi.org/10.3832/ifor2381-011)).
+With a needle-like heater a heat field is created across the stem and the heat distribution is measured with three needle-like sensors. 
+A needle sensor can have multiple, evenly distributed, thermocouples which record radial flow profile. Based on the ratio of temperature gradients around the heater in axial (TSym) and tangential (Tas) directions, sap flow metrics (sap flow per section, sap flow density), sap flow rate and tree water use can be estimated. 
 The method requires to determine a calibration value (K) for each tree and thermometer. 
 With the SFA, data can be cleaned or filtered, K can be determined and sap flow per section can be scaled to sap flow and total tree water use.
 
-The following sections describe each step required to upload, filter and process data. The SFA is designed in a way that the navigation bar on the left (_Figure 1_) sets the order of analyzing sap flow recordings:
+The following sections describe each step required to upload, filter and process data. The SFA is designed in a way that the navigation bar on the left (_Figure 1_) guides the order in which sap flow recordings are analyzed:
 
 1.  Create a project and define the measuring environment (Settings)
 2.  Upload data (Data)
 3.  Estimate K for each thermometer (K-value)
 4.  Calculate sap flow index (SFI), sap flow per section (SFS), sap flow density (SFD), sap flow (SF) and tree water use (TWU) (Sap flow)
 
-The navigation bar can be collapsed by pressing the triple bar symbol (≡). The header on the top right shows the name of the current project as well as of the uploaded data file.
+The navigation bar can be collapsed by pressing the triple bar symbol (≡). The header on the top right shows the name of the current project (user determined) as well as the name of the uploaded raw data file.
 
 <br>
 
 # Launch the SFA
 
-SFA can be started in two different ways, either by manually creating a local copy of the github repository or by launching the app via an R wrapper function. Both methods require the package ‘shiny’ (version 1.5, [Chang et al., 2020](https://cran.r-project.org/package=shiny)).
+SFA can be inicialized in two different ways:
 
-### Manual start
+1) by manually creating a local copy of the github repository,
+2) by launching the app via an R wrapper function. 
+
+Both methods require the free software [R](https://cran.r-project.org/) and the R-package ‘shiny’ (version 1.5 or higher, [Chang et al., 2020](https://cran.r-project.org/package=shiny)). The use of the IDE [Rstudio](https://www.rstudio.com/) is optional.
+
+### Launching through manual start
 
 Fork and clone (GitHub, 2022) or download the github repository https://github.com/mcwimm/SFA and navigate to the directory where the repository is stored. The main shiny app files, _server.R_ and _ui.R_, can be used to launch SFA using the ‘Run App’ button in RStudio. This method allows the user to modify the code and cooperate with the developers.
 
-### Wrapper function
+### Launching through Wrapper function
 
 Use the ‘runGitHub’ command providing the name and the owner of the repository as well as the destination directory: 
 ```
 runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)
 ```
 This method has the advantage, that the user always accesses the current version. 
-However, files are stored in a temporary folder if not defined otherwise, and might get lost.
+However, files are stored in a temporary folder if not previously defined by the user, and might get lost.
 
 If the app is launched successfully it opens in a browser window, leading the user to the landing (about) page of the SFA (**<1>**), which provides some basic information about the app (**<2>**), the heat field deformation (HFD) method (**<3>**), a short guide on how to use the app (**<4>**) and output options (**<5>**). 
 The dash or plus in the right upper corner of each box allows to collapse each box (**<6>**).
@@ -72,17 +77,17 @@ In the second menu item, the project settings are defined. All project settings 
 
 ### Box `Measuring environment`
 
-The measuring environment defines wood and sensor properties.
+In this section of the app, the user defines wood and sensor properties.
 Wood and sensor properties are crucial to calculate SFD, SF or TWU as they determine the position of each thermometer.
 
 Wood properties (**<1>**) describe, inter alia, the stem geometry that is used to estimate thermometer positions.
-If know, exact measures of sapwood and heartwood depth can be provided and used instead (**<2>**).
+If known, exact measures of sapwood and heartwood depth can be provided and used instead (**<2>**).
 Sensor properties describe the spacing between needles as well as the depth of needle insertion (**<3>**).
 
 ![](https://storage.david-giesemann.de/SFA/settings_measuring.png)
 
 
-The calculated prositions can be seen at the button of this box.
+The calculated positions can be seen at the bottom of this box.
 Thermometer positions can also be defined manually.
 
 The definition of wood and sensor properties is only required, if recordings are scaled to SFD, SF or TWU.
@@ -93,16 +98,16 @@ The definition of wood and sensor properties is only required, if recordings are
 
 The user can create a project by selecting a project directory. 
 
-To create a project, one must press ‘Folder select’ to browse to the directory where all project files should be stored. 
-The user can choose a volume to browse in (on windows this is usually the working directory and the main drive, **<1>**). 
-A folder is selected by clicking on it's name (**<2>**).
-The user can also create a new subfolder by clicking **<3>**, type a name and confirm with **<4>**.
-Finally select the folder by clicking **<5>**.
+To create a project, press ‘Folder select’ to browse to the directory where all project files should be stored. 
+Choose a volume to browse in (on windows this is usually the working directory and the main drive, **<1>**). 
+Select a project destination folder by clicking on it's name (**<2>**).
+You can also create a new subfolder by clicking **<3>**, type a name and confirm by clicking on the plus symbol **<4>**.
+Finally select the folder by clicking 'select' **<5>**.
 
 ![](https://storage.david-giesemann.de/SFA/settings_project.png)
 
 
-After a folder is selected, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories, namely ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
+After selecting a Project destination folder, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories: ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
 If no project is created, all results (csv-files and graphics) are saved in the root directory of the app, which might be in the temporary data. 
 If the project was created successfully, the project name is shown in the upper right corner of the SFA **<3>**.
 The path to the project directory is shown in **<4>**.
@@ -115,7 +120,9 @@ If no project was created, the path to the root directory is shown.
 ### Box `File output (optional)`
 
 File output allow the user to define 
+- File format in which data files will be exported (csv, xls)- Note these files will be saved into the csv-file project folder regardless of the format selected
 - the format in which figures are saved (jpeg, rdata, pdf)
+- the format in which all procesed data files will be exported to (csv or excel, they will be stored in the csv-files folder of the porject)
 - a title added to each saved figure, e.g. the investigated tree species
 - an prefix added to the name of each saved file
 
@@ -125,6 +132,7 @@ File output allow the user to define
 ### Box `Visualization (optional)`
 
 In the Visualization box, the figure scheme ([Wickham, 2016](https://doi.org/10.1007/978-0-387-98141-3)) and colors to be used in all graphics can be defined as hex colors.
+
 
 ![](https://storage.david-giesemann.de/SFA/settings_visualization.png =400x)
 
@@ -143,7 +151,7 @@ Select the input file type (**<2>**), the separator and the number of lines to s
 If the upload is successful, the box `Preview data` shows a table with data.
 To confirm the usage of the file click ‘Use data’ (**<4>**).
 Afterwards, the file name is shown in the upper right corner of the SFA.
-If the data is not shown correctly, open the csv-file externally and check the required column names (Table 1) and the csv-settings.
+If the data is not shown correctly, open the csv-file externally and check the required column names (Table 1) and the csv-settings (i.e., comma delimited, tab delimited, etc.).
 
 ![](https://storage.david-giesemann.de/SFA/data_upload.png =400x)
 
@@ -159,19 +167,19 @@ In the ‘read’ mode, the existing data cannot be changed. That means, if the 
 However, this mode allows to modify figures. 
 The ‘write’ mode, contrary, allows to change previously calculated results, e.g. by adjusting wood properties.
 
-_**Table 1** Data types available in the SFA. Column names are not case sensitive__
+_**Table 1** Data types available in the SFA. Column names are not case sensitive._
 
 | **Type**                                 | **Description**                                                                                                                                                              | **Required columns**                                                                                                                                                                                   |
 |:---------------------------------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Raw**                                  | Raw HFD temperature recordings, this includes temperatures recorded with the upper, side and lower sensor, respectively, at different depths.                                | Column names must contain the number of thermometer position i and the letters U, S or L to indicate the sensor, e.g. “Temp 2 S”, “temp_1_U”.                                                          |
-| **Delta**                                | Recordings of symmetrical and asymmetrical temperatures differences at different depths.                                                                                     | Columns names must contain temperature differences, dtsym and dtas at different depths i, e.g. “dTSym_1”, “dTas 3”.                                                                                    |
+| **Raw**                                  | Raw HFD temperature recordings, this includes temperatures recorded with the upper, side and lower sensor, respectively, at different depths.                                | Column names must contain the number of thermometer position _i_ and the letters U, S or L to indicate the sensor, e.g. “Temp 2 S”, “temp_1_U”.                                                          |
+| **Delta**                                | Recordings of symmetrical and asymmetrical temperatures differences at different depths.                                                                                     | Columns names must contain temperature differences, dtsym and dtas at different depths _i_, e.g. “dTSym_1”, “dTas 3”.                                                                                    |
 | **Processed read** / **Processed write** | Processed recordings of SFS, SFD, etc., preferably produced with the SFA, in long-format. That is, one column contains the results, e.g. SFD, for all thermometer positions. | Column names are fixed and case sensitive. File contains at least: dTas, dTSym, dTsa, dTsym.dTas. Further optional column names are: k, SFS, SFDsw, depth, Aring, R, Cring, SFdepth, sfM1, sfM2, sfM3. |
 
 
 ### Box `Preview data`
 
 Data are shown in wide and long format (**<1, 2>**). 
-The latter can be downloaded as csv-file (**<3>**) and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’.
+The latter can be downloaded as csv or excel files (**<3>**) and later used to continue the analysis using the input file types ‘Processed read’ or ‘Processed write’ from the 'input file type' drop-down menu located on the "Upload file" tab.
 
 ![](https://storage.david-giesemann.de/SFA/data_upload_preview.png =400x)
 
@@ -193,7 +201,7 @@ To load or refresh filter options, click 'Load filter options' (**<1>**).
 In case a new data set has been uploaded without refreshin the app, this button needs to be clicked, too, in order to refresh filter options (**<2>**).
 
 By clicking ‘Apply filter’ (**<3>**), all defined changes are applied to the data set.
-‘Delete filter’ resets the data set to its original extend (**<4>**).
+‘Delete filter’ resets the data set to its original extend version (**<4>**).
 
 ![](https://storage.david-giesemann.de/SFA/data_filter.png =400x)
 
@@ -203,7 +211,7 @@ By clicking ‘Apply filter’ (**<3>**), all defined changes are applied to the
 In this box, the filtered data are visualized, either as violin plot, boxplot, histogram or using frequency polygons (**<1>**).
 The drop-down menues 'Variable' and 'Color/ Group' determine the appearance of the image.
 
-Filtered data can be saved as csv-file (long-format) or as figure by clicking 'Save csv' or 'Save figure', respectively (**<2>**).
+Filtered data can be saved as csv or excel-file (long-format) or as figure by clicking 'Save file' or 'Save figure', respectively (**<2>**).
 
 ![](https://storage.david-giesemann.de/SFA/data_filter_figures.png)
 
@@ -236,10 +244,10 @@ If K is estimated properly, it can be set using the ‘Set k-value’ button (**
 
 All set K values will appear in the table ‘Selected’ (**<1>**).
 The other tables (**<2>**) provide estimation for all thermometer positions at once obtained with each method. 
-All optional regression options (figure above **<3>**) apply to this table, too. 
+All regression options (figure above **<3>**) apply to this table, too. 
 If the values of this tables are sufficient, they can all be set at once by clicking ‘Use k-values’ below the table. 
 If K values are provided in a csv-file, the file can be uploaded in the ‘Read csv’ tab (**<2>**). 
-Selected K values can be saved as csv (**<3>**).
+Selected K values can also be exported as data files (**<3>**).
 
 ![](https://storage.david-giesemann.de/SFA/k_table.png)
 
@@ -319,20 +327,31 @@ An explanation to those options is listed below.
 
 We try to provide constructive warnings or error messages.
 However, we cannot catch all issues.
-Below is a list with possible operating errors and their cause and solution.
+Below is a list with possible operating errors, their cause and a possible solution. Moreover, the output of the R console often provides a hint on what went wrong.
 
+Please note that the App was developed and tested on a Windows system, and tested on mac OSX. 
+
+| **General** | 
+| -------- | 
+| &#10060; Warning in R console: Error in (...) could not find function(...)
+&#10004; It is likely that not all packages were loaded. Please run the setup file ('set-up.R' located in the root directory) separately and make sure all required packages are installed. |
 
 
 | **Launch the SFA** | 
 | -------- | 
 | &#10060; The SFA does not open when started via the ‘Run App’ or ‘RungGitHub’-command.
 &#10004; Try to run the script ‘setup.R’ separately to install and load all required packages
-&#10004; On Mac: Allow your Mac XXX | 
+&#10004; On Mac: 1) run the command -library(shiny)- 2) Grant access permissions to R Studio (open system preferences>Security and privacy>privacy and select "full disk access" from the left pane and click or add R Studio on the right pane). If this does not solve the problem and you are running the app through the wrapper function, then 3) you will need to also grant access to your navigation browser (i.e., Safari) as described for step 2)| 
 
 | **Data upload** | 
 | -------- | 
 | &#10060; Preview table shows error message instead of uploaded table
 &#10004; Carefully check the upload settings. May open the csv file externally in a text editor and see which separator is used and how many lines need to be skipped. In some cases, the raw data file contains header sections between recordings, which can cause trouble. Delete them manually.|
+
+| **K estimation** | 
+| -------- | 
+| &#10060; Figures do not show zero-flow axis (x=0) by default
+&#10004; This seems to only occur with Mac. To change the scale of the x-axis in the diagram enable 'fixed' scales in Box `Control plots` |
 
 | **Sap Flow Metrics** | 
 | -------- | 
