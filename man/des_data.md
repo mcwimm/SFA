@@ -12,7 +12,7 @@ If nothing is selected, a default file is used. This file contains data of a....
 
 - **Raw**: raw temperature measurements
    + required columns: `i*U`, `i*L`, `i*S` with `U`, `L` and `S` representing temperature measurements in the upper, lower and side sensor
-- **Delta**: data sets with calculated temperature differences, e.g. Sap Flow Analyzer output
+- **Delta**: data sets with calculated temperature differences
    + required columns: `dTSym*i` and `dTas*i`
 - **Processed**: data processed with SFA (long format), i.e. include _K_, _SFS_, _SFD_, etc.
    + _read_ mode: data can be visualized
