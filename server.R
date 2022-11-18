@@ -277,6 +277,11 @@ shinyServer(function(input, output, session) {
             note,
             "<b>Note:</b> the sensors needles seem to be longer than the stem diameter.", sep="<br/>")
         }
+        if (max(depths[, 2] > get.rxy(ui.input = input))){
+          note = paste(
+            note,
+            "<b>Note:</b> one or more thermometers are outside the stem.", sep="<br/>")
+        }
       }
       return(note)
     })
