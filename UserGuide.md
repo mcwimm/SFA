@@ -44,12 +44,19 @@ The navigation bar can be collapsed by pressing the triple bar symbol (≡). The
 
 # Launch the SFA
 
-SFA can be inicialized in two different ways:
+SFA can be initialized in two different ways:
 
 1) by manually creating a local copy of the github repository,
 2) by launching the app via an R wrapper function. 
 
-Both methods require the free software [R](https://cran.r-project.org/) and the R-package ‘shiny’ (version 1.5 or higher, [Chang et al., 2020](https://cran.r-project.org/package=shiny)). The use of the IDE [Rstudio](https://www.rstudio.com/) is optional.
+Both methods require the free software [R](https://cran.r-project.org/) and the R-package ‘shiny’ (version 1.5 or higher, [Chang et al., 2020](https://cran.r-project.org/package=shiny)). 
+To install and load the package, run the following two lines of code in an R script:
+```
+install.packages("shiny")
+library("shiny")
+```
+
+The use of the IDE [Rstudio](https://www.rstudio.com/) is optional.
 
 ### Launching through manual start
 
@@ -107,7 +114,7 @@ Finally select the folder by clicking 'select' **<5>**.
 ![](https://storage.david-giesemann.de/SFA/settings_project.png)
 
 
-After selecting a Project destination folder, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories: ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
+After selecting a project destination folder, press ‘Create/set project’ (**<1>**). The app automatically creates two subdirectories: ‘graphics’ and ‘csv-files’, where all the processed files are stored in. 
 If no project is created, all results (csv-files and graphics) are saved in the root directory of the app, which might be in the temporary data. 
 If the project was created successfully, the project name is shown in the upper right corner of the SFA **<3>**.
 The path to the project directory is shown in **<4>**.
@@ -329,7 +336,7 @@ We try to provide constructive warnings or error messages.
 However, we cannot catch all issues.
 Below is a list with possible operating errors, their cause and a possible solution. Moreover, the output of the R console often provides a hint on what went wrong.
 
-Please note that the App was developed and tested on a Windows system, and tested on mac OSX. 
+Please note that the App was developed and tested on a Windows system, and partially tested on mac OSX. 
 
 | **General** | 
 | -------- | 
@@ -341,7 +348,7 @@ Please note that the App was developed and tested on a Windows system, and teste
 | -------- | 
 | &#10060; The SFA does not open when started via the ‘Run App’ or ‘RungGitHub’-command.
 &#10004; Try to run the script ‘setup.R’ separately to install and load all required packages
-&#10004; On Mac: 1) run the command -library(shiny)- 2) Grant access permissions to R Studio (open system preferences>Security and privacy>privacy and select "full disk access" from the left pane and click or add R Studio on the right pane). If this does not solve the problem and you are running the app through the wrapper function, then 3) you will need to also grant access to your navigation browser (i.e., Safari) as described for step 2)| 
+&#10004; On Mac: 1) run the command `library(shiny)` (see [Launch the SFA](#Launch-the-SFA)), 2) grant access permissions to RStudio (open system preferences > Security and privacy > privacy and select "full disk access" from the left pane and click or add R Studio on the right pane). If this does not solve the problem and you are running the app through the wrapper function, then 3) you will need to also grant access to your navigation browser (i.e., Safari) as described for step 2)| 
 
 | **Data upload** | 
 | -------- | 
