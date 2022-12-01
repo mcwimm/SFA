@@ -21,7 +21,15 @@ introOutput = function() {
          width = "6",
          height = "95%",
          collapsible = T,
-         includeMarkdown("./man/des_main_guide.md")
+
+         includeMarkdown("./man/des_main_guide.md"),
+         p(a(
+            HTML("Go to detailed guide"),
+            href = "https://hackmd.io/@mcwimm/SapFlowAnalyzerGuide",
+            target = "_blank",
+            class = "btn btn-adn"
+         ))
+
       )
    ),
    fluidRow(

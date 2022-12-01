@@ -1,5 +1,5 @@
 
-The processed sap flow data can be saved if a project is created (see 'Project settings'). Output formats are
+The processed sap flow data can be saved if a project is created (see 'Settings'). Output formats are
 
 - csv or excel files (i.e. sap flow density, sap flow rate, k-values)
 - figures (pdf or jpg)
