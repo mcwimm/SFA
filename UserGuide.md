@@ -17,6 +17,8 @@ This document describes the handling of the R Shiny Application SapFlowAnalyzer 
 - [Data](#Data)
 - [K value](#K-value)
 - [Sap Flow](#Sap-Flow)
+- [Visualization](#Visualization)
+- [Troubleshooting](#Troubleshooting)
 
 <!-- /MarkdownTOC -->
 
