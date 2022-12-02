@@ -195,6 +195,7 @@ shinyServer(function(input, output, session) {
                         swd = sapWoodDepth())  
         }
       )
+
       if (is.character(out)){
         return(NULL)
       } else {
@@ -326,6 +327,7 @@ shinyServer(function(input, output, session) {
       data = rawData()
       positions = get.positionsFromRawData(dataSource = data,
                                            input = input)
+
       if (input$inputType == "HFD_raw"){
         d = get.delta.from.temp(data, positions)
       }
@@ -376,16 +378,26 @@ shinyServer(function(input, output, session) {
     #' Button to load filter options
     #' Assigns unfiltered, long-format data as reactive 
     #' value 'deltaTempLong'
-    observeEvent(input$LoadFilter, {
-      values$deltaTempLong <- deltaTempLongNoFilter()
+    observeEvent(input$LoadFilter, { 
+      if (input$inputType == "HFD_processed_read"){
+        showNotification("Read-only modus. Filter can't be applied.",
+                         type = "warning")
+      } else {
+        values$deltaTempLong <- deltaTempLongNoFilter()
+      }
     })
     
     #' Button to apply filter
     #' Assigns filterd, long-format data as reactive 
     #' value 'deltaTempLong'
     observeEvent(input$FilterApply, {
-      values$deltaTempLong <- get.filteredData(data = values$deltaTempLong,
-                                               ui.input = input)
+      if (input$inputType == "HFD_processed_read"){
+        showNotification("Read-only modus. Filter can't be applied.",
+                         type = "warning")
+      } else {
+        values$deltaTempLong <- get.filteredData(data = values$deltaTempLong,
+                                                 ui.input = input)
+      }
     })
     
     #' Button to delete filter
@@ -719,14 +731,19 @@ shinyServer(function(input, output, session) {
       if (click == 1){
         emptyKvalues()
       }
-      if (input$kMethod == "regression"){
-        method_name = method_name_reg(ui.input = input)
+      if (input$inputType == "HFD_processed_read"){
+        showNotification("Read-only modus. K can't be modified.",
+                         type = "warning")
       } else {
-        method_name = gsub(".", "-", input$kMethod, fixed = TRUE)
+        if (input$kMethod == "regression"){
+          method_name = method_name_reg(ui.input = input)
+        } else {
+          method_name = gsub(".", "-", input$kMethod, fixed = TRUE)
+        }
+        values$kvalues[values$kvalues$position == input$kPositionSelect, 2:3] <- cbind(
+          method = as.character(method_name),
+          k = kValue())
       }
-      values$kvalues[values$kvalues$position == input$kPositionSelect, 2:3] <- cbind(
-        method = as.character(method_name),
-        k = kValue())
     })
 
     #' Eventlistener to store k-values from csv upload
@@ -959,14 +976,18 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding daily tree water 
     #' use in kg per h and kg per day
     #' for selected method
-    treeWaterUse <- reactive({ 
-       if (all(is.na(values$kvalues$k))){
-          return(tab.with.message(message.no.k))
-          } else if (get.sapFlowSum() == 0){ 
-            tab.with.message(message.no.sapflow)
-             } else {
-                get.treeWaterUseByMethod(data = sapFlow(),
-                                         ui.input = input)
+    treeWaterUse <- reactive({
+      if (all(is.na(values$kvalues$k))) {
+        return(tab.with.message(message.no.k))
+      } else if (get.sapFlowSum() == 0) {
+        if (input$inputType == "HFD_processed_read") {
+          tab.with.message("Metric not available for uploaded file.")
+        } else {
+          tab.with.message(message.no.sapflow)
+        }
+      } else {
+        get.treeWaterUseByMethod(data = sapFlow(),
+                                 ui.input = input)
       }
     })
     
@@ -1113,13 +1134,26 @@ shinyServer(function(input, output, session) {
     
     
     ##### Sap Flow Rate #####
+    
+    get.sfplot.empty = reactive({
+      if (input$inputType == "HFD_processed_read" ){
+        return(plot.emptyMessage(message = "Metric not available for uploaded file."))
+      } else {
+        return(plot.emptyMessage(message = message.no.sapflow))
+      }
+    })
+    
     ###### Diurnal Pattern ######
     
     get.sapFlowSum = reactive({
        if (click() > 0){
           groups = get.selectedMethods(input)
           sapFlow = sapFlow()
-          return(sum(sapFlow[, groups], na.rm = T))
+          if (any(groups %in% colnames(sapFlow))) {
+            return(sum(sapFlow[, groups], na.rm = T))
+          } else {
+            return(0)
+          }
        } else {
           return(0)
        }
@@ -1129,16 +1163,16 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of sap flow rate
     #' for selected methods
     sapFlowTreePlot <- reactive({
-       if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = message.no.k)
-          } else {
-             if (get.sapFlowSum() == 0){ 
-                     plot.emptyMessage(message = message.no.sapflow)
-                } else {
-                   plot.sapFlowRate(data = sapFlow(), 
-                                    ui.input = input)
-                }
-          }
+      if (all(is.na(values$kvalues$k))) {
+        plot.emptyMessage(message = message.no.k)
+      } else {
+        if (get.sapFlowSum() == 0) {
+          get.sfplot.empty()
+        } else {
+          plot.sapFlowRate(data = sapFlow(),
+                           ui.input = input)
+        }
+      }
     })
     
     #' Eventlistener to show figure of sap flow rate
@@ -1170,15 +1204,15 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
     TWUbarplot <- reactive({
-       if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = message.no.k)
-          } else {
-             if (get.sapFlowSum() == 0){ 
-                plot.emptyMessage(message = message.no.sapflow)
-             } else {
-                plot.sapFlowDay(data = sapFlow(),
-                                ui.input = input)
-             } 
+      if (all(is.na(values$kvalues$k))) {
+        plot.emptyMessage(message = message.no.k)
+      } else {
+        if (get.sapFlowSum() == 0) {
+          get.sfplot.empty()
+        } else {
+          plot.sapFlowDay(data = sapFlow(),
+                          ui.input = input)
+        }
       }
     })
     
@@ -1202,15 +1236,17 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding figure of daily water balance
     #' for selected methods
     TWUradialprofilePlot <- reactive({
-       if (all(is.na(values$kvalues$k))){
-          plot.emptyMessage(message = message.no.k)
-          } else {
-             if (get.sapFlowSum() == 0){ 
-                plot.emptyMessage(message = message.no.sapflow)
-             } else {
-                plot.twu.radialprofile(data = sapFlow(), 
-                                       ui.input = input)
-             } 
+      if (all(is.na(values$kvalues$k))) {
+        plot.emptyMessage(message = message.no.k)
+      } else {
+        if (get.sapFlowSum() == 0) {
+          get.sfplot.empty()
+        } else if (input$treeScaleSimple1 | input$treeScaleSimple3) {
+          plot.twu.radialprofile(data = sapFlow(),
+                                 ui.input = input)
+        } else {
+          plot.emptyMessage(message = "Radial profile not available for method 2.")
+        }
       }
     })
     

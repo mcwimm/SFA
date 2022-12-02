@@ -677,7 +677,6 @@ add.group.mean = function(data, y.col){
 
 plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
    data$SFI = data$dTSym
-
    if (ui.input$sf_y_axis %in% colnames(data)){
       p = plot.sf.function(data = data,
                         ui.input = ui.input, 
@@ -690,7 +689,11 @@ plot.sf.helper = function(data, ui.input, radial.profile = FALSE){
       }
       
    } else {
-      p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Settings')")
+      if (ui.input$inputType == "HFD_processed_read"){
+         p = plot.emptyMessage(message = "Metric not available for uploaded file.")
+      } else {
+         p = plot.emptyMessage(message = "Sapwood depth is missing (see 'Settings')")
+      }
    }
    return(p)
 }
