@@ -711,15 +711,26 @@ shinyServer(function(input, output, session) {
     
     #' Reactive helper function to clear reactive kvalues
     emptyKvalues = reactive({
-      values$kvalues <-  data.frame(position = positions(),  
-                                    method = rep(NA),
-                                    k = rep(NA))
-      if (input$inputType == "HFD_processed_read" | 
-          input$inputType == "HFD_processed_write"){
-          values$kvalues <-  deltaTempLong() %>%
-                                mutate(method = "HFD_processed") %>% 
-                                distinct(position, method, k) %>% 
-                                select(position, method, k)
+      cond1 = input$inputType == "HFD_processed_read" |
+        input$inputType == "HFD_processed_write"
+      cond2 = FALSE
+      
+      if (cond1) {
+        deltaTempLong = deltaTempLong()
+        cond2 = any(grepl("(?i)k", colnames(deltaTempLong)))
+      }
+      
+      if (cond1 & cond2) {
+        values$kvalues <-  deltaTempLong %>%
+          mutate(method = "HFD_processed") %>%
+          distinct(position, method, k) %>%
+          select(position, method, k)
+      }
+      
+      if (!cond1 | !cond2) {
+        values$kvalues <-  data.frame(position = positions(),
+                                      method = rep(NA),
+                                      k = rep(NA))
       }
     })
     
