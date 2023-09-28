@@ -417,7 +417,7 @@ add.Props2DepthsHelper = function(depths){
              Aring = pi*(r_outer^2 - r_inner^2),
              R = depth,
              Cring = 2*pi * R) %>% 
-      select(-c(thermo_distance, r_outer, r_inner)) %>% 
+      select(-c(thermo_distance, r_outer, r_inner)) %>%
       mutate(Aring = abs(Aring),
              Cring = abs(Cring))
    return(depths)

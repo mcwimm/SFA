@@ -1293,4 +1293,149 @@ shinyServer(function(input, output, session) {
                csvObject = treeWaterUse(), 
                ui.input = input)
     })
+    
+    ######################
+    ##### UNCERTAINTY ####
+    ######################
+    
+    #### Variables ####
+    
+    
+    uncertaintyValues <- reactive({
+       data = sapFlowDens()
+       return(get.uncertainty(
+          data = data,
+          depths = depths(),
+          ui.input = input
+       ))
+    })
+    
+    
+    #### Graphics ####
+    
+    #' Reactive variable holding the plot showing customized
+    #' temperature visualizations
+    uncertaintyPlot <- function(absolute){
+       if (is.null(values$kvalues)){
+          plot.emptyMessage("Plot not available.")
+       } else {
+          plot.uncertainty(data = uncertaintyValues(),
+                           ui.input = input,
+                           absolute = absolute)
+       }
+    }
+    
+    output$uncertaintyPlot <- renderPlot({
+       uncertaintyPlot(absolute = T)
+    })
+    
+    
+    output$uncertaintyPlotRel <- renderPlot({
+       uncertaintyPlot(absolute = F)
+    })
+    
+    
+    #### Text #####
+    
+    output$uncertaintyInputs <- renderText({
+       if (!is.null(values$kvalues)){
+          data = sapFlowDens()
+          if ("SFDsw" %in% colnames(data)){
+             data$swd = data$SFS / data$SFDsw
+             d = data %>% 
+                       group_by(Dst) %>% 
+                       reframe(Dst, k=mean(k, na.rm=T), 
+                               Z = Zax/Ztg, swd) %>% 
+                       distinct(.) 
+             
+             t = paste("The following values are used as references:<br>
+                       <b>Dnom</b>:", d$Dst[1], 
+                       "<br><b>Zax/Ztg</b>:", d$Z[1],
+                       "<br><b>mean K/b>:", round(d$k[1], 2),  
+                       "<br><b>Lsw</b>:", d$swd[1], "<br><br>")
+          } else {
+             d = data %>% 
+                       group_by(Dst) %>% 
+                       reframe(Dst, k=mean(k, na.rm=T), 
+                               Z = Zax/Ztg) %>% 
+                       distinct(.)
+             
+             t = paste("The following values are used as references:<br>
+                       <b>Dnom</b>:", d$Dst[1], 
+                       "<br><b>Zax/Ztg</b>:", d$Z[1],
+                       "<br><b>mean K</b>:", round(d$k[1], 2), "<br><br>")
+          }
+          return(t)
+       }
+    }) 
+    
+    #### Table #####
+    
+    output$uncertaintyOutputs <- DT::renderDataTable(rownames = FALSE, {
+       get.uncertTable(values, uncertaintyValues())
+    }, options = list(dom = "t")) 
+    
+    
+    output$uncertaintyOutputsRel <- DT::renderDataTable(rownames = FALSE, {
+       get.uncertTable(values, uncertaintyValues(), absolute = F)
+    }, options = list(dom = "t")) 
+    
+    
+    #### Buttons ####
+    
+    
+    #' Eventlistener to uncertainty figure with absolute values
+    #' (Uncertainty (beta) > Results > Absolute)
+    observeEvent(input$save.uncertaintyPlot, {
+       fn = paste("uncertainty", input$uncert_y, sep = "_")
+       if (input$uncert_y %in% c("SF", "TWU")){
+          fn = paste(fn, tail(strsplit(input$uncert_y_method, "")[[1]], 1), sep = "_")
+       }
+       save.figure(path = projectPath(),
+                   name = fn,
+                   plotObject = uncertaintyPlot(absolute = T), 
+                   ui.input = input)
+    })
+    
+    
+    #' Eventlistener to uncertainty figure with absolute values
+    #' (Uncertainty (beta) > Results > Absolute)
+    observeEvent(input$save.uncertaintyPlotRel, {
+       fn = paste("uncertainty_rel_", input$uncert_y, sep = "_")
+       if (input$uncert_y %in% c("SF", "TWU")){
+          fn = paste(fn, tail(strsplit(input$uncert_y_method, "")[[1]], 1), sep = "_")
+       }
+       save.figure(path = projectPath(),
+                   name = fn,
+                   plotObject = uncertaintyPlot(absolute = F), 
+                   ui.input = input)
+    })
+    
+    #' Eventlistener to save uncertainty table as csv 
+    #' (Uncertainty (beta) > Results > Table)
+    observeEvent(input$save.uncertaintyOutputs, {
+       csvObject = get.uncertTable(values, uncertaintyValues())
+       fn = paste("uncertainty", input$uncert_y, sep = "_")
+       if (input$uncert_y %in% c("SF", "TWU")){
+          fn = paste(fn, tail(strsplit(input$uncert_y_method, "")[[1]], 1), sep = "_")
+       }
+       save.csv(path = projectPath(), 
+                name = fn,
+                csvObject = csvObject, 
+                ui.input = input)
+    })
+    
+    #' Eventlistener to save uncertainty table as csv 
+    #' (Uncertainty (beta) > Results > Table)
+    observeEvent(input$save.uncertaintyOutputsRel, {
+       csvObject = get.uncertTable(values, uncertaintyValues(), absolute = F)
+       fn = paste("uncertainty_rel", input$uncert_y, sep = "_")
+       if (input$uncert_y %in% c("SF", "TWU")){
+          fn = paste(fn, tail(strsplit(input$uncert_y_method, "")[[1]], 1), sep = "_")
+       }
+       save.csv(path = projectPath(), 
+                name = fn,
+                csvObject = csvObject, 
+                ui.input = input)
+    })
 })

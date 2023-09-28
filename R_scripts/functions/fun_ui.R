@@ -93,7 +93,9 @@ menuOutput = function(){
       menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "sf_des"), 
                menuSubItem("Sap Flow Metrics", tabName = "sf_metrics", icon = icon("angles-right")),
-               menuSubItem("Tree Water Use", tabName = "sf_flow", icon = icon("angles-right")))
+               menuSubItem("Tree Water Use", tabName = "sf_flow", icon = icon("angles-right"))),
+      menuItem("Uncertainty (beta)", tabName = "uncert", icon = icon("circle-notch"))
+      
       ))
 }
 

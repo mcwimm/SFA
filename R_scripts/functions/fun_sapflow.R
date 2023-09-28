@@ -49,8 +49,9 @@ get.sapFlowDensity <- function(method = "HFD", data,
          data = get.negativeSFS(data, ui.input)
       }
       if (sapWoodDepth != 0){
+         data$swd = sapWoodDepth
          data$SFDsw = NA
-         data$SFDsw = data$SFS / sapWoodDepth
+         data$SFDsw = data$SFS / data$swd
       }
    }
    return(data)
@@ -247,20 +248,24 @@ get.sapFlow <- function(data, depths, sapWoodDepth, ui.input){
 #' @param data: data.frame, long-format
 #' @param ui.input: UI-input
 #' @return data.frame
-get.treeWaterUseByMethod = function(data, ui.input){
+get.treeWaterUseByMethod = function(data, ui.input, method=F){
    groups = c()
-   if (ui.input$treeScaleSimple1){
-      groups = rbind(groups, "sfM1")
+   if (!(method)){
+      if (ui.input$treeScaleSimple1){
+         groups = rbind(groups, "sfM1")
+      }
+      if (ui.input$treeScaleSimple2){
+         groups = rbind(groups, "sfM2")
+      }
+      if (ui.input$treeScaleSimple3){
+         groups = rbind(groups, "sfM3")
+      }
+   } else {
+      groups = rbind(groups,
+                     colnames(data) %>% str_subset(pattern = "sfM"))
    }
-   if (ui.input$treeScaleSimple2){
-      groups = rbind(groups, "sfM2")
-   }
-   if (ui.input$treeScaleSimple3){
-      groups = rbind(groups, "sfM3")
-   }
-   
+
    groups = groups[,1]
-   
    data = data %>% 
       gather(., Method, SFrate, groups) %>% 
       mutate(Method = ifelse(Method == "sfM1", "Method 1",
@@ -290,4 +295,3 @@ get.treeWaterUseByMethod = function(data, ui.input){
 
    return(data)
 }
-

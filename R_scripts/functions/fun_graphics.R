@@ -100,7 +100,12 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
                "SFS" = expression(paste("Sap Flow per Section (g \u00b7 ",
                                         cm^-1, "\u00b7", h^-1, ")")),
                "SFDsw" = expression(paste("Sapwood-related Sap Flow Density (g \u00b7",
-                                          cm^-2, "\u00b7 ", h^-1, ")")))
+                                          cm^-2, "\u00b7 ", h^-1, ")")),
+               "SFD" = expression(paste("Sapwood-related Sap Flow Density (g \u00b7",
+                                          cm^-2, "\u00b7 ", h^-1, ")")),
+               "TWU" = expression(paste("Tree water use (L \u00b7 ",
+                                        d^-1, ")"))
+               )
 
 
 ######### labels working for PDF but not in shiny
@@ -996,5 +1001,42 @@ plot.twu.radialprofile = function(data, ui.input){
            y = expression(Tree~water~use~(kg~d^{-1}))) +
       facet_wrap(~Method, ncol = 3, scales = "fixed") 
    
+   return(p)
+}
+
+
+######## UNCERTAINTY ########
+
+
+plot.uncertainty = function(data, ui.input, absolute = T){
+      
+   if (nrow(data) == 0 | sum(data$y) == 0){
+      p = plot.emptyMessage("Plot not available.")
+   } else {
+      data = data %>% 
+         mutate(error_x = (param.value-1)*100) %>% 
+         mutate(parameter = factor(parameter,
+                                   levels = c("D", "Z", "L", "k"),
+                                   labels = c("Dnom", "Zax/Ztg", "Lsw", "k"))) 
+      if (!absolute){
+         data$y = data$y_ref
+         y_lab = paste("Error in", ui.input$uncert_y, "(%)", sep = " ")
+      } else {
+         y_lab = labels[[ui.input$uncert_y]]
+      }
+      p = data %>% 
+         ggplot(., aes(x = error_x, y = y, 
+                       shape = parameter, linetype = parameter,
+                       group = parameter, col = parameter)) +
+         geom_hline(yintercept = 0, alpha = 0.5) +
+         geom_vline(xintercept = 0, alpha = 0.5) +
+         geom_point(size = 2) +
+         geom_line() +
+         labs(x = "Error in parameter (%)",
+              y = y_lab,
+              col = "Parameter",
+              shape = "Parameter",
+              linetype = "Parameter")
+   }
    return(p)
 }
