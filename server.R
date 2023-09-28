@@ -324,21 +324,32 @@ shinyServer(function(input, output, session) {
     #' input type: raw temperature (HFD sensor data), 
     #' temperature differences
     deltaTempLongNoFilter <- reactive({
-      data = rawData()
-      positions = get.positionsFromRawData(dataSource = data,
-                                           input = input)
+       an.error.occured = F
+       tryCatch({
+          data = rawData()
+          positions = get.positionsFromRawData(dataSource = data,
+                                               input = input)
+          if (input$inputType == "HFD_raw"){
+             d = get.delta.from.temp(data, positions)
+          }
+          if (input$inputType == "HFD_delta"){
+             d = get.delta.temp(data, positions)
+          }
+          if (input$inputType == "HFD_processed_read" |
+              input$inputType == "HFD_processed_write"){ #hier
+             # if (c("datetime", "doy", "dTsym.dTas") %in% colnames(data)){
+             d = data
+             # }
+          } 
+          return(d)
+       }, 
+       error = function(e) {an.error.occured <<- TRUE})
+       
 
-      if (input$inputType == "HFD_raw"){
-        d = get.delta.from.temp(data, positions)
-      }
-      if (input$inputType == "HFD_delta"){
-        d = get.delta.temp(data, positions)
-      }
-      if (input$inputType == "HFD_processed_read" |
-          input$inputType == "HFD_processed_write"){
-        d = data
-      }
-      return(d)
+       if (an.error.occured){
+          showNotification("Upload failed. Check upload settings.",
+                           type = "error")
+       } 
     })
   
     #' Create empty reactive value with a placeholder for the
@@ -355,13 +366,14 @@ shinyServer(function(input, output, session) {
       return(values$deltaTempLong)
     })
   
-    #' Trigger to update reactive data when 'Use data' 
+    #' Trigger to update reactive data when 'Use data'
     #' button is pressed
     #' Updates data for the whole App
     observeEvent(input$setData, {
-      values$deltaTempLong <- deltaTempLongNoFilter()
-      # Reset selected K values (empty table)
-      emptyKvalues()
+       values$deltaTempLong <- deltaTempLongNoFilter()
+       
+       # Reset selected K values (empty table)
+       emptyKvalues()
     })
     
     #' Reactive variable holding long-format data for
@@ -714,24 +726,28 @@ shinyServer(function(input, output, session) {
       cond1 = input$inputType == "HFD_processed_read" |
         input$inputType == "HFD_processed_write"
       cond2 = FALSE
-      
       if (cond1) {
         deltaTempLong = deltaTempLong()
         cond2 = any(grepl("(?i)k", colnames(deltaTempLong)))
       }
-      
+
       if (cond1 & cond2) {
         values$kvalues <-  deltaTempLong %>%
           mutate(method = "HFD_processed") %>%
           distinct(position, method, k) %>%
           select(position, method, k)
       }
-      
-      if (!cond1 | !cond2) {
-        values$kvalues <-  data.frame(position = positions(),
-                                      method = rep(NA),
-                                      k = rep(NA))
-      }
+      an.error.occured = F
+      tryCatch({
+         if (!cond1 | !cond2) {
+            values$kvalues <-  data.frame(position = positions(),
+                                          method = rep(NA),
+                                          k = rep(NA))
+         }
+      },
+      error = function(e) {
+         an.error.occured <<- TRUE
+      })
     })
     
     #' Eventlistener to set/ store k-value as reactive value

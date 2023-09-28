@@ -3,6 +3,7 @@
 #' @param UI-input: file, file-args, method, etc.
 #' @return data.frame
 get.rawData = function(input){
+   rawData = data.frame()
    an.error.occured = F
    if (input$inputType == "HFD_raw"){
       tryCatch( { rawData  = get.temperatures.HFD(input$file1$datapath,
@@ -18,7 +19,7 @@ get.rawData = function(input){
                                                       skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
    }
-   if (an.error.occured){
+   if (an.error.occured | ncol(rawData) <= 1){
       return(data.frame())
    } else {
       return(rawData)
@@ -44,6 +45,7 @@ get.temperatures.HFD = function(file, sep, skip){
    }
    return(rawData)
 }
+
 
 unify.datetime = function(rawData){
    if ("datetime" %in% tolower(names(rawData))){
