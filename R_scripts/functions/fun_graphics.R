@@ -470,6 +470,11 @@ plot.nighttime <- function(data.complete){
 #' @param ui.input: UI-input
 #' @return ggplot-object
 plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
+   
+   cols <- c("dTas" = fillcolors(4)[1],
+             "dTSym" = fillcolors(4)[2], 
+             "dTsa" = fillcolors(4)[3])
+   
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
    fixedScales = ui.input$k1Plot_scales
@@ -485,7 +490,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
                              col = temp), shape = 1) +
-      scale_color_manual(values=fillcolors(3)) +
+      scale_color_manual(values=cols) +# fillcolors(3)) +
       xlim(c(xmin, xmax)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       
@@ -502,6 +507,15 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
       } else {
          ad = data.adj %>% 
             gather(., temp, value, dTsa, dTas)
+         
+         if (fullrange){
+            p = p +
+               stat_smooth(ad, method = "lm", 
+                           mapping=aes(x = dTsym.dTas, y = value, group = temp),
+                           col = "#333333", fullrange = T, se = F,
+                           size = 0.5)
+         }
+         
          p = p +
             geom_point(ad, 
                        mapping = aes(x = dTsym.dTas, y = value, group = temp), 
@@ -541,6 +555,11 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
 #' @return ggplot-object
 plot.kEst2 <- function(data.complete, data.adj, k, 
                        ui.input){
+   cols <- c("dTas" = fillcolors(4)[1],
+             "dTSym" = fillcolors(4)[2], 
+             "dTsa" = fillcolors(4)[3], 
+             "K+dTsa" = fillcolors(4)[4])
+   
    if (!is.numeric(k)){
       p = plot.emptyMessage("K is not defined.")
    } else {
@@ -554,7 +573,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       
       d = data.complete %>% 
          mutate("K+dTsa" = (dTsa + k)) %>% 
-         gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`)
+         gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`) 
       
       p = ggplot() +
          geom_point(d, 
@@ -563,7 +582,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
          geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                         label = paste("k = ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) +
-         scale_color_manual(values=fillcolors(4)) +
+         scale_color_manual(values=cols) + #fillcolors(4)) +
          xlim(xmin, xmax) +
          ylim(min(d$value), max(d$value)) +
          geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
