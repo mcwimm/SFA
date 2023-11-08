@@ -762,7 +762,7 @@ shinyServer(function(input, output, session) {
         showNotification("Read-only modus. K can't be modified.",
                          type = "warning")
       } else {
-        if (input$kMethod == "regression"){
+        if (input$kMethod == "nf.regression"){
           method_name = method_name_reg(ui.input = input)
         } else {
           method_name = gsub(".", "-", input$kMethod, fixed = TRUE)
@@ -789,8 +789,8 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setKfromRegression, {
       emptyKvalues()
-      values = fill.k.table(method = "regression",
-                            k.data = kComplete()$regression %>% mutate_if(is.numeric, round, 3), 
+      values = fill.k.table(method = "nf.regression",
+                            k.data = kComplete()$nf.regression %>% mutate_if(is.numeric, round, 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -800,8 +800,8 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > K-value estimation)
     observeEvent(input$setKfromZeroFlow, {
       emptyKvalues()
-      values = fill.k.table(method = "no.flow",
-                            k.data = kComplete()$no.flow %>% mutate_if(is.numeric, round, 3), 
+      values = fill.k.table(method = "nf.median",
+                            k.data = kComplete()$nf.median %>% mutate_if(is.numeric, round, 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -845,13 +845,13 @@ shinyServer(function(input, output, session) {
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable(rownames = FALSE, {  
-      return(kComplete()$regression %>% mutate_if(is.numeric, round, 2))
+      return(kComplete()$nf.regression %>% mutate_if(is.numeric, round, 2))
     }, options = list(dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Zero-flow)
     output$kZeroFlow <- DT::renderDataTable(rownames = FALSE, {
-      return(kComplete()$no.flow %>% mutate_if(is.numeric, round, 2))
+      return(kComplete()$nf.median %>% mutate_if(is.numeric, round, 2))
     }, options = list(dom = 't'))
 
     #' UI table output of uploaded k-values
@@ -933,8 +933,10 @@ shinyServer(function(input, output, session) {
     #' (K-value > Estimation > Control plots) 
     observeEvent(input$save.kPlots, {
       appendix = input$kPositionSelect
-      if (input$kMethod == "regression"){
+      if (input$kMethod == "nf.regression"){
         appendix = paste(appendix, method_name_reg(ui.input = input), sep = "_")
+        appendix = gsub("no-flow", "nf", appendix)
+        
       } else {
         appendix = paste(appendix, input$kMethod, sep = "_")
       }
@@ -944,17 +946,18 @@ shinyServer(function(input, output, session) {
       appendix = str_replace_all(appendix, pattern = ":", replacement = "_")
       appendix = str_replace_all(appendix, pattern = " ", replacement = "")
       appendix = str_replace_all(appendix, pattern = "\\.", replacement = "_")
+      appendix = gsub("nf.median", "nfMED", appendix)
       
       save.figure(path = projectPath(),
-                  name = paste("k-diagram_position", "_", appendix, sep = ""),
+                  name = paste("K_p", "_", appendix, sep = ""),
                   plotObject = kplot1(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-1_position", "_", appendix, sep = ""),
+                  name = paste("Kc1_p", "_", appendix, sep = ""),
                   plotObject = kplot2(),
                   ui.input = input)
       save.figure(path = projectPath(),
-                  name = paste("k-control-2_position", "_", appendix, sep = ""),
+                  name = paste("Kc2_p", "_", appendix, sep = ""),
                   plotObject = kplot3(),
                   ui.input = input)
       

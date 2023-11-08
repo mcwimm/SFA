@@ -11,11 +11,11 @@ get.kByMethod <- function(data, ui.input){
       k = ui.input$kManual
    }
    
-   if (method == "regression"){
+   if (method == "nf.regression"){
       k = get.regressionK.depth(data, sensorDepth, ui.input)[, "k"]
    }
    
-   if (method == "no.flow"){
+   if (method == "nf.median"){
       allK = get.zeroflowKvalues(data)
       k = allK[allK$position == sensorDepth, "k"][[1]]
    }
@@ -36,13 +36,13 @@ get.kByMethod <- function(data, ui.input){
 #' @param ui.input: UI-input
 #' @return list
 get.kByMethodAll <- function(data, ui.input){
-   return(list( "regression" = get.regressionKvalues(data, ui.input),
-                "no.flow" = get.zeroflowKvalues(data)))
+   return(list( "nf.regression" = get.regressionKvalues(data, ui.input),
+                "nf.median" = get.zeroflowKvalues(data)))
 }
 
 
 method_name_reg = function(ui.input){
-   method_name = "regression, dTas"
+   method_name = "no-flow REG, dTas"
    if (ui.input$kRegUseBoth){
       method_name = paste(method_name, "-dTs-a", sep = "")
    }
@@ -67,11 +67,11 @@ method_name_reg = function(ui.input){
 #' @return reactive values
 fill.k.table = function(method, k.data, ui.input, reactive.value){
    # Define method name
-   if (method == "regression"){
+   if (method == "nf.regression"){
       method_name = method_name_reg(ui.input)
    }
-   if (method == "no.flow"){
-      method_name = "No-flow"
+   if (method == "nf.median"){
+      method_name = "no-flow MED"
    }
    
    # Fill method and k-value by row/ position

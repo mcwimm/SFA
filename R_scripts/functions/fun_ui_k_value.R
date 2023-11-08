@@ -58,10 +58,10 @@ box.k.estimation = function() {
             "kMethod",
             "Method",
             choices = c(
-               "regression" = "regression",
-               "no-flow" = "no.flow",
+               "no-flow regression" = "nf.regression",
+               "no-flow median" = "nf.median",
                "manual" = "manual",
-               "csv" = "csv"
+               "from csv" = "csv"
             )
          ),
          conditionalPanel(condition = "input.kMethod != `manual`",
@@ -185,7 +185,7 @@ box.k.figures = function() {
             "K-diagram",
             br(),
             conditionalPanel(
-               condition = "input.kMethod == `regression`",
+               condition = "input.kMethod == `nf.regression`",
                checkboxInput("k1Plot.fullrange", "Fullrange regression",
                              value = F)
             ),

@@ -493,7 +493,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
            y = labels["dT"][[1]], 
            col = labels["T"][[1]])
       
-   if (kMethod == "regression"){
+   if (kMethod == "nf.regression"){
       if (is.null(data.adj)){
          p = p +
             labs(subtitle = "ERROR: Regression with chosen settings not possible.") +
@@ -529,13 +529,6 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
    if (fixedScales){
       p = p +
          xlim(xRange[1], xRange[2])
-   }
-   if (kMethod == "regression" & fullrange){
-      p = p +
-         stat_smooth(ad, method = "lm", 
-                     mapping=aes(x = dTsym.dTas, y = value, group = temp),
-                     col = "#333333", fullrange = T, se = F,
-                     size = 0.5)
    }
    return(p)
 }
