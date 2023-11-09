@@ -2,7 +2,7 @@
 ### uncertainty ###
 ###################
 
-uncertaintyOutput = function() {
+uncertaintyOutputI = function() {
    return(list(
       box(
          title = "Settings",
@@ -84,3 +84,5 @@ uncertaintyOutput = function() {
       )
    ))
 }
+
+

@@ -47,8 +47,10 @@ shinyUI(
                 tabItem(tabName = "sf_flow",
                         sfRateOutput()),
                 
-                tabItem(tabName = "uncert",
-                        uncertaintyOutput())
+                tabItem(tabName = "uncert_i",
+                        uncertaintyOutputI()),
+                tabItem(tabName = "uncert_c",
+                        uncertaintyOutputC())
             ),
             
             # style/ appearance
