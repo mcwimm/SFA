@@ -71,7 +71,7 @@ box.k.estimation = function() {
             numericInput("kManual", "Enter k manually", value = 1.11)
          ),
          
-         p(strong("Regression: filter options")),
+         p(strong("No-flow regression: filter options")),
          
          checkboxInput(
             "kRegUseBoth",
@@ -81,7 +81,7 @@ box.k.estimation = function() {
             value = F
          ),
          
-         checkboxInput("dTimeFilter", "Custom no-flow time (regression)", F),
+         checkboxInput("dTimeFilter", "Custom low flow time", F),
          conditionalPanel(condition = "input.dTimeFilter == true",
                           fluidRow(
                              column(
@@ -101,7 +101,7 @@ box.k.estimation = function() {
                           )),
          checkboxInput(
             "kRegXFilter",
-            HTML("Custom max. <i>dTsym dTas <sup>-1</sup></i>  (regression)"),
+            HTML("Custom max. <i>dTsym dTas <sup>-1</sup></i>"),
             F
          ),
          conditionalPanel(condition = "input.kRegXFilter == true",
@@ -122,12 +122,12 @@ box.k.estimation = function() {
                actButton("save.kValues", "Save file", "saveCsv")
             ),
             tabPanel(
-               "Regression",
+               "No-flow regression",
                output.table("kRegression"),
                actButton("setKfromRegression", "Use k-values", "setValue")
             ),
             tabPanel(
-               "No-flow",
+               "No-flow median",
                output.table("kZeroFlow"),
                actButton("setKfromZeroFlow", "Use k-values", "setValue")
             ),
