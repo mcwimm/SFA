@@ -102,13 +102,11 @@ box.setting_visualization = function(){
                 choices = names(themes),
                 selected = themes["Light"]),
     uiOutput('theme_output'),
-    textInput("fillColors", "Fill colors for discrete data*",
-              placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00, #6495ED'),
-    textInput("gradientColors", "Colors for gradient color scale**",
-              placeholder = 'Hex colors, comma delimited: #CD5C5C, #FFBF00'),
-    p("* Colors can be either hex colors or a RColorBrewer palette, 
-                         e.g. 'Blues'"),
-    p("** Two colors representing low and high values.")
+    selectInput("fillColors", "Color palette (viridis)*",
+                choices = c("viridis", "magma", "plasma", "inferno",
+                            "cividis", "mako", "rocket", "turbo")),
+
+    HTML("*<a href='https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html' target='_blank'>Viridis documentation</a>")
   ))
 }
 

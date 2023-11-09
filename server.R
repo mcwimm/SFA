@@ -83,28 +83,30 @@ shinyServer(function(input, output, session) {
     #' all plots with discrete data
     #' Can be defined in UI
     fillcolors_react = reactive({
-      return(get.fillcolors(ui.input = input))
+      return(input$fillColors)
     })
 
     #' Global function (accessible from other scripts) 
     #' that returns a set of N fillcolors
     fillcolors <<- function(N){
       col = fillcolors_react()
-      len = length(col)
-      return(col[(len-N):len])
+      return(col)
     }
     
     #' Reactive variable holding colors to be used in 
     #' all plots with gradient color scale
     #' Can be defined in UI
     gradientcolors_react = reactive({
-      return(get.gradientcolors(ui.input = input))
+       opt = input$fillColors
+       print(opt)
+       return(get(opt)(2))
     })
-    
+
     #' Global function (accessible from other scripts) 
     #' that returns 2 colors
     gradientcolors <<- function(){
       col = gradientcolors_react()
+      print(col)
       return(col)
     }
     

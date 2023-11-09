@@ -9,6 +9,7 @@ if(!require("shinyFiles")) install.packages("shinyFiles")
 if(!require("markdown")) install.packages("markdown")  
 if(!require("DT")) install.packages("DT")  
 if(!require("tidyverse")) install.packages("tidyverse") 
+if(!require("viridisLite")) install.packages("viridisLite") # viridis options
 if(!require("ggpubr")) install.packages("ggpubr") # draw regression line in ggplot
 if(!require("scales")) install.packages("scales") # modify datetime format in ggpplot
 if(!require("writexl")) install.packages("writexl") # write data frame to excel

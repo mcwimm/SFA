@@ -23,60 +23,6 @@ is.Date <- function(x) {
    inherits(x, c("Date", "POSIXt"))
 }
 
-#' Fill colors
-#' @description Helper function to get fill colors for discrete data. Colors are either default colors or manually obtained from UI.
-#' @param ui.input: UI-input
-#' @return vector
-get.fillcolors = function(ui.input){
-   # If no colors are defined use default set
-   print("Discrete color scheme: default")
-   col = c("#d8b365", "#260C7D", "#5ab4ac", "#7D410C", 
-           "#007D06", '#999999','#E69F00', '#56B4E9')
-   if (ui.input$fillColors != ""){
-      print("Discrete color scheme: customized")
-      cols = ui.input$fillColors
-      cols_split = strsplit(cols, ",")[[1]]
-      if (length(cols_split) == 1){
-         print(cols_split[1])
-         try(col <- RColorBrewer::brewer.pal(n = 100,
-                                             name = cols_split[1]),
-             silent = F)
-         print(col)
-      } else {
-         for (i in 1:length(cols_split)){
-            # remove white spaces
-            c = gsub(" ", "", cols_split[i], fixed = TRUE)
-            col = append(col, c)
-         }
-      }
-   }
-   return(col)
-}
-
-#' Gradient colors
-#' @description Helper function to get gradient colors for continious data. Colors are either default colors or manually obtained from UI.
-#' @param ui.input: UI-input
-#' @return vector
-get.gradientcolors = function(ui.input){
-   # If no colors are defined use default set
-   if (ui.input$gradientColors == ""){
-      print("Gradient color scheme: default")
-      col = c("#d8b365", "#5ab4ac")
-      
-   } else {
-      print("Gradient color scheme: customized")
-      cols = ui.input$gradientColors
-      cols_split = strsplit(cols, ",")[[1]]
-      col = c()
-      for (i in 1:length(cols_split)){
-         # remove white spaces
-         c = gsub(" ", "", cols_split[i], fixed = TRUE)
-         col = append(col, c)
-      }
-   }
-   return(col)
-}
-
 
 ######### labels working in shiny ggplot
 # mit den Labels funktioniert die Anzeige, aber nicht das speichern an svg und beim pdf fehlen delta fehlt
@@ -250,8 +196,8 @@ plot.histogram <- function(data, ui.input){
    if (fill.col == "position"){
       N = length(unique(data$position))
       p = p +
-         scale_color_manual(values = fillcolors(N)) +
-         scale_fill_manual(values = fillcolors(N))
+         scale_color_viridis_d(option = fillcolors()) +
+         scale_fill_viridis_d(option = fillcolors()) 
    }
    if (facetGrid){
       p = p +
@@ -344,7 +290,7 @@ plot.customTemperature <- function(data, ui.input.processed){
             if (col.col == "position"){
                p = p +
                   geom_line(aes(col = factor(col))) +
-                  scale_color_manual(values = fillcolors(length(unique(col))))
+                  scale_color_viridis_d(option = fillcolors())
             } 
             if (col.col == "date"){
                p = p +
@@ -389,7 +335,7 @@ plot.customTemperature <- function(data, ui.input.processed){
             if (col.col == "position"){
                p = p +
                   geom_point(aes(col = factor(col))) +
-                  scale_color_manual(values = fillcolors(length(unique(col))))
+                  scale_color_viridis_d(option = fillcolors())
             } 
             if (col.col == "date"){
                p = p +
@@ -417,7 +363,7 @@ plot.customTemperature <- function(data, ui.input.processed){
             ggplot(., aes(x = datetime, y = value,
                           col = key, group = key)) +
             geom_line() +
-            scale_color_manual(values = fillcolors(3)) +
+            scale_color_viridis_d(option = fillcolors()) +
             labs(x = labels["datetime"][[1]],
                  y = labels["dT"][[1]],
                  col = labels["dT"][[1]]) 
@@ -479,18 +425,13 @@ plot.nighttime <- function(data.complete){
 #' @param ui.input: UI-input
 #' @return ggplot-object
 plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
-   
-   cols <- c("dTas" = fillcolors(4)[1],
-             "dTSym" = fillcolors(4)[2], 
-             "dTsa" = fillcolors(4)[3])
-   
    xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
    fullrange = ui.input$k1Plot.fullrange
    fixedScales = ui.input$k1Plot_scales
    kMethod = ui.input$kMethod
    
    d = data.complete %>% 
-      gather(., temp, value, dTsa, dTas, dTSym)
+      gather(., temp, value, dTsa, dTas, dTSym) 
    
    xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
    xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
@@ -498,14 +439,19 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                             col = temp), shape = 1) +
-      scale_color_manual(values=cols) +# fillcolors(3)) +
+                             col = temp, fill = temp), shape = 21) +
+      scale_color_viridis_d(option = fillcolors(),
+                            begin = 0, end = 0.75) +
+      scale_fill_viridis_d(option = fillcolors(),
+                           alpha = 0.2,
+                           begin = 0, end = 0.75) +
       xlim(c(xmin, xmax)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
       
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
-           col = labels["T"][[1]])
+           col = labels["T"][[1]], 
+           fill = labels["T"][[1]])
       
    if (kMethod == "nf.regression"){
       if (is.null(data.adj)){
@@ -564,11 +510,6 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
 #' @return ggplot-object
 plot.kEst2 <- function(data.complete, data.adj, k, 
                        ui.input){
-   cols <- c("dTas" = fillcolors(4)[1],
-             "dTSym" = fillcolors(4)[2], 
-             "dTsa" = fillcolors(4)[3], 
-             "K+dTsa" = fillcolors(4)[4])
-   
    if (!is.numeric(k)){
       p = plot.emptyMessage("K is not defined.")
    } else {
@@ -587,18 +528,23 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       p = ggplot() +
          geom_point(d, 
                     mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                col = temp), shape = 1) +
+                                col = temp, fill = temp), shape = 21) +
          geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                         label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) +
-         scale_color_manual(values=cols) + #fillcolors(4)) +
+         scale_color_viridis_d(option = fillcolors(),
+                               begin = 0, end = 1) +
+         scale_fill_viridis_d(option = fillcolors(),
+                              alpha = 0.2,
+                               begin = 0, end = 1) +
          xlim(xmin, xmax) +
          ylim(min(d$value), max(d$value)) +
          geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
          geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
          labs(x = labels["dTsym.dTas"][[1]], 
               y = labels["dT"][[1]], 
-              col = labels["T"][[1]])
+              col = labels["T"][[1]], 
+              fill = labels["T"][[1]])
       
       if (fixedScales){
          p = p +
@@ -644,14 +590,18 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       p = ggplot() +
          geom_point(d, 
                     mapping=aes(x = x.value, y = dTas, 
-                                col = x.temp, shape = "dTas")) +
+                                col = x.temp, fill = x.temp,
+                                shape = "dTas")) +
          geom_point(d, 
                     mapping=aes(x = x.value, y = dTsa, 
-                                col = x.temp, shape = "dTsa")) +
+                                col = x.temp, fill = x.temp,
+                                shape = "dTsa")) +
          geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
                         label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) + #D2D0AD
-         scale_color_manual(values=fillcolors(2)) +
+         scale_color_viridis_d(option = fillcolors()) +
+         scale_fill_viridis_d(option = fillcolors(),
+                              alpha = 0.2) +
          scale_shape_manual(values = c(21, 24)) +
          xlim(xmin, xmax) +
          ylim(-max(d$dTas), max(d$dTas)) +
@@ -659,6 +609,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
          labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
                y = labels["dT"][[1]], 
                col = "x-axis", 
+               fill = "x-axis", 
                shape = labels["T"][[1]])
       if (fixedScales){
          p = p +
@@ -757,7 +708,7 @@ plot.sf.basic = function(data, ui.input, radial.profile = FALSE){
    }
    N = length(unique(data$position))
    p = p +
-      scale_color_manual(values = fillcolors(N))
+      scale_color_viridis_d(option = fillcolors())
    return(p)
 }
 
@@ -803,7 +754,7 @@ plot.sf.facets = function(data, ui.input, radial.profile = FALSE){
                               trans = "date")
    } else {
       p = p  +
-         scale_color_manual(values = fillcolors(N)) 
+         scale_color_viridis_d(option = fillcolors())
    }
    p = p  +
       facet_wrap(~ (facet), scales = scales,
@@ -839,7 +790,7 @@ plot.sf.groups = function(data, ui.input, radial.profile = FALSE){
               linetype = labels["position"][[1]])
    }
    p = p +
-      scale_color_manual(values = fillcolors(N))
+      scale_color_viridis_d(option = fillcolors())
    return(p)
 }
 
@@ -938,7 +889,7 @@ plot.sapFlowRate = function(data, ui.input){
       N = N + 1
    }
    p = p +
-      scale_color_manual(values = fillcolors(N))
+      scale_color_viridis_d(option = fillcolors())
    
    return(p)
 }
@@ -970,7 +921,7 @@ plot.sapFlowDay = function(data, ui.input){
       ggplot(., aes(x = factor(doy), fill = Method, y = auc)) +
          geom_bar(position="dodge", stat="identity", 
                   col = "black", alpha = 0.6) +
-         scale_fill_manual(values = fillcolors(length(groups))) +
+         scale_fill_viridis_d(option = fillcolors()) +
          labs(x = labels["doy"][[1]],
               y = labels["TWU"][[1]],
               fill = "Scaling method"))
@@ -1016,8 +967,8 @@ plot.twu.radialprofile = function(data, ui.input){
        ggplot(., aes(x = position, y = auc/1000, col = factor(position))) +
        geom_boxplot(fill = NA) +
        geom_jitter() +
-       scale_color_manual(values = fillcolors(N)) +
-       guides(col = F) +
+      scale_color_viridis_d(option = fillcolors()) +
+      guides(col = F) +
        labs(x = "Thermometer position",
            y = expression(Tree~water~use~(kg~d^{-1}))) +
       facet_wrap(~Method, ncol = 3, scales = "fixed") 
@@ -1083,7 +1034,7 @@ plot.uncertaintyCumTWU = function(data) {
       ggplot(., aes(x = factor(doy), y = y, col = Balance)) +
       geom_errorbar(aes(ymin = ymin, ymax = ymax), width = 0.5) +
       geom_point(size = 3) +
-      scale_color_manual(values = fillcolors(2)) +
+      scale_color_viridis_d(option = fillcolors()) +
       labs(x = labels["doy"][[1]],
            y = labels["TWU"][[1]])
    return(p)
