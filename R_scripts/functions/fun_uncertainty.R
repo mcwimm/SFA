@@ -60,7 +60,7 @@ get.uncertainty = function(data, depths, ui.input){
             d = d %>% 
                merge(., depths, by = "position")
             if ("Cring" %in% colnames(d)){
-               t = get.sapFlowByMethod(data = d,
+                  t = get.sapFlowByMethod(data = d,
                                        method = ui.input$uncert_y_method, 
                                        swd = unique(d$swd),
                                        ui.input = ui.input)
@@ -147,4 +147,76 @@ get.uncertTable <- function(values, uncertaintyValues, absolute=T){
          }
       }
    }
+}
+
+
+get.Extremes = function(data, depths, ui.input, limit){
+   unc.dnom = ui.input$unc.dnom
+   unc.zaxztg = ui.input$unc.zaxztg
+   unc.k = ui.input$unc.k
+   unc.swd = ui.input$unc.swd
+   scaling = ui.input$uncert_c_y_method
+   
+   d = get.sapFlowDensitySA(
+      data = data,
+      f_k = 1 + limit*unc.k/100,
+      f_D = 1 + limit*unc.dnom/100,
+      f_Z = 1 + limit*unc.zaxztg/100,
+      f_swd = 1 + limit*unc.swd/100
+   )
+   
+   d = d %>% 
+      merge(., depths, by = "position")
+   if ("Cring" %in% colnames(d)){
+      t = get.sapFlowByMethod(data = d,
+                              method = scaling, 
+                              swd = unique(d$swd),
+                              ui.input = ui.input)
+      
+      if (scaling == "treeScaleSimple1"){
+         t$sfM = t$sfM1
+      } 
+      if (scaling == "treeScaleSimple2"){
+         t$sfM = t$sfM2
+      } 
+      if (scaling == "treeScaleSimple3"){
+         t$sfM = t$sfM3
+      } 
+      t$y = t$sfM
+
+   } else {
+      return(data.frame())
+   }
+
+   return(t)
+}
+
+get.uncertaintyCumSF = function(data, depths, ui.input){
+
+   dmin = get.Extremes(data, depths, ui.input, limit=-1) %>% 
+      select(datetime, y)
+   dmax = get.Extremes(data, depths, ui.input, limit=1) %>% 
+      select(datetime, y)
+   org = get.Extremes(data, depths, ui.input, limit=0) %>% 
+      select(datetime, doy, dTime, y)
+
+   minmax = merge(dmin, dmax, by = "datetime",
+                     suffixes = c("min","max"))
+   df_uncert = merge(org, minmax, by = "datetime")
+
+   return(df_uncert)
+}
+
+get.uncertaintyCumTWU = function(df_uncert){
+   org = get.treeWaterUseOneMethod(df_uncert %>% select(-ymin, -ymax))
+   dmin = get.treeWaterUseOneMethod(df_uncert %>% select(-y, ymax) %>% 
+                                       rename("y" = "ymin"))
+   dmax = get.treeWaterUseOneMethod(df_uncert %>% select(-y, ymin) %>% 
+                                       rename("y" = "ymax"))
+
+   minmax = merge(dmin, dmax, by = c("doy", "Balance"),
+                  suffixes = c("min","max"))
+   df_uncert = merge(org, minmax, by = c("doy", "Balance"))
+   
+   return(df_uncert)
 }

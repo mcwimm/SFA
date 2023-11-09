@@ -1331,6 +1331,7 @@ shinyServer(function(input, output, session) {
     ##### UNCERTAINTY ####
     ######################
     
+    #### Individual ####
     #### Variables ####
     
     
@@ -1471,4 +1472,81 @@ shinyServer(function(input, output, session) {
                 csvObject = csvObject, 
                 ui.input = input)
     })
+    
+    #### Cumulative #####
+    #### Variables ####
+    
+    uncertaintyValuesCumSF <- function(){
+       data = sapFlowDens()
+       data = get.uncertaintyCumSF(
+          data = data,
+          depths = depths(),
+          ui.input = input
+       )
+       return(data)
+    }
+    
+    uncertaintyValuesCumTWU <- function(){
+       df_uncert = uncertaintyValuesCumSF()
+       print(names(df_uncert))
+       data = get.uncertaintyCumTWU(df_uncert = df_uncert)
+       return(data)
+    }
+    #### Graphics ####
+    
+    #' Reactive variable holding the plot showing customized
+    #' temperature visualizations
+    uncertaintyPlotCumSF <- function(){
+       if (is.null(values$kvalues)){
+          plot.emptyMessage("Plot not available.")
+       } else {
+          plot.uncertaintyCumSF(data = uncertaintyValuesCumSF())
+       }
+    }
+    
+    output$uncertC.plot.sf <- renderPlot({
+       uncertaintyPlotCumSF()
+    })
+    
+    
+    uncertaintyPlotCumTWU <- function(){
+       if (is.null(values$kvalues)){
+          plot.emptyMessage("Plot not available.")
+       } else {
+          data = uncertaintyValuesCumTWU()
+          plot.uncertaintyCumTWU(data = data)
+       }
+    }
+    
+    output$uncertC.plot.twu <- renderPlot({
+       uncertaintyPlotCumTWU()
+    })
+    
+    
+    
+    #' Eventlistener to uncertainty figure with absolute values
+    #' (Uncertainty (beta) > Results > Absolute)
+    observeEvent(input$save.uncertC.plot.sf, {
+       fn = "uncertainty_SF"
+       fn = paste(fn, tail(strsplit(input$uncert_c_y_method, "")[[1]], 1), sep = "_")
+
+       save.figure(path = projectPath(),
+                   name = fn,
+                   plotObject = uncertaintyPlotCumSF(), 
+                   ui.input = input)
+    })
+    
+    
+    #' Eventlistener to uncertainty figure with absolute values
+    #' (Uncertainty (beta) > Results > Absolute)
+    observeEvent(input$save.uncertC.plot.twu, {
+       fn = "uncertainty_TWU"
+       fn = paste(fn, tail(strsplit(input$uncert_c_y_method, "")[[1]], 1), sep = "_")
+       
+       save.figure(path = projectPath(),
+                   name = fn,
+                   plotObject = uncertaintyPlotCumTWU(), 
+                   ui.input = input)
+    })
+    
 })

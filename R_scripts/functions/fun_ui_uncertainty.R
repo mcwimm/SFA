@@ -86,3 +86,59 @@ uncertaintyOutputI = function() {
 }
 
 
+uncertaintyOutputC = function() {
+   return(list(
+      box(
+         title = "Settings",
+         collapsible = T,
+         width = 4,
+         status = "warning",
+
+         p(strong("\u00b1Error in input (0-100 %)")),
+         numericInput("unc.dnom",
+                      label = "Dnom",
+                      value = 5),
+         numericInput("unc.zaxztg",
+                      label = "Zax/Ztg",
+                      value = 5),
+         numericInput("unc.swd",
+                      label = "swd",
+                      value = 5),
+         numericInput("unc.k",
+                      label = "K",
+                      value = 5),
+         
+         radioButtons(
+            "uncert_c_y_method",
+            "Scaling method",
+            choiceNames =  list("1", "2", "3"),
+            choiceValues = list(
+               "treeScaleSimple1",
+               "treeScaleSimple2",
+               "treeScaleSimple3"
+            ),
+            inline = T
+         )
+
+      ),
+      box(
+         title = "Results",
+         collapsible = T,
+         width = 8,
+         status = "success",
+         tags$style(HTML(
+            ".tabbable > .nav > li > a {margin-top:5px;}"
+         )),
+         tabsetPanel(
+            tabPanel("Sap flow",
+                     output.figure("uncertC.plot.sf"),
+                     actButton("save.uncertC.plot.sf", "Save figure", "saveFigure")
+                     ),
+            tabPanel("TWU",
+                     output.figure("uncertC.plot.twu"),
+                     actButton("save.uncertC.plot.twu", "Save figure", "saveFigure")
+            ),
+         )
+      )
+   ))
+}

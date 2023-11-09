@@ -1061,3 +1061,30 @@ plot.uncertainty = function(data, ui.input, absolute = T){
    }
    return(p)
 }
+
+
+
+plot.uncertaintyCumSF = function(data){
+
+   p = data %>% 
+      ggplot(., aes(x = datetime, y = y)) +
+      geom_ribbon(aes(ymin = ymin, ymax = ymax),
+                  alpha = 0.4) +
+      geom_line(size = 0.9) +
+      labs(x = "",
+           y = labels["SF"][[1]])
+   
+   return(p)
+}
+
+
+plot.uncertaintyCumTWU = function(data) {
+   p = data %>%
+      ggplot(., aes(x = factor(doy), y = y, col = Balance)) +
+      geom_errorbar(aes(ymin = ymin, ymax = ymax), width = 0.5) +
+      geom_point(size = 3) +
+      scale_color_manual(values = fillcolors(2)) +
+      labs(x = labels["doy"][[1]],
+           y = labels["TWU"][[1]])
+   return(p)
+}
