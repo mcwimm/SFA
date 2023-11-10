@@ -801,9 +801,10 @@ save.figure = function(path, name, plotObject, ui.input){
 #' @param fileAppendix: character to be appended to file name
 save.csv = function(path, name, csvObject, ui.input){
    format = ui.input$fileFor
-   try(
+   tryCatch({
       csvObject = csvObject %>%
          arrange(datetime)
+      }, error=function(e){}
    )
    # Gets list(noti_note, noti_type, path)
    nots = get.notifications(ui.input)

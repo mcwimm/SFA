@@ -465,7 +465,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
          
          if (fullrange){
             p = p +
-               stat_smooth(ad, method = "lm", 
+               stat_smooth(ad, method = "lm", formula = 'y~x',
                            mapping=aes(x = dTsym.dTas, y = value, group = temp),
                            col = "#333333", fullrange = T, se = F,
                            size = 0.5)
@@ -475,7 +475,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
             geom_point(ad, 
                        mapping = aes(x = dTsym.dTas, y = value, group = temp), 
                        col = "black", shape = 4) +
-            stat_smooth(ad, method = "lm", formula = 'y ~ x',
+            stat_smooth(ad, method = "lm", formula = 'y~x',
                         mapping=aes(x = dTsym.dTas, y = value, group = temp),
                         col = "red") +
             stat_regline_equation(ad,
@@ -555,7 +555,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       }
       if (fullrange){
          p = p +
-            stat_smooth(data.adj, method = "lm", 
+            stat_smooth(data.adj, method = "lm", formula = 'y~x',
                         mapping=aes(x = dTsym.dTas, y = dTas),
                         col = "#333333", fullrange = T, se = F,
                         size = 0.5)
