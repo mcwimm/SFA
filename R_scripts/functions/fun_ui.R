@@ -87,7 +87,7 @@ menuOutput = function(){
                menuSubItem("Upload", tabName = "dat_upl", icon = icon("angles-right")), 
                menuSubItem("Filter", tabName = "dat_filter", icon = icon("angles-right")),
                menuSubItem("View", tabName = "dat_view", icon = icon("angles-right"))),
-      menuItem("K-value", tabName = "k_values", icon = icon("circle-notch"),
+      menuItem(HTML("<i>K</i> parameter"), tabName = "k_values", icon = icon("circle-notch"),
                menuSubItem("Description", tabName = "k_des", icon = icon("angles-right")), 
                menuSubItem("Estimation", tabName = "k_est", icon = icon("angles-right"))),
       menuItem("Sap Flow", tabName = "sap_flow", icon = icon("circle-notch"),

@@ -7,7 +7,7 @@ shinyServer(function(input, output, session) {
     ######################
   
     message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
-    message.no.k = "No k-values have been set yet."
+    message.no.k = "Parameter K have been set."
     message.no.sapflow = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Settings)."
   
     #' Function to return table with warning message
@@ -815,9 +815,9 @@ shinyServer(function(input, output, session) {
       req(input$kPositionSelect)
       kValue = kValue()
       if (is.numeric(kValue)){
-        paste("K-value", round(kValue, 3))
+        paste("K:", round(kValue, 3))
       } else {
-        paste("K-value", kValue)
+        paste("K:", kValue)
       }
     })
     
@@ -924,7 +924,7 @@ shinyServer(function(input, output, session) {
     observeEvent(input$save.kValues, {
       csvObject = values$kvalues
       save.csv(path = projectPath(), 
-               name = "K_values",
+               name = "K",
                csvObject = csvObject, 
                ui.input = input)
     })

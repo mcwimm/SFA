@@ -1,10 +1,11 @@
-**Control-diagram 1**
+**Control-diagram 1**, *Figure (a)*
 
-- 'dTsym' and 'K+dTs-a' should intersect in the coordinate origin
-- 'K+dTs-a' becomes parallel to x-axis for higher 'dTsym/dTas'
+- 'dTsym' and 'K+dTsa' should intersect in the coordinate origin (red diamand)
+- 'K+dTsa' becomes parallel to x-axis for higher 'dTsym/dTas'
 
 
-**Control-diagram 2**
+**Control-diagram 2**, *Figure (b)*
 
-- 'dTas' and 'dTas for R' as well as 'dTs-a' and 'dTs-a for R' should intersect on the y-axis 
+- 'dTas' and 'dTsa' are plotted against the ratio 'dTsym/dTas' and 'R'
+- 'dTas' and 'dTsa' plotted against the different x-axis values (yellow and grey) should intersect on the y-axis (red diamond)
 

@@ -580,7 +580,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                     mapping=aes(x = dTsym.dTas, y = value, group = temp,
                                 col = temp), shape = 1) +
          geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
-                        label = paste("k = ", round(k, 2))), 
+                        label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) +
          scale_color_manual(values=cols) + #fillcolors(4)) +
          xlim(xmin, xmax) +
@@ -595,7 +595,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
          p = p +
             xlim(xRange[1], xRange[2]) +
             geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$value),
-                           label = paste("k = ", round(k, 2))), 
+                           label = paste("K: ", round(k, 2))), 
                        fill = "#B8B361", alpha = 0.6)
       }
       if (fullrange){
@@ -640,7 +640,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
                     mapping=aes(x = x.value, y = dTsa, 
                                 col = x.temp, shape = "dTsa")) +
          geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
-                        label = paste("k = ", round(k, 2))), 
+                        label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) + #D2D0AD
          scale_color_manual(values=fillcolors(2)) +
          scale_shape_manual(values = c(21, 24)) +
@@ -655,7 +655,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
          p = p +
             xlim(xRange[1], xRange[2]) +
             geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$dTas),
-                           label = paste("k = ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
+                           label = paste("K: ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
       }
    }
    return(p)

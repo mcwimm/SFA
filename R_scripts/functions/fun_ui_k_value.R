@@ -5,23 +5,24 @@
 kDescriptionOutput <- function() {
    return(list(fluidRow(
       box(
-         title = "K-value estimation",
+         title = HTML("<i>K</i> estimation"),
          collapsible = T,
          status = "info",
-         includeMarkdown("./man/des_k_value.md")
-      ),
-      box(
-         title = "K-diagrams",
-         collapsible = T,
-         status = "info",
-         includeMarkdown("./man/des_k_diagrams.md"),
-         img(src = 'Nadezhdina_2018_fig1.png', width = "80%"),
+         includeMarkdown("./man/des_k_value.md"),
          p(
-            HTML('&nbsp;'),
+            HTML('For more information see'),
             a("Nadezhdina (2018)", href = "https://iforest.sisef.org/abstract/?id=ifor2381-011", target =
                  "_blank")
          ),
-         includeMarkdown("./man/des_k_diagrams2.md")
+      ),
+      box(
+         title = HTML("<i>K</i>-diagrams"),
+         collapsible = T,
+         status = "info",
+         includeMarkdown("./man/des_k_diagrams.md"),
+         img(src = 'K_diagram.jpeg', width = "80%"),
+         includeMarkdown("./man/des_k_diagrams2.md"),
+         img(src = 'K_controls.jpeg', width = "100%")
       )
    )))
 }
@@ -29,7 +30,7 @@ kDescriptionOutput <- function() {
 kValueOutput <- function() {
    return(list(fluidRow(
       box(
-         title = "K-value estimation",
+         title = HTML("<i>K</i> estimation settings"),
          collapsible = T,
          status = "warning",
          box.k.estimation()
@@ -113,7 +114,7 @@ box.k.estimation = function() {
                              )
                           ))),
          
-         actButton("setK", "Set k-value", "setValue"),
+         actButton("setK", HTML("Set <i>K</i>"), "setValue"),
          
          tabsetPanel(
             tabPanel(
@@ -124,12 +125,12 @@ box.k.estimation = function() {
             tabPanel(
                "No-flow regression",
                output.table("kRegression"),
-               actButton("setKfromRegression", "Use k-values", "setValue")
+               actButton("setKfromRegression", HTML("Use <i>K</i> estimates"), "setValue")
             ),
             tabPanel(
                "No-flow median",
                output.table("kZeroFlow"),
-               actButton("setKfromZeroFlow", "Use k-values", "setValue")
+               actButton("setKfromZeroFlow", HTML("Use <i>K</i> estimates"), "setValue")
             ),
             tabPanel(
                "Read csv",
@@ -169,7 +170,7 @@ box.k.estimation = function() {
                   )
                ),
                output.table("uploadedKvalues"),
-               actButton("setKfromCsv", "Use k-values", "setValue")
+               actButton("setKfromCsv", HTML("Use <i>K</i> estimates"), "setValue")
             )
          )
       )

@@ -44,7 +44,7 @@ get.kByMethodAll <- function(data, ui.input){
 method_name_reg = function(ui.input){
    method_name = "no-flow REG, dTas"
    if (ui.input$kRegUseBoth){
-      method_name = paste(method_name, "-dTs-a", sep = "")
+      method_name = paste(method_name, "-dTsa", sep = "")
    }
    if (ui.input$dTimeFilter){
       method_name = paste(method_name, ", time: ",
@@ -118,7 +118,7 @@ get.regressionK.depth <- function(data, sensorDepth, ui.input){
       datapoints_used = nrow(data.adj[[1]])
       print(paste(round(datapoints_used/datapoints_sensordepth*100, 1),
                   " % (", datapoints_used, "/ ", datapoints_sensordepth,
-                  " ) of data points are used to estimate k.",
+                  " ) of data points are used to estimate K.",
                   sep = ""))
       
       # Combine results into a table
