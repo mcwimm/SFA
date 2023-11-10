@@ -23,10 +23,10 @@ uncertaintyOutputI = function() {
             "uncert_y",
             "Variable",
             choices = c(
-               "Sap flow per section" = "SFS",
-               "Sap-wood-related density" = "SFD",
-               "Sap flow" = "SF",
-               "Tree water use" = "TWU"
+               "Sap flow per section, SFS" = "SFS",
+               "Sap-wood-related density, SFD" = "SFD",
+               "Sap flow, SF" = "SF",
+               "Tree water use, TWU" = "TWU"
             )
          ),
          conditionalPanel(
@@ -105,7 +105,7 @@ uncertaintyOutputC = function() {
                       label = "swd",
                       value = 5),
          numericInput("unc.k",
-                      label = "K",
+                      label = HTML("<i>K</i>"),
                       value = 5),
          
          radioButtons(
@@ -130,11 +130,11 @@ uncertaintyOutputC = function() {
             ".tabbable > .nav > li > a {margin-top:5px;}"
          )),
          tabsetPanel(
-            tabPanel("Sap flow",
+            tabPanel("Sap flow, SF",
                      output.figure("uncertC.plot.sf"),
                      actButton("save.uncertC.plot.sf", "Save figure", "saveFigure")
                      ),
-            tabPanel("TWU",
+            tabPanel("Tree water use, TWU",
                      output.figure("uncertC.plot.twu"),
                      actButton("save.uncertC.plot.twu", "Save figure", "saveFigure")
             ),

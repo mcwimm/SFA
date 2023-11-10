@@ -128,7 +128,7 @@ get.uncertTable <- function(values, uncertaintyValues, absolute=T){
             return(uncert %>% 
                       mutate(parameter = factor(parameter,
                                                 levels = c("D", "Z", "L", "k"),
-                                                labels = c("Dnom", "Zax/Ztg", "Lsw", "k"))) %>% 
+                                                labels = c("Dnom", "Zax/Ztg", "swd", "K"))) %>% 
                       spread(., parameter, y) %>% 
                       mutate_at(colnames(.)[-1], round, 2) %>%
                       mutate(param.value = round((param.value-1)*100)) %>% 
@@ -138,7 +138,7 @@ get.uncertTable <- function(values, uncertaintyValues, absolute=T){
             return(uncert %>% 
                       mutate(parameter = factor(parameter,
                                                 levels = c("D", "Z", "k"),
-                                                labels = c("Dnom", "Zax/Ztg", "k"))) %>% 
+                                                labels = c("Dnom", "Zax/Ztg", "K"))) %>% 
                       spread(., parameter, y) %>% 
                       mutate_at(colnames(.)[-1], round, 2) %>%
                       mutate(param.value = round((param.value-1)*100)) %>% 
