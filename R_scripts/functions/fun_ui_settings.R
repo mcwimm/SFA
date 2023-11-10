@@ -116,35 +116,32 @@ box.settings_measuring = function(){
   return(list(
     h3(strong("Wood properties")),
     fluidRow(
-      column(4, numericInput("stemCircumference", 
-                             "Stem circumference (c, cm)",
-                             value = 0.0)),
-      column(4, numericInput("stemDiameter", 
-                             "Stem diameter (d, cm)",
-                             value = 0.0)),
-      column(4, numericInput("barkThickness", 
-                             "Bark thickness (bt, cm)",
-                             value = 0.0))
+       column(5, 
+              numericInput("stemDiameter", 
+                              "Stem diameter (d, cm)",
+                              value = 0.0),
+              numericInput("stemCircumference",
+                                     "Stem circumference (c, cm)",
+                                     value = 0.0),
+              numericInput("barkThickness", 
+                           "Bark thickness (bt, cm)",
+                           value = 0.0)
+              ),
+       column(5, 
+              numericInput("sapWoodDepth", 
+                              "Sap wood depth (swd, cm)",
+                              value = 0.0),
+              checkboxInput("swExact", "Use exact sap-/ heartwood values*", F),
+              conditionalPanel(
+                 condition = "input.swExact == true",
+                 numericInput("heartWoodDepth", 
+                              "Heart wood depth (hwd, cm)",
+                              value = 0.0)
+              ),
+              p("* If enabled wood attributes, i.e. R, Aring, Cring, are calculated using 
+                            the sum of sapwood and heartwood depth"),
+              offset = 1)
     ),
-    
-    fluidRow(
-      column(4, numericInput("sapWoodDepth", 
-                             "Sap wood depth (swd, cm)",
-                             value = 0.0)),
-      column(4, numericInput("heartWoodDepth", 
-                             "Heart wood depth (hwd, cm)",
-                             value = 0.0))
-    ),
-    
-    
-    fluidRow(
-      column(4, checkboxInput("swExact", "Use exact sap-/ heartwood values*",
-                              F)),
-      column(6, p("* If enabled wood attributes, i.e. R, Aring, Cring, are calculated using 
-                            the sum of sapwood and heartwood depth"))
-    ),
-    
-    
     
     numericInput("ThermalDiffusivity", 
                  HTML("Thermal diffusivity (cm<sup>2</sup> s <sup>-1</sup>)"),
