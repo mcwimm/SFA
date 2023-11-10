@@ -112,6 +112,20 @@ shinyServer(function(input, output, session) {
 
     #### UI output ####
     
+    #' Update diameter or circumference in the UI if one of them is provided
+    observeEvent(input$stemDiameter, {
+       updateNumericInput(session,
+                          inputId = "stemCircumference",
+                          value = round(input$stemDiameter*pi, 1))
+    })
+    
+    observeEvent(input$stemCircumference, {
+       updateNumericInput(session,
+                          inputId = "stemDiameter",
+                          value = round(input$stemCircumference/pi, 1))
+    })
+    
+
     #' Function to render all ggplots with defined theme
     output$theme_output <- renderUI({ 
       #req(input$figTheme)
