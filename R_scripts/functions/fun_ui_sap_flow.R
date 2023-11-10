@@ -61,9 +61,9 @@ sfDensityOutput <- function(){
              status = "warning",
              
              selectInput("sf_y_axis", "Y-axis",
-                         choices = c("Sap flow index" = "SFI",
-                                     "Sap flow per section" = "SFS",
-                                     "Sap-wood-related density" = "SFDsw")),
+                         choices = c("Sap flow index (SFI)" = "SFI",
+                                     "Sap flow per section (SFS)" = "SFS",
+                                     "Sap-wood-related density (SFD)" = "SFDsw")),
              
              radioButtons("sf_style", "Style",
                           choices = c("Normal" = "normal",

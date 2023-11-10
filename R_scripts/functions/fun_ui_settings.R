@@ -117,22 +117,22 @@ box.settings_measuring = function(){
     h3(strong("Wood properties")),
     fluidRow(
       column(4, numericInput("stemCircumference", 
-                             "Stem circumference (cm)",
+                             "Stem circumference (c, cm)",
                              value = 0.0)),
       column(4, numericInput("stemDiameter", 
-                             "Stem diameter (cm)",
+                             "Stem diameter (d, cm)",
                              value = 0.0)),
       column(4, numericInput("barkThickness", 
-                             "Bark thickness (cm)",
+                             "Bark thickness (bt, cm)",
                              value = 0.0))
     ),
     
     fluidRow(
       column(4, numericInput("sapWoodDepth", 
-                             "Sap wood depth (cm)",
+                             "Sap wood depth (swd, cm)",
                              value = 0.0)),
       column(4, numericInput("heartWoodDepth", 
-                             "Heart wood depth (cm)",
+                             "Heart wood depth (hwd, cm)",
                              value = 0.0))
     ),
     
@@ -159,18 +159,18 @@ box.settings_sensor = function(){
       h3(strong("Sensor properties")),
       fluidRow(
          column(6, numericInput("dist2first", 
-                                "Distance to first thermometer (mm)",
+                                "Distance to first thermometer (lt, mm)",
                                 value = 20)),
          column(6, numericInput("spacer", 
-                                "Length of spacer (mm, distance sensor head to stem)",
+                                "Length of spacer (ls, mm, distance sensor head to stem)",
                                 value = 0))
       ),
       fluidRow(
          column(6, numericInput("Zax", 
-                                "Axial sensor distance Zax (mm)",
+                                "Axial sensor distance (Zax, mm)",
                                 value = 15)),
          column(6, numericInput("Ztg", 
-                                "Tangential sensor distance Ztg (mm)",
+                                "Tangential sensor distance (Ztg, mm)",
                                 value = 5))
       ),
 
@@ -206,7 +206,7 @@ box.settings_sensor = function(){
       h3(strong("Estimated thermometer positions")),
       
       p("The following table shows estimated depth of thermometers as distance to the center (`Thermometer R`) 
-        as well as the area and circumference of the cirular ring, assuming the thermometers are centered 
+        as well as the area (`Area`) and circumference (`Circ.`) of the cirular ring, assuming the thermometers are centered 
         in the respective ring. Based on the values shown here, sap flow per section can be scaled to
         sap flow density or total tree water use."),
       p("Default: Position 1 is the outermost thermometer position (i.e. closest to the bark). To change this

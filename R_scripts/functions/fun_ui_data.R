@@ -147,13 +147,13 @@ dataViewOutput = function(){
                                   choices = c("dTsym.dTas" = "dTsym.dTas",
                                               "dTas" = "dTas",
                                               "dTsa" = "dTsa",
-                                              "dTSym" = "dTSym",
+                                              "dTsym" = "dTSym",
                                               "day time" = "dTime",
                                               "date-time" = "datetime"))),
              column(6, selectInput("rawPlot.ycol", "Y-axis",
                                   choices = c("dTas" = "dTas",
                                               "dTsa" = "dTsa",
-                                              "dTSym" = "dTSym",
+                                              "dTsym" = "dTSym",
                                               "dTsym.dTas" = "dTsym.dTas")))
           ),
           fluidRow(

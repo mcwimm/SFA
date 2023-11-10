@@ -662,8 +662,8 @@ update.filter.ui = function(ui.output, ui.input){
          
          # Temperature ranges
          h4(strong("Temperature ranges")),
-         fluidRow(# dTSym
-            column(4, p(strong('dTSym'))),
+         fluidRow(# dTsym
+            column(4, p(strong('dTsym'))),
             column(4, numericInput("dTSymMin", "Min", value = Inf)),
             column(4, numericInput("dTSymMax", "Max", value = Inf)),
          ),

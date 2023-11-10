@@ -86,7 +86,7 @@ get.gradientcolors = function(ui.input){
 labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
                "dTas" = "dTas",
                "dTsa" = "dTsa",
-               "dTSym" = "dTSym",
+               "dTSym" = "dTsym",
                "dT" = "\U0394 T (\u00B0 C)",
                "T" = paste("Temperature (\u00B0", "C)", sep = ""),
                "doy" = "Day of year",
@@ -963,7 +963,7 @@ plot.sapFlowDay = function(data, ui.input){
                   col = "black", alpha = 0.6) +
          scale_fill_manual(values = fillcolors(length(groups))) +
          labs(x = labels["doy"][[1]],
-              y = "Area under curve (kg)",
+              y = labels["TWU"][[1]],
               fill = "Scaling method"))
 }
 
