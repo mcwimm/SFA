@@ -115,7 +115,8 @@ box.filter.figures = function(){
                    choices = c("Violin plot" = "violin",
                                "Boxplot" = "boxp",
                                "Histogram" = "hist", 
-                               "Frequency polygons" = "freq")),
+                               "Frequency polygons" = "freq",
+                               "Time series" = "timeseries")),
       
       fluidRow(
          column(4, selectInput("filterPlot_X", "Variable",

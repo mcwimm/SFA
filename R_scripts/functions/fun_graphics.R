@@ -202,6 +202,15 @@ plot.histogram <- function(data, ui.input){
          labs(x = labels[variable.col][[1]],
               col = labels[fill.col][[1]])
    }
+   
+   if (type == "timeseries"){
+      p = ggplot(data, aes(x = datetime, y = variable, col = fill)) +
+         geom_line() +
+         scale_color_viridis_d() +
+         labs(col = labels[fill.col][[1]],
+              y = labels[variable.col][[1]]) +
+         theme(axis.title.x = element_blank())
+   }
 
    # Set x axis for violin and boxplot
    if (fill.col == "none"){
