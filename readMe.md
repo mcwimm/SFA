@@ -1,6 +1,6 @@
 # Sap Flow Analyzer
 
-The Sap Flow Analyzer is an [R Shiny](https://shiny.rstudio.com/) App to process sap flow data recorded with Heat Field Deformation (HFD) sensors. The app allows to clean the data, determine k-values, calculate sap flow per section and density as well as to estimate sap flow rates and tree water use.
+The Sap Flow Analyzer (SFA) is an [R Shiny](https://shiny.rstudio.com/) App to process sap flow data recorded with Heat Field Deformation (HFD) instruments. The app allows to clean the data, determine k-values, calculate sap flow per section and density as well as to estimate sap flow rates and tree water use. A detailed description of the methodology can be found in Wimmler et al. (in prep.).
 
 ## User Guide
 
