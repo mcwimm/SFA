@@ -78,7 +78,7 @@ unify.datetime = function(rawData){
                                   format = dateformat))
       }
    }
-   
+
    # add hour of day and date of year
    rawData$dTime = convertTimeToDeci(as.character(rawData$time))
    rawData$doy <- as.numeric(strftime(rawData$datetime, format = "%j",  tz = "GMT"))
@@ -815,6 +815,41 @@ save.csv = function(path, name, csvObject, ui.input){
                           file = filename,
                           row.names = FALSE))
    }
+   if (file.exists(filename)){
+      showNotification(nots[[1]], 
+                       type = nots[[2]])
+   } else {
+      showNotification("Error: File not saved!",
+                       type = "error")
+   }
+}
+
+
+
+#' Save rds
+#' @description Handler to save data.frames as csv-file.
+#' @return success-message
+#' @param name: file name
+#' @param rdsObject: object to be saved, i.e. data.frame
+#' @param fileAppendix: character to be appended to file name
+save.rds = function(path, name, rdsObject, ui.input){
+   format = ui.input$fileFor
+   tryCatch({
+      rdsObject = rdsObject %>%
+         arrange(datetime)
+   }, error=function(e){}
+   )
+   # Gets list(noti_note, noti_type, path)
+   nots = get.notifications(ui.input)
+   if (nots[[2]] == "message"){
+      path = paste(path, "csv-files", sep = "/")
+   }
+   
+
+   filename = get.filename(path, name, "rds", ui.input)
+   res = try(saveRDS(rdsObject,
+                       file = filename))
+
    if (file.exists(filename)){
       showNotification(nots[[1]], 
                        type = nots[[2]])

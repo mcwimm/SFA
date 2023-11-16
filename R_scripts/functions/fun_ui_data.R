@@ -12,11 +12,11 @@ dataUplOutput = function(){
                     status = "warning",
                     box.dat_upl.upload()
                     ),
-                box(title = "Description", collapsed = T,
+                box(title = "Restore settings",
                     collapsible = T, width = "100%",
-                    status = "info",
-                    includeMarkdown("./man/des_data.md"))
-                ),
+                    status = "warning",
+                    box.dat_upl.settings()
+                )),
          column(6,
                 box(title = "Preview data",
                     collapsible = T, width = "100%",
@@ -28,20 +28,18 @@ dataUplOutput = function(){
                        tabPanel("long", br(),
                                 actButton("save_dat_upl", "Save file", "saveCsv"),
                                 br(),
-                                output.table("raw.long")))))
+                                output.table("raw.long")))),
+                box(title = "Description", collapsed = T,
+                    collapsible = T, width = "100%",
+                    status = "info",
+                    includeMarkdown("./man/des_data.md"))
+         )
       ))
 }
 
 box.dat_upl.upload = function(){
    return(list(
-      # Input: Select a file ----
-      fluidRow(
-         column(6, fileInput("file1", "Choose CSV File",
-                             multiple = F,
-                             accept = c("text/csv",
-                                        "text/comma-separated-values,text/plain",
-                                        ".csv"))),
-         tags$style("
+      tags$style("
              .btn-file {  
              background-color: #78875D; 
              border-color: #404731; 
@@ -53,18 +51,20 @@ box.dat_upl.upload = function(){
              }
 
              "),
-         column(6,  selectInput("inputType", "Input file type",
-                     c("Raw" = "HFD_raw", 
-                       "Delta" = "HFD_delta",
-                       "Processed read" = "HFD_processed_read",
-                       "Processed write" = "HFD_processed_write")))
-      ),
+      # Input: Select a file ----
+      fileInput("file1", "Choose CSV File",
+                multiple = F,
+                accept = c("text/csv",
+                           "text/comma-separated-values,text/plain",
+                           ".csv")),
+         
       fluidRow(
-         column(6,  selectInput("sep", "Separator", 
-                                choices = c("Semicolon" = ";",
-                                            "Comma" = ",",
-                                            "Tab" = "\t"))),
-         column(6,   numericInput("skip", "Skip:", min = 0, max = 100, 10))        
+         column(6,  selectInput("inputType", "Input file type",
+                                c("Raw" = "HFD_raw", 
+                                  "Delta" = "HFD_delta",
+                                  "Processed read" = "HFD_processed_read",
+                                  "Processed write" = "HFD_processed_write"))),
+         column(6, textInput("skip", "Character in header row:", value = "ime"))        
       ),
       fluidRow(
          column(6, actButton("setData", "Use data", "create")),
@@ -76,6 +76,16 @@ box.dat_upl.upload = function(){
    ))
 }
 
+box.dat_upl.settings = function(){
+   return(list(
+      fileInput("fileSettings", "Choose RDS File",
+                multiple = F,
+                accept = c(".rds")),
+      actButton("load.inputs", "Load settings", "update"),
+      p("<Note> Settings of a session are stored as .rds file.
+        Make sure your settings are loaded correctly.")
+   ))
+}
 
 ### Filter ###
 

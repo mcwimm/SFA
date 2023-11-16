@@ -19,6 +19,17 @@ settingsOutput = function() {
       box.settings_measuring()
     ),
     box(
+       title = "Save settings",
+       status = "warning",
+       collapsed = T,
+       collapsible = T,
+       width = 5,
+       p("Save all settings to a .rds file.
+         Settings include sensor and wood properties as well as file output and visualization options.
+         The file can be used to restore these settings when the SFA is used again."),
+       actButton("save.inputs", "Save settings", "saveCsv")
+    ),
+    box(
       title = "Project",
       status = "info",
       solidHeader = F,

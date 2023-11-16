@@ -33,6 +33,47 @@ shinyServer(function(input, output, session) {
     ### SETTINGS ###
     ################
     
+    ##### Save and update Input ####
+    list_with_params = c(
+       # Wood properties
+       "stemDiameter", "barkThickness",
+       "sapWoodDepth", "swExact", "heartWoodDepth", "ThermalDiffusivity",
+       # Sensor properties,
+       "dist2first", "spacer", "Zax", "Ztg", "sensorType",
+       "thermoDistances", "thermoNumbering", "distInput", "depthInput",
+       # Project settings
+       "folder", 
+       # Output
+       "fileFor", "figFor", "figTitle", "fileAppend", "fileAppendName",
+       "figTheme", "fillColors"
+       )
+    
+    #' Eventlistener to all reactive inputs
+    #' (Menu bottom) 
+    observeEvent(input$save.inputs, {
+       inputs_ls = list()
+       for (i in 1:length(list_with_params)) {
+          inputs_ls[list_with_params[i]] = input[[list_with_params[i]]]
+       }
+       save.rds(path = projectPath(), 
+                name = "inputs",
+                rdsObject = inputs_ls, 
+                ui.input = input)
+    })
+    
+    observeEvent(input$load.inputs,{   
+       if(!file.exists(input$fileSettings$datapath)) {return(NULL)}
+       
+       savedInputs <- readRDS(input$fileSettings$datapath)
+       for (i in 1:length(savedInputs)) { 
+          id = names(savedInputs[i])[1]
+          v = savedInputs[id][[1]]
+          session$sendInputMessage(id, list(value = v)) 
+       }
+    })
+    
+    
+    
     #### Variables ####
   
     #' Shiny function that returns 'available volumes on the system'
