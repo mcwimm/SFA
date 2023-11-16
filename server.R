@@ -1,5 +1,6 @@
 # Define file upload limit, now 15 MB
-options(shiny.maxRequestSize = 15*1024^2)
+options(shiny.maxRequestSize = 15*1024^2,
+        warn = -1)
 
 shinyServer(function(input, output, session) {
     ######################
