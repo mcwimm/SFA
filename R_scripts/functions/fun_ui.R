@@ -96,9 +96,7 @@ menuOutput = function(){
                menuSubItem("Tree Water Use", tabName = "sf_flow", icon = icon("angles-right"))),
       menuItem("Uncertainty (beta)", tabName = "uncert", icon = icon("circle-notch"),
                menuSubItem("Individual", tabName = "uncert_i", icon = icon("angles-right")), 
-               menuSubItem("Commulative", tabName = "uncert_c", icon = icon("angles-right")) 
-      )
-      
+               menuSubItem("Commulative", tabName = "uncert_c", icon = icon("angles-right")))
       ))
 }
 

@@ -140,7 +140,6 @@ shinyServer(function(input, output, session) {
     #' Can be defined in UI
     gradientcolors_react = reactive({
        opt = input$fillColors
-       print(opt)
        return(get(opt)(2))
     })
 
@@ -148,7 +147,6 @@ shinyServer(function(input, output, session) {
     #' that returns 2 colors
     gradientcolors <<- function(){
       col = gradientcolors_react()
-      print(col)
       return(col)
     }
     
@@ -846,7 +844,8 @@ shinyServer(function(input, output, session) {
     observeEvent(input$setKfromRegression, {
       emptyKvalues()
       values = fill.k.table(method = "nf.regression",
-                            k.data = kComplete()$nf.regression %>% mutate_if(is.numeric, round, 3), 
+                            k.data = kComplete()$nf.regression %>% ungroup() %>% 
+                               mutate_if(is.numeric, round, 3), 
                             ui.input = input, 
                             reactive.value = values)
     })
@@ -901,13 +900,17 @@ shinyServer(function(input, output, session) {
     #' UI table output of auto. regression k-values
     #' (K-value > Estimation > K-value estimation > Regression)
     output$kRegression <- DT::renderDataTable(rownames = FALSE, {  
-      return(kComplete()$nf.regression %>% mutate_if(is.numeric, round, 2))
+      return(kComplete()$nf.regression %>% 
+                ungroup() %>% 
+                mutate_if(is.numeric, round, 2))
     }, options = list(dom = 't'))
     
     #' UI table output of closest zero-flow k-values
     #' (K-value > Estimation > K-value estimation > Zero-flow)
     output$kZeroFlow <- DT::renderDataTable(rownames = FALSE, {
-      return(kComplete()$nf.median %>% mutate_if(is.numeric, round, 2))
+      return(kComplete()$nf.median %>% 
+                ungroup() %>% 
+                mutate_if(is.numeric, round, 2))
     }, options = list(dom = 't'))
 
     #' UI table output of uploaded k-values
@@ -1530,7 +1533,6 @@ shinyServer(function(input, output, session) {
     
     uncertaintyValuesCumTWU <- function(){
        df_uncert = uncertaintyValuesCumSF()
-       print(names(df_uncert))
        data = get.uncertaintyCumTWU(df_uncert = df_uncert)
        return(data)
     }
