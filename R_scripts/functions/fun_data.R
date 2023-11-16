@@ -7,7 +7,6 @@ get.rawData = function(input){
    an.error.occured = F
    if (input$inputType == "HFD_raw"){
       tryCatch( { rawData  = get.temperatures.HFD(input$file1$datapath,
-                                                  sep = input$sep,
                                                   skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
    }
@@ -15,7 +14,6 @@ get.rawData = function(input){
        input$inputType == "HFD_processed_read" |
        input$inputType == "HFD_processed_write"){
       tryCatch( { rawData  = get.temp.differences.HFD(input$file1$datapath,
-                                                      sep = input$sep,
                                                       skip = input$skip) },
                 error = function(e) {an.error.occured <<- TRUE})
    }
@@ -31,16 +29,13 @@ get.rawData = function(input){
 #' @param sep: symbol to use as separator
 #' @param skip: number of rows to skip
 #' @return data.frame
-get.temperatures.HFD = function(file, sep, skip){
-   rawData <- read.csv(file,
-                       header = TRUE, sep = sep, 
-                       fileEncoding="latin1",
-                       skip = skip)
+get.temperatures.HFD = function(file, skip = "ime"){
+   rawData = fread(file, skip = skip, header = T) %>% 
+      data.frame(.)
 
    if (length(colnames(rawData)) > 1){
-      col = grep("Exter", colnames(rawData) )[1]
+      col = as.integer(grep("Exter", colnames(rawData) )[1])
       rawData = rawData[, c(1:col)]
-      
       rawData = suppressWarnings(unify.datetime(rawData))
    }
    return(rawData)
@@ -100,11 +95,9 @@ unify.datetime = function(rawData){
 #' @param sep: symbol to use as separator
 #' @param skip: number of rows to skip
 #' @return data.frame
-get.temp.differences.HFD = function(file, sep, skip){
-   rawData <- read.csv(file,
-                       header = TRUE, sep = sep, 
-                       fileEncoding="latin1",
-                       skip = skip)
+get.temp.differences.HFD = function(file, skip = "ime"){
+   rawData <- fread(file, skip = skip) %>% 
+      data.frame(.)
    rawData = suppressWarnings(unify.datetime(rawData))
 
    return(rawData)

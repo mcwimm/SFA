@@ -1,12 +1,11 @@
 #### How to upload your data?
 
-1. Browse to your target directory
-2. Select the type of input, i.e. the manufacturer
-3. Select how many rows should be skipped (_Skip_) and which separator is used (_Separator_)
+1. Browse to the target directory and select a file
+2. Select the type of input, e.g., raw data or processed data
+3. If the upload does not work, specify a character string that occurs in the header line of the selected file, e.g. 'dTSym' (case sensitive, default is 'ime')
 4. Check your data (including extracted sensor depths)
 
-If nothing is selected, a default file is used. This file contains data of a....
-
+If nothing is selected, a default file is used. 
 
 #### Current input types
 

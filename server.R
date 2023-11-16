@@ -325,9 +325,7 @@ shinyServer(function(input, output, session) {
       if (is.null(input$file1)){
         defaultData = "./data/default_Avicennia_g.csv"
         print("Default data")
-        data = get.temperatures.HFD(defaultData,
-                                    sep = ";",
-                                    skip = 0)
+        data = get.temperatures.HFD(defaultData)
       } else {
         data = get.rawData(input)
       }
@@ -501,7 +499,7 @@ shinyServer(function(input, output, session) {
     output$raw.long <- DT::renderDataTable(rownames = FALSE, {
       an.error.occured = FALSE
       tryCatch({
-        tab  = deltaTempLongNoFilter() %>%
+        tab  = deltaTempLongNoFilter() %>% ungroup() %>% 
           mutate_if(is.numeric, round, 3)
         },
         error = function(e) {
