@@ -1383,12 +1383,21 @@ shinyServer(function(input, output, session) {
     
     
     uncertaintyValues <- reactive({
-       data = sapFlowDens()
-       return(get.uncertainty(
-          data = data,
-          depths = depths(),
-          ui.input = input
-       ))
+       tryCatch({
+          data = sapFlowDens()
+          return(get.uncertainty(
+             data = data,
+             depths = depths(),
+             ui.input = input
+          ))
+       },
+       error = function(e) {
+          an.error.occured <<- TRUE
+       })
+
+       if (an.error.occured) {
+          return(NULL)
+       }
     })
     
     
@@ -1397,12 +1406,18 @@ shinyServer(function(input, output, session) {
     #' Reactive variable holding the plot showing customized
     #' temperature visualizations
     uncertaintyPlot <- function(absolute){
-       if (is.null(values$kvalues)){
-          plot.emptyMessage("Plot not available.")
+       data = uncertaintyValues()
+
+       if (is.null(data)){
+          plot.emptyMessage(message.no.preview)
        } else {
-          plot.uncertainty(data = uncertaintyValues(),
-                           ui.input = input,
-                           absolute = absolute)
+          if (nrow(data) == 0 | sum(data$y) == 0){
+             p = plot.emptyMessage(message.no.preview)
+          } else {
+             plot.uncertainty(data = data,
+                              ui.input = input,
+                              absolute = absolute)
+          }
        }
     }
     
@@ -1419,7 +1434,7 @@ shinyServer(function(input, output, session) {
     #### Text #####
     
     output$uncertaintyInputs <- renderText({
-       if (!is.null(values$kvalues)){
+       if (!is.null(values$kvalues) & all(!is.na(values$kvalues$k))){
           data = sapFlowDens()
           if ("SFDsw" %in% colnames(data)){
              data$swd = data$SFS / data$SFDsw
@@ -1453,12 +1468,25 @@ shinyServer(function(input, output, session) {
     #### Table #####
     
     output$uncertaintyOutputs <- DT::renderDataTable(rownames = FALSE, {
-       get.uncertTable(values, uncertaintyValues())
+       tab = get.uncertTable(values, uncertaintyValues())
+       
+       if (is.null(tab)){
+          tab.with.message(message = message.no.preview)
+       } else {
+          tab
+       }
     }, options = list(dom = "t")) 
     
     
     output$uncertaintyOutputsRel <- DT::renderDataTable(rownames = FALSE, {
-       get.uncertTable(values, uncertaintyValues(), absolute = F)
+       tab = get.uncertTable(values = values,
+                             uncertaintyValues = uncertaintyValues(), 
+                             absolute = F)
+       if (is.null(tab)){
+          tab.with.message(message = message.no.preview)
+       } else {
+          tab
+       }
     }, options = list(dom = "t")) 
     
     
@@ -1524,29 +1552,50 @@ shinyServer(function(input, output, session) {
     #### Variables ####
     
     uncertaintyValuesCumSF <- function(){
-       data = sapFlowDens()
-       data = get.uncertaintyCumSF(
-          data = data,
-          depths = depths(),
-          ui.input = input
-       )
-       return(data)
+       tryCatch({
+          data = sapFlowDens()
+          data = get.uncertaintyCumSF(
+             data = data,
+             depths = depths(),
+             ui.input = input
+          )
+          if (sum(data$y) == 0){
+             return(NULL)
+          } else {
+             return(data)
+          }
+       },
+       error = function(e) {
+          an.error.occured <<- TRUE
+       })
+       if (an.error.occured) {
+          return(NULL)
+       }
     }
     
     uncertaintyValuesCumTWU <- function(){
-       df_uncert = uncertaintyValuesCumSF()
-       data = get.uncertaintyCumTWU(df_uncert = df_uncert)
-       return(data)
+       tryCatch({
+          df_uncert = uncertaintyValuesCumSF()
+          data = get.uncertaintyCumTWU(df_uncert = df_uncert)
+          return(data)
+       },
+       error = function(e) {
+          an.error.occured <<- TRUE
+       })
+       if (an.error.occured) {
+          return(NULL)
+       }
     }
     #### Graphics ####
     
     #' Reactive variable holding the plot showing customized
     #' temperature visualizations
     uncertaintyPlotCumSF <- function(){
-       if (is.null(values$kvalues)){
-          plot.emptyMessage("Plot not available.")
+       uncertaintyValuesCumSF = uncertaintyValuesCumSF()
+       if (is.null(uncertaintyValuesCumSF)){
+          plot.emptyMessage(message.no.preview)
        } else {
-          plot.uncertaintyCumSF(data = uncertaintyValuesCumSF())
+          plot.uncertaintyCumSF(data = uncertaintyValuesCumSF)
        }
     }
     
@@ -1556,11 +1605,11 @@ shinyServer(function(input, output, session) {
     
     
     uncertaintyPlotCumTWU <- function(){
-       if (is.null(values$kvalues)){
-          plot.emptyMessage("Plot not available.")
+       uncertaintyValuesCumTWU = uncertaintyValuesCumTWU()
+       if (is.null(uncertaintyValuesCumTWU)){
+          plot.emptyMessage(message.no.preview)
        } else {
-          data = uncertaintyValuesCumTWU()
-          plot.uncertaintyCumTWU(data = data)
+          plot.uncertaintyCumTWU(data = uncertaintyValuesCumTWU)
        }
     }
     

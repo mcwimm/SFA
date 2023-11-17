@@ -979,37 +979,32 @@ plot.twu.radialprofile = function(data, ui.input){
 
 ######## UNCERTAINTY ########
 
-
 plot.uncertainty = function(data, ui.input, absolute = T){
-      
-   if (nrow(data) == 0 | sum(data$y) == 0){
-      p = plot.emptyMessage("Plot not available.")
+   data = data %>% 
+      mutate(error_x = (param.value-1)*100) %>% 
+      mutate(parameter = factor(parameter,
+                                levels = c("D", "Z", "L", "k"),
+                                labels = c("Dnom", "Zax/Ztg", "Lsw", "k"))) 
+   if (!absolute){
+      data$y = data$y_ref
+      y_lab = paste("Error in", ui.input$uncert_y, "(%)", sep = " ")
    } else {
-      data = data %>% 
-         mutate(error_x = (param.value-1)*100) %>% 
-         mutate(parameter = factor(parameter,
-                                   levels = c("D", "Z", "L", "k"),
-                                   labels = c("Dnom", "Zax/Ztg", "Lsw", "k"))) 
-      if (!absolute){
-         data$y = data$y_ref
-         y_lab = paste("Error in", ui.input$uncert_y, "(%)", sep = " ")
-      } else {
-         y_lab = labels[[ui.input$uncert_y]]
-      }
-      p = data %>% 
-         ggplot(., aes(x = error_x, y = y, 
-                       shape = parameter, linetype = parameter,
-                       group = parameter, col = parameter)) +
-         geom_hline(yintercept = 0, alpha = 0.5) +
-         geom_vline(xintercept = 0, alpha = 0.5) +
-         geom_point(size = 2) +
-         geom_line() +
-         labs(x = "Error in parameter (%)",
-              y = y_lab,
-              col = "Parameter",
-              shape = "Parameter",
-              linetype = "Parameter")
+      y_lab = labels[[ui.input$uncert_y]]
    }
+   p = data %>% 
+      ggplot(., aes(x = error_x, y = y, 
+                    shape = parameter, linetype = parameter,
+                    group = parameter, col = parameter)) +
+      geom_hline(yintercept = 0, alpha = 0.5) +
+      geom_vline(xintercept = 0, alpha = 0.5) +
+      geom_point(size = 2) +
+      geom_line() +
+      labs(x = "Error in parameter (%)",
+           y = y_lab,
+           col = "Parameter",
+           shape = "Parameter",
+           linetype = "Parameter")
+   
    return(p)
 }
 

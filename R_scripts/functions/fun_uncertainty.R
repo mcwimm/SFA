@@ -111,18 +111,22 @@ get.uncertainty = function(data, depths, ui.input){
    df_uncert = df_uncert %>% 
       mutate(y_ref = (y - ref[[1]])/ref[[1]] * 100)
    
-   
-   return(df_uncert)
+   if (sum(df_uncert$y == 0) | nrow(df_uncert) == 0){
+      return(NULL)
+   } else {
+      return(df_uncert)
+   }
 }
 
 
 get.uncertTable <- function(values, uncertaintyValues, absolute=T){
-   if (!is.null(values$kvalues)){
+   if (!is.null(uncertaintyValues)){
       uncert = uncertaintyValues
       if (!absolute){
          uncert$y = uncert$y_ref
       }
       uncert$y_ref = NULL
+
       if (nrow(uncert) > 0 & sum(uncert$y) != 0){
          if ("L" %in% uncert$parameter){
             return(uncert %>% 
@@ -146,6 +150,8 @@ get.uncertTable <- function(values, uncertaintyValues, absolute=T){
             )
          }
       }
+   } else {
+      return(NULL)
    }
 }
 
