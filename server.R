@@ -7,9 +7,9 @@ shinyServer(function(input, output, session) {
     ### Error messages ###
     ######################
   
-    message.fail.upload = "An error occured. Please check your upload settings (e.g. number of lines skipped) and required column names."
-    message.no.k = "Parameter K have been set."
-    message.no.sapflow = "No sap flow data available. \nMake sure wood and sensor properties \nare entered correctly (see Settings)."
+    message.fail.upload = "An error has occurred. Please check your upload settings and the required column names."
+    message.no.k = "HFD parameter K is not set."
+    message.no.sapflow = "No sap flow data available. \nMake sure that wood and sensor properties \nare entered correctly (see Settings)."
   
     #' Function to return table with warning message
     tab.with.message = function(message,
@@ -1375,6 +1375,8 @@ shinyServer(function(input, output, session) {
     ######################
     ##### UNCERTAINTY ####
     ######################
+    
+    message.no.preview = "Preview not available. \nMake sure parameter K and wood/sensor properties are defined."
     
     #### Individual ####
     #### Variables ####
