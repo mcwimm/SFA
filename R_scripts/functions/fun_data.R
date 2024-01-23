@@ -30,14 +30,18 @@ get.rawData = function(input){
 #' @param skip: number of rows to skip
 #' @return data.frame
 get.temperatures.HFD = function(file, skip = "ime"){
-   rawData = fread(file, skip = skip, header = T) %>% 
-      data.frame(.)
+   rawData = fread(file, 
+                   skip = skip,
+                   header = T)
+   setnames(rawData, make.names(str_replace_all(colnames(rawData), "[^[:alnum:]]", ".")))
+   rawData = data.frame(rawData)
 
    if (length(colnames(rawData)) > 1){
       col = as.integer(grep("Exter", colnames(rawData) )[1])
       rawData = rawData[, c(1:col)]
       rawData = suppressWarnings(unify.datetime(rawData))
    }
+   
    return(rawData)
 }
 
