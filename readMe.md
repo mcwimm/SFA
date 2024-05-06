@@ -12,19 +12,25 @@ The Sap Flow Analyzer (SFA) is an [R Shiny](https://shiny.rstudio.com/) App to p
 
 - [`R`](https://cran.r-project.org/)
 - *optional* [`R Studio`](https://www.rstudio.com/)
-- In `R`: shiny package
-  + `if(!require("shiny")) install.packages("shiny")`
+
   
 #### Option 1
 
+Run the following lines in R to use the latest version of the app
 
-- Download and open github repository via shiny function
-  + ``runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)``
+```
+if(!require("shiny")) install.packages("shiny")
+runGitHub(repo = "SFA", username = "mcwimm", destdir = NULL)
+```
+
+*Note*
+This option will download and open the application directly from the github repository.
+This means that each time you run this command, the application will be freshly downloaded to your computer.
 
 #### Option 2
 
 - Clone or download the complete project (repo) manually
 - RStudio: open _ui.R_ and click `Run App`
-- Command line: R -e "shiny::runApp('~/shinyapp')"
+- Command line: ``R -e "shiny::runApp('~/shinyapp')"``
 
-For more information visit [Shiny](https://shiny.rstudio.com/articles/basics.html)
+For more information visit our [User Guide](https://hackmd.io/@-Zyj5KK8QtCu0gqPrdZVGA/rkNXyruZs) or the [Shiny](https://shiny.rstudio.com/articles/basics.html) Webpage.
