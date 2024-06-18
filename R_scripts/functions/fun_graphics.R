@@ -441,7 +441,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
    p = ggplot() +
       geom_point(d, 
                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                             col = temp, fill = temp), shape = 21) +
+                             col = temp, fill = temp, shape = temp)) +
       scale_color_viridis_d(option = fillcolors(),
                             begin = 0, end = 0.75) +
       scale_fill_viridis_d(option = fillcolors(),
@@ -449,11 +449,12 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
                            begin = 0, end = 0.75) +
       xlim(c(xmin, xmax)) +
       geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
-      
+      geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
       labs(x = labels["dTsym.dTas"][[1]], 
            y = labels["dT"][[1]], 
            col = labels["T"][[1]], 
-           fill = labels["T"][[1]])
+           fill = labels["T"][[1]], 
+           shape = labels["T"][[1]])
       
    if (kMethod == "nf.regression"){
       if (is.null(data.adj)){
@@ -468,8 +469,11 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
          if (fullrange){
             p = p +
                stat_smooth(ad, method = "lm", formula = 'y~x',
-                           mapping=aes(x = dTsym.dTas, y = value, group = temp),
-                           col = "#333333", fullrange = T, se = F,
+                           mapping=aes(x = dTsym.dTas, 
+                                       y = value,
+                                       group = temp),
+                           col = "#333333", 
+                           fullrange = T, se = F,
                            size = 0.5)
          }
          
@@ -481,11 +485,15 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
                         mapping=aes(x = dTsym.dTas, y = value, group = temp),
                         col = "red") +
             stat_regline_equation(ad,
-                                  mapping=aes(x = dTsym.dTas, y = value, group = temp,
+                                  mapping=aes(x = dTsym.dTas, y = value,
+                                              group = temp,
+                                              col = temp,
                                               label =  paste(..eq.label..,
                                                              ..adj.rr.label.., 
                                                              sep = "~~~~")),
-                                  label.y.npc = c("top", "bottom")) +
+                                  label.x.npc = 0.2,
+                                  label.y.npc = 0.3,
+                                  show.legend = F) +
             labs(caption = "* Black cross (x): data point used for regression")
       }
 
@@ -501,6 +509,8 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
       p = p +
          xlim(xRange[1], xRange[2])
    }
+   p = p +
+      scale_shape_manual(values = c(21:24)) 
    return(p)
 }
 
@@ -530,8 +540,8 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       p = ggplot() +
          geom_point(d, 
                     mapping=aes(x = dTsym.dTas, y = value, group = temp,
-                                col = temp, fill = temp), shape = 21) +
-         geom_label(aes(x = 0.9 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
+                                col = temp, fill = temp, shape = temp)) +
+         geom_label(aes(x = 0.1 * max(d$dTsym.dTas), y = 0.9 * max(d$value),
                         label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) +
          scale_color_viridis_d(option = fillcolors(),
@@ -546,7 +556,8 @@ plot.kEst2 <- function(data.complete, data.adj, k,
          labs(x = labels["dTsym.dTas"][[1]], 
               y = labels["dT"][[1]], 
               col = labels["T"][[1]], 
-              fill = labels["T"][[1]])
+              fill = labels["T"][[1]], 
+              shape = labels["T"][[1]])
       
       if (fixedScales){
          p = p +
@@ -555,15 +566,9 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                            label = paste("K: ", round(k, 2))), 
                        fill = "#B8B361", alpha = 0.6)
       }
-      if (fullrange){
-         p = p +
-            stat_smooth(data.adj, method = "lm", formula = 'y~x',
-                        mapping=aes(x = dTsym.dTas, y = dTas),
-                        col = "#333333", fullrange = T, se = F,
-                        size = 0.5)
-      }
    }
-   
+   p = p +
+      scale_shape_manual(values = c(21:24)) 
    return(p)
 }
 
