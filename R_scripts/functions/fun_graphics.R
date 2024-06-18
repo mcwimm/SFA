@@ -55,7 +55,6 @@ labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
                                         d^-1, ")"))
                )
 
-
 ######### labels working for PDF but not in shiny
 # labels <- list("dTsym.dTas" = expression(dTsym~"·"~dTas^-1),
 #                "dTas" = "dTas",
@@ -154,7 +153,7 @@ plot.histogram <- function(data, ui.input){
    if (type == "timeseries"){
       p = ggplot(data, aes(x = datetime, y = variable, col = fill)) +
          geom_line() +
-         scale_color_viridis_d() +
+         scale_color_viridis_d(option = fillcolors()) +
          labs(col = labels[fill.col][[1]],
               y = labels[variable.col][[1]]) +
          theme(axis.title.x = element_blank())

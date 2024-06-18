@@ -1447,7 +1447,7 @@ shinyServer(function(input, output, session) {
              t = paste("The following values are used as references:<br>
                        <b>Dnom</b>:", d$Dst[1], 
                        "<br><b>Zax/Ztg</b>:", d$Z[1],
-                       "<br><b>mean K/b>:", round(d$k[1], 2),  
+                       "<br><b>mean K</b>:", round(d$k[1], 2),  
                        "<br><b>Lsw</b>:", d$swd[1], "<br><br>")
           } else {
              d = data %>% 
