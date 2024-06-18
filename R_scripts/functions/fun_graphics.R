@@ -30,6 +30,8 @@ is.Date <- function(x) {
 #' Labels
 #' @description Helper variable to get uniform labels.
 labels <- list("dTsym.dTas" = expression(paste("dTsym \u00b7 ", dTas^-1)),
+               "dTsym.dTas.R" = expression(paste("dTsym \u00b7 ", dTas^-1, "\u007c R = (K + dTsa) \u00b7 ", dTas^-1 )),
+               "R" = expression(paste("R = (K + dTsa) \u00b7 ", dTas^-1 )),
                "dTas" = "dTas",
                "dTsa" = "dTsa",
                "dTSym" = "dTsym",
@@ -581,8 +583,12 @@ plot.kEst3 <- function(data.complete, data.adj, k,
       kMethod = ui.input$kMethod
       
       d = data.complete %>%
-         mutate(`R = (k + dTsa) / dTas` = (k + dTsa) / dTas) %>% 
-         gather(., x.temp, x.value, `dTsym.dTas`, `R = (k + dTsa) / dTas`)
+         mutate(R = (k + dTsa) / dTas) %>% 
+         gather(., x.temp, x.value, `dTsym.dTas`, R) %>% 
+         mutate(x.temp = factor(x.temp,
+                                levels = c("dTsym.dTas", "R"),
+                                labels = c(labels[["dTsym.dTas"]],
+                                           labels[["R"]]))) 
       
       xmin = min(-0.1, min(data.complete$dTsym.dTas, na.rm = T))
       xmax = max(0.1, max(data.complete$dTsym.dTas, na.rm = T))
@@ -599,14 +605,18 @@ plot.kEst3 <- function(data.complete, data.adj, k,
          geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
                         label = paste("K: ", round(k, 2))), 
                     fill = "#B8B361", alpha = 0.6) + #D2D0AD
-         scale_color_viridis_d(option = fillcolors()) +
+         scale_color_viridis_d(option = fillcolors(),
+                               labels = parse_format()) +
          scale_fill_viridis_d(option = fillcolors(),
+                              labels = parse_format(),
                               alpha = 0.2) +
-         scale_shape_manual(values = c(21, 24)) +
+         scale_shape_manual(values = c(21, 24),
+                            labels = parse_format()) +
          xlim(xmin, xmax) +
          ylim(-max(d$dTas), max(d$dTas)) +
          geom_vline(xintercept = 0, linetype = "dashed", col = "#333333") +
-         labs( x = "dTsym /dTas | R = (k + dTsa) / dTas", 
+         geom_hline(yintercept = 0, linetype = "dashed", col = "#333333") +
+         labs( x = labels[["dTsym.dTas.R"]], 
                y = labels["dT"][[1]], 
                col = "x-axis", 
                fill = "x-axis", 
