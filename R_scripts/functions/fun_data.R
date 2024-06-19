@@ -784,7 +784,7 @@ save.figure = function(path, name, plotObject, ui.input){
       showNotification(nots[[1]],
                        type = nots[[2]])
    } else {
-      showNotification("Error: File not saved!",
+      showNotification(paste("Error (<", name, ">): File not saved!", sep = ""),
                        type = "error")
    }
 }
@@ -823,7 +823,7 @@ save.csv = function(path, name, csvObject, ui.input){
       showNotification(nots[[1]], 
                        type = nots[[2]])
    } else {
-      showNotification("Error: File not saved!",
+      showNotification(paste("Error (<", name, ">): File not saved!", sep = ""),
                        type = "error")
    }
 }
@@ -858,7 +858,7 @@ save.rds = function(path, name, rdsObject, ui.input){
       showNotification(nots[[1]], 
                        type = nots[[2]])
    } else {
-      showNotification("Error: File not saved!",
+      showNotification(paste("Error (<", name, ">): File not saved!", sep = ""),
                        type = "error")
    }
 }
