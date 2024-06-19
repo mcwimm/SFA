@@ -490,7 +490,7 @@ plot.kEst1 <- function(data.complete, data.adj, k, ui.input){
                                               label =  paste(..eq.label..,
                                                              ..adj.rr.label.., 
                                                              sep = "~~~~")),
-                                  label.x.npc = 0.2,
+                                  label.x.npc = 0.1,
                                   label.y.npc = 0.3,
                                   show.legend = F) +
             labs(caption = "* Black cross (x): data point used for regression")
@@ -576,6 +576,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                         size = 0.5)
          }
    }
+   
    p = p +
       scale_shape_manual(values = c(21:24)) 
    return(p)
