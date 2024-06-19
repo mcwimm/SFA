@@ -28,6 +28,29 @@ shinyServer(function(input, output, session) {
       )
     }
     
+    observeEvent(input$saveallcsv, {
+       # Save settings
+       save.settings()
+       # Save data in long format
+       save.data.uploaded()
+       # Save measuring environment
+       save.measuring.env()
+       # Save filtered data
+       save.data.filtered()
+       # Save K values
+       save.k.values()
+       # Save sapflow metrics
+       save.sapflow.metrics()
+       # Save sapflow
+       save.sapflow()
+       # Save TWU
+       save.twu()
+       # Save Uncertainty Absolut values
+       save.uncertaintyOutputsAbs()
+       # Save Uncertainty Absolut values
+       save.uncertaintyOutputsRel()
+
+    })
     
     ################
     ### SETTINGS ###
@@ -48,9 +71,7 @@ shinyServer(function(input, output, session) {
        "figTheme", "fillColors"
        )
     
-    #' Eventlistener to all reactive inputs
-    #' (Menu bottom) 
-    observeEvent(input$save.inputs, {
+    save.settings = function(){
        inputs_ls = list()
        for (i in 1:length(list_with_params)) {
           inputs_ls[list_with_params[i]] = input[[list_with_params[i]]]
@@ -59,6 +80,12 @@ shinyServer(function(input, output, session) {
                 name = "inputs",
                 rdsObject = inputs_ls, 
                 ui.input = input)
+    }
+    
+    #' Eventlistener to all reactive inputs
+    #' (Menu bottom) 
+    observeEvent(input$save.inputs, {
+       save.settings()
     })
     
     observeEvent(input$load.inputs,{   
@@ -343,13 +370,17 @@ shinyServer(function(input, output, session) {
       return(note)
     })
     
-    #' Eventlistener to save thermometer depth table
-    #' (Settings > Measuring environment)
-    observeEvent(input$save.sensor_props, {
+    save.measuring.env = function(){
        save.csv(path = projectPath(), 
                 name = "sensor_props",
                 csvObject = get.depths.table(), 
                 ui.input = input)
+    }
+    
+    #' Eventlistener to save thermometer depth table
+    #' (Settings > Measuring environment)
+    observeEvent(input$save.sensor_props, {
+       save.measuring.env()
     })
     
     
@@ -390,7 +421,7 @@ shinyServer(function(input, output, session) {
              d = get.delta.temp(data, positions)
           }
           if (input$inputType == "HFD_processed_read" |
-              input$inputType == "HFD_processed_write"){ #hier
+              input$inputType == "HFD_processed_write"){ 
              # if (c("datetime", "doy", "dTsym.dTas") %in% colnames(data)){
              d = data
              # }
@@ -630,14 +661,17 @@ shinyServer(function(input, output, session) {
     
     #### Buttons ####
     
+    save.data.uploaded = function(){
+       save.csv(path = projectPath(), 
+                name = "dTemp",
+                csvObject = deltaTempLongNoFilter(), 
+                ui.input = input)
+    }
+    
     #' Eventlistener to save unfiltered, long-format data
     #' (Data > Upload > Preview data)
     observeEvent(input$save_dat_upl, {
-        save.csv(path = projectPath(), 
-                 name = "dTemp",
-                 csvObject = deltaTempLongNoFilter(), 
-                 ui.input = input)
-        
+       save.data.uploaded()
     })
     
     #' Eventlistener to save plot with customized temperatures
@@ -655,13 +689,17 @@ shinyServer(function(input, output, session) {
                   ui.input = input)
     })
 
+    save.data.filtered = function(){
+       save.csv(path = projectPath(), 
+                name = "dTemp_filtered",
+                csvObject = values$deltaTempLong, 
+                ui.input = input)
+    }
+    
     #' Eventlistener to save filtered, long-format data
     #' (Data > Filter > Figures)
     observeEvent(input$save_dat_filter, {
-      save.csv(path = projectPath(), 
-               name = "dTemp_filtered",
-               csvObject = values$deltaTempLong, 
-               ui.input = input)
+       save.data.filtered()
     })
     
     #' Eventlistener to save plot with filtered data
@@ -978,14 +1016,18 @@ shinyServer(function(input, output, session) {
     
     #### Buttons ####
     
+    save.k.values = function(){
+       csvObject = values$kvalues
+       save.csv(path = projectPath(), 
+                name = "K",
+                csvObject = csvObject, 
+                ui.input = input)
+    }
+    
     #' Eventlistener to save selected k-values as csv 
     #' (K-value > Estimation > K-value estimation > Selected)
     observeEvent(input$save.kValues, {
-      csvObject = values$kvalues
-      save.csv(path = projectPath(), 
-               name = "K",
-               csvObject = csvObject, 
-               ui.input = input)
+       save.k.values()
     })
     
     #' Eventlistener to save k-diagrams
@@ -1133,19 +1175,23 @@ shinyServer(function(input, output, session) {
                   ui.input = input)
     })
     
-    #' Eventlistener to save sap flow density plot
+    save.sapflow.metrics = function(){
+       if (is.null(values$kvalues)){
+          d = deltaTempLong()
+       } else {
+          d = sapFlowDens()
+       }
+       save.csv(path = projectPath(), 
+                name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
+                csvObject = d, 
+                ui.input = input)
+    }
+    
+    #' Eventlistener to save sap flow density data
     #' vertical profile
     #' (Sap Flow > Sap Flow Metrics > Figures > Radial profile)
     observeEvent(input$save.sapFlowMetrics, {
-      if (is.null(values$kvalues)){
-        d = deltaTempLong()
-      } else {
-        d = sapFlowDens()
-      }
-      save.csv(path = projectPath(), 
-               name = paste(input$sf_y_axis, input$sf_formula, sep = "_"),
-               csvObject = d, 
-               ui.input = input)
+       save.sapflow.metrics()
     })
     
     ##### Sap Flow Metrics Radial Profile #####
@@ -1279,13 +1325,18 @@ shinyServer(function(input, output, session) {
                   ui.input = input)
     })
     
+    
+    save.sapflow = function(){
+       save.csv(path = projectPath(), 
+                name = "SapFlow",
+                csvObject = sapFlow(), 
+                ui.input = input)
+    }
+    
     #' Eventlistener to save sap flow rate data as csv
     #' (Sap Flow > Sap Flow > Figures > Diurnal pattern)
     observeEvent(input$save.SapFlowCsv, {
-      save.csv(path = projectPath(), 
-               name = "SapFlow",
-               csvObject = sapFlow(), 
-               ui.input = input)
+       save.sapflow()
     })
     
     ###### Daily Balance ######
@@ -1362,14 +1413,17 @@ shinyServer(function(input, output, session) {
        treeWaterUse()
     }, options = list(dom = 't'))
     
+    save.twu = function(){
+       save.csv(path = projectPath(), 
+                name = "TWU",
+                csvObject = treeWaterUse(), 
+                ui.input = input)
+    }
     
     #' Eventlistener to save daily tree water use as csv
     #' (Sap Flow > Sap Flow > Tree water use)
     observeEvent(input$save.TWUCsv, {
-      save.csv(path = projectPath(), 
-               name = "TWU",
-               csvObject = treeWaterUse(), 
-               ui.input = input)
+       save.twu()
     })
     
     ######################
@@ -1520,9 +1574,7 @@ shinyServer(function(input, output, session) {
                    ui.input = input)
     })
     
-    #' Eventlistener to save uncertainty table as csv 
-    #' (Uncertainty (beta) > Results > Table)
-    observeEvent(input$save.uncertaintyOutputs, {
+    save.uncertaintyOutputsAbs = function(){
        csvObject = get.uncertTable(values, uncertaintyValues())
        fn = paste("uncertainty", input$uncert_y, sep = "_")
        if (input$uncert_y %in% c("SF", "TWU")){
@@ -1532,11 +1584,15 @@ shinyServer(function(input, output, session) {
                 name = fn,
                 csvObject = csvObject, 
                 ui.input = input)
-    })
+    }
     
     #' Eventlistener to save uncertainty table as csv 
     #' (Uncertainty (beta) > Results > Table)
-    observeEvent(input$save.uncertaintyOutputsRel, {
+    observeEvent(input$save.uncertaintyOutputs, {
+       save.uncertaintyOutputsAbs()
+    })
+    
+    save.uncertaintyOutputsRel = function(){
        csvObject = get.uncertTable(values, uncertaintyValues(), absolute = F)
        fn = paste("uncertainty_rel", input$uncert_y, sep = "_")
        if (input$uncert_y %in% c("SF", "TWU")){
@@ -1546,6 +1602,12 @@ shinyServer(function(input, output, session) {
                 name = fn,
                 csvObject = csvObject, 
                 ui.input = input)
+    }
+    
+    #' Eventlistener to save uncertainty table as csv 
+    #' (Uncertainty (beta) > Results > Table)
+    observeEvent(input$save.uncertaintyOutputsRel, {
+       save.uncertaintyOutputsRel()
     })
     
     #### Cumulative #####

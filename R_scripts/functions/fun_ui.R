@@ -50,7 +50,12 @@ actButton <- function(ID, label, type){
                    style = buttonStyles("green"), 
                    icon("broom", style="margin-right:.5em")))
    }
-   
+   if (type == "dowaloadAll"){
+      return(actionButton(ID, label,
+                          style = paste(buttonStyles("green"), "color: #222d32;background-color: #79a0b3;
+                               margin-top: 4rem"), 
+                          icon("broom")))
+   }
 }
 
 buttonStyles = function(type = "blue"){
@@ -96,7 +101,8 @@ menuOutput = function(){
                menuSubItem("Tree Water Use", tabName = "sf_flow", icon = icon("angles-right"))),
       menuItem("Uncertainty (beta)", tabName = "uncert", icon = icon("circle-notch"),
                menuSubItem("Individual", tabName = "uncert_i", icon = icon("angles-right")), 
-               menuSubItem("Commulative", tabName = "uncert_c", icon = icon("angles-right")))
+               menuSubItem("Commulative", tabName = "uncert_c", icon = icon("angles-right"))),
+      actButton("saveallcsv", "Save all files", "dowaloadAll")
       ))
 }
 
