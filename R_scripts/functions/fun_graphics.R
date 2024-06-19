@@ -560,10 +560,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       
       if (fixedScales){
          p = p +
-            xlim(xRange[1], xRange[2]) +
-            geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$value),
-                           label = paste("K: ", round(k, 2))), 
-                       fill = "#B8B361", alpha = 0.6)
+            xlim(xRange[1], xRange[2])
       }
       if (show_regression){
          dd = data.adj %>% 
@@ -617,9 +614,9 @@ plot.kEst3 <- function(data.complete, data.adj, k,
                     mapping=aes(x = x.value, y = dTsa, 
                                 col = x.temp, fill = x.temp,
                                 shape = "dTsa")) +
-         geom_label(aes(x = 0.9 * max(d$x.value), y = 0.9 * max(d$dTas),
+         geom_label(aes(x = 0.1 * max(d$x.value), y = 0.9 * max(d$dTas),
                         label = paste("K: ", round(k, 2))), 
-                    fill = "#B8B361", alpha = 0.6) + #D2D0AD
+                    fill = "#B8B361", alpha = 0.6) +
          scale_color_viridis_d(option = fillcolors(),
                                labels = parse_format()) +
          scale_fill_viridis_d(option = fillcolors(),
@@ -638,9 +635,7 @@ plot.kEst3 <- function(data.complete, data.adj, k,
                shape = labels["T"][[1]])
       if (fixedScales){
          p = p +
-            xlim(xRange[1], xRange[2]) +
-            geom_label(aes(x = 0.9 * xRange[2], y = 0.9 * max(d$dTas),
-                           label = paste("K: ", round(k, 2))), fill = "#B8B361", alpha = 0.6)
+            xlim(xRange[1], xRange[2])
       }
    }
    return(p)
