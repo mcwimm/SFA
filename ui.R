@@ -17,7 +17,7 @@ shinyUI(
             tags$footer("Systems Analysis", align = "center"),
             tags$footer("Technische Universität", align = "center"),
             tags$footer("Dresden", align = "center"),
-            tags$footer("2020 - 2023", align = "center"),
+            tags$footer("2020 - 2024", align = "center"),
             tags$hr()
             
         ),
