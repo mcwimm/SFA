@@ -525,7 +525,7 @@ plot.kEst2 <- function(data.complete, data.adj, k,
       p = plot.emptyMessage("K is not defined.")
    } else {
       xRange = c(ui.input$k1Plot.x.min, ui.input$k1Plot.x.max)
-      fullrange = ui.input$k1Plot.fullrange
+      show_regression = ui.input$k2Plot.regression
       fixedScales = ui.input$k1Plot_scales
       kMethod = ui.input$kMethod
       
@@ -565,6 +565,16 @@ plot.kEst2 <- function(data.complete, data.adj, k,
                            label = paste("K: ", round(k, 2))), 
                        fill = "#B8B361", alpha = 0.6)
       }
+      if (show_regression){
+         dd = data.adj %>% 
+            mutate("K+dTsa" = (dTsa + k)) %>% 
+            gather(., temp, value, dTsa, dTas, dTSym, `K+dTsa`) 
+         p = p +
+            stat_smooth(dd, method = "lm", formula = 'y~x',
+                        mapping=aes(x = dTsym.dTas, y = value, group = temp),
+                        col = "#5b5b5b", fullrange = T, se = F,
+                        size = 0.5)
+         }
    }
    p = p +
       scale_shape_manual(values = c(21:24)) 

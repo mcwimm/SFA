@@ -203,6 +203,11 @@ box.k.figures = function() {
             #       value = F
             #    )
             # ),
+            conditionalPanel(
+               condition = "input.kMethod == `nf.regression`",
+               checkboxInput("k2Plot.regression", "Regression lines",
+                             value = F)
+            ),
             output.figure("kvaluePlot2")
          ),
          tabPanel("Control-diagram 2", br(),
