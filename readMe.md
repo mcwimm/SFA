@@ -4,7 +4,7 @@ The Sap Flow Analyzer (SFA) is an [R Shiny](https://shiny.rstudio.com/) App to p
 
 ## User Guide
 
-[Go to SFA User Guide](https://hackmd.io/@-Zyj5KK8QtCu0gqPrdZVGA/rkNXyruZs)
+[Go to SFA User Guide](https://mcwimm.github.io/SFA_guide/)
 
 ## Launch the App
 
