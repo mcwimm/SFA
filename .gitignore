@@ -16,3 +16,7 @@ output
 /tests/testApp
 
 *.pdf
+*.csv
+*.jpg
+*.html
+*.rds
