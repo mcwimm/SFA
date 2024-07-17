@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Wimmler"
+  given-names: "Marie-Christin"
+  orcid: "https://orcid.org/0000-0002-4542-6764"
+- family-names: "Vovides"
+  given-names: "Alejandra G."
+  orcid: "https://orcid.org/0000-0002-3293-5770"
+- family-names: "Bowen"
+  given-names: "Hannah"
+- family-names: "Nadezhdina"
+  given-names: "Nadezhda"
+title: "Sap Flow Analyzer (SFA): an R Shiny tool for processing heat field deformation measurements"
+version: 0.3.2
+doi: 10.5281/zenodo.12755349
+date-released: 2024-06
+url: "https://github.com/mcwimm/SFA"
